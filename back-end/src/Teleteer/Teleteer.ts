@@ -1,7 +1,7 @@
 import { ElementHandle, Page } from "puppeteer";
 
 import { toSelector, ToXPath } from "./toPaths";
-import logger from "./Winston";
+import logger from "../WinstonLogger/Winston";
 
 const thisLogger = logger("Teleteer");
 
@@ -55,7 +55,7 @@ class Teleteer {
    * @param toXPath method of class ToXPath, it supplies with the xpath fulfilled with the textToQuery
    * @param errorMessage error logged if no element is found
    */
-  protected checkXPath = async (
+  checkXPath = async (
     textToQuery: string,
     toXPath: (textToQuery: string) => string,
     errorMessage: string
@@ -68,7 +68,7 @@ class Teleteer {
     }
     return promise;
   };
-  protected checkReadyXPath = async (xPath: string, errorMessage: string) => {
+  checkReadyXPath = async (xPath: string, errorMessage: string) => {
     const isAvailable = await this.page.waitForXPath(xPath);
     const promise = this.page.$x(xPath);
     if (isAvailable === null) {
@@ -76,7 +76,7 @@ class Teleteer {
     }
     return promise;
   };
-  protected checkXPathInElement = async (
+  checkXPathInElement = async (
     textToQuery: string,
     elementHandle: ElementHandle<Element>,
     toXPath: (textToQuery: string) => string,
@@ -97,7 +97,7 @@ class Teleteer {
    * @param callBackfn
    * @returns the return of the callback, void otherwise
    */
-  protected checkSingleMatchAndDo = async (
+  checkSingleMatchAndDo = async (
     errorMessage: string,
     handle: ElementHandle<Element>[],
     callBackfn: (handle: ElementHandle<Element>) => Promise<void>
@@ -110,7 +110,7 @@ class Teleteer {
       );
     }
   };
-  protected checkSingleMatchAnd = {
+  checkSingleMatchAnd = {
     click: async (errorMessage: string, handle: ElementHandle<Element>[]) =>
       this.checkSingleMatchAndDo(errorMessage, handle, (handle) =>
         handle.click()
@@ -156,71 +156,42 @@ class Teleteer {
    * @param profileName the name of the user/bot on telegram
    */
   message = {
-    allByProfileName: async (profileName: string) =>
-      this.checkXPath(
-        profileName,
-        ToXPath.message,
-        `Can't find any message from: ${profileName}`
-      ),
-    lastByProfileName: async (profileName: string) =>
-      this.message
-        .allByProfileName(profileName)
-        .then((messages) => messages[messages.length - 1]),
-    allByProfileNameAndText: async (profileName: string, text: string) =>
-      this.checkReadyXPath(
-        ToXPath.messageWithText(profileName, text),
-        `Can't find message with text: ${text}`
-      ),
-    button: {
-      allByProfileNameAndText: async (
-        profileName: string,
-        buttonText: string
-      ) =>
-        this.checkReadyXPath(
-          ToXPath.inMessage.replyButton(profileName, buttonText),
-          `Can't find message button with text: ${buttonText}`
+    all: {
+      byProfileName: async (profileName: string) =>
+        this.checkXPath(
+          profileName,
+          ToXPath.message,
+          `Can't find any message from: ${profileName}`
         ),
-      btnLinkAllByProfileNameAndText: async (
-        profileName: string,
-        buttonText: string
-      ) =>
+      byProfileNameAndText: async (profileName: string, text: string) =>
         this.checkReadyXPath(
-          ToXPath.inMessage.replyButtonLink(profileName, buttonText),
-          `Can't find message button link with text: ${buttonText}`
+          ToXPath.messageWithText(profileName, text),
+          `Can't find message with text: ${text}`
         ),
     },
+
+    lastByProfileName: async (profileName: string) =>
+      this.message.all
+        .byProfileName(profileName)
+        .then((messages) => messages[messages.length - 1]),
+    button: {
+      all: {
+        byProfileNameAndText: async (profileName: string, buttonText: string) =>
+          this.checkReadyXPath(
+            ToXPath.inMessage.replyButton(profileName, buttonText),
+            `Can't find message button with text: ${buttonText}`
+          ),
+        linkByProfileNameAndText: async (
+          profileName: string,
+          buttonText: string
+        ) =>
+          this.checkReadyXPath(
+            ToXPath.inMessage.replyButtonLink(profileName, buttonText),
+            `Can't find message button link with text: ${buttonText}`
+          ),
+      },
+    },
   };
-  // messages = async (profileName: string) =>
-  //   this.checkXPath(
-  //     profileName,
-  //     ToXPath.message,
-  //     `Can't find any message from: ${profileName}`
-  //   );
-  // lastMessage = async (profileName: string) =>
-  //   this.messages(profileName).then(
-  //     (messages) => messages[messages.length - 1]
-  //   );
-  // messagesWithText = async (profileName: string, buttonText: string) =>
-  //   this.checkReadyXPath(
-  //     ToXPath.messageWithText(profileName, buttonText),
-  //     `Can't find message with text: ${buttonText}`
-  //   );
-  /**
-   * @param buttonText text contained in the button
-   */
-  // messageButtons = async (profileName: string, buttonText: string) =>
-  //   this.checkReadyXPath(
-  //     ToXPath.inMessage.replyButton(profileName, buttonText),
-  //     `Can't find message button with text: ${buttonText}`
-  //   );
-  /**
-   * @param buttonText text contained in the button
-   */
-  // messageButtonLinks = async (profileName: string, buttonText: string) =>
-  //   this.checkReadyXPath(
-  //     ToXPath.inMessage.replyButtonLink(profileName, buttonText),
-  //     `Can't find message button link with text: ${buttonText}`
-  //   );
   /**
    *
    * @param buttonText text contained in the button
@@ -254,33 +225,6 @@ class Teleteer {
       await this.page.keyboard.type(text + keyEnter, { delay: 100 });
     },
   };
-  // bottomPanelButton = async (buttonText: string) =>
-  //   this.checkXPath(
-  //     buttonText,
-  //     ToXPath.inBottomPanel.replyButton,
-  //     `Can't find bottom panel button with text: ${buttonText}`
-  //   );
-  // showBottomPanel = async () =>
-  //   this.checkSingleMatchAnd.click(
-  //     `Bottom panel 'active composer keyboad' button`,
-  //     await this.checkXPath(
-  //       "",
-  //       ToXPath.inBottomPanel.composerKeyboardButton,
-  //       ``
-  //     )
-  //   );
-  // clickBottomPanelButton = async (buttonText: string) =>
-  //   this.checkSingleMatchAnd.click(
-  //     `Bottom panel button with text: ${buttonText}`,
-  //     await this.bottomPanelButton(buttonText)
-  //   );
-  // sendMessage = async (text: string) => {
-  //   await this.page.waitForSelector(toSelector.messageInput);
-  //   await this.page.click(toSelector.messageInput);
-
-  //   const keyEnter: string = String.fromCharCode(13);
-  //   await this.page.keyboard.type(text + keyEnter, { delay: 100 });
-  // };
 }
 
 export default Teleteer;

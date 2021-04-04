@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 import { Browser } from "puppeteer";
 
-import Bot from "./Teleteer/Bot";
+import Bot from "./Bot";
 
 (async () => {
   // Starting browser

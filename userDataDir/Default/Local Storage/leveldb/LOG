@@ -1,3 +1,5 @@
-2021/04/04-19:33:07.727 8203 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Local Storage/leveldb/MANIFEST-000001
-2021/04/04-19:33:07.728 8203 Recovering log #151
-2021/04/04-19:33:07.728 8203 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Local Storage/leveldb/000151.log 
+2021/04/04-22:18:00.569 11603 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Local Storage/leveldb/MANIFEST-000001
+2021/04/04-22:18:00.569 11603 Recovering log #159
+2021/04/04-22:18:00.570 11603 Level-0 table #161: started
+2021/04/04-22:18:00.580 11603 Level-0 table #161: 9003 bytes OK
+2021/04/04-22:18:00.604 11603 Delete type=0 #159
