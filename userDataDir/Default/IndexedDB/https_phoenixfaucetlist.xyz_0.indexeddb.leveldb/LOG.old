@@ -1,0 +1,15 @@
+2021/03/22-16:38:36.727 15c37 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_phoenixfaucetlist.xyz_0.indexeddb.leveldb/MANIFEST-000001
+2021/03/22-16:38:36.728 15c37 Recovering log #4
+2021/03/22-16:38:36.728 15c37 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_phoenixfaucetlist.xyz_0.indexeddb.leveldb/000004.log 
+2021/03/22-16:39:15.779 13277 Level-0 table #8: started
+2021/03/22-16:39:15.791 13277 Level-0 table #8: 812 bytes OK
+2021/03/22-16:39:15.811 13277 Delete type=0 #4
+2021/03/22-16:39:15.812 13277 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
+2021/03/22-16:39:15.813 13277 Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x01\x01\x02\x01\x0a\x00p\x00r\x00o\x00p\x00e\x00r\x00t\x00y\x00I\x00d' @ 97 : 1
+2021/03/22-16:39:15.813 13277 Compacting 1@1 + 1@2 files
+2021/03/22-16:39:15.826 13277 Generated table #9@1: 22 keys, 795 bytes
+2021/03/22-16:39:15.826 13277 Compacted 1@1 + 1@2 files => 795 bytes
+2021/03/22-16:39:15.851 13277 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/03/22-16:39:15.852 13277 Delete type=2 #5
+2021/03/22-16:39:15.852 13277 Delete type=2 #8
+2021/03/22-16:39:15.853 13277 Manual compaction at level-1 from '\x00\x01\x01\x02\x01\x0a\x00p\x00r\x00o\x00p\x00e\x00r\x00t\x00y\x00I\x00d' @ 97 : 1 .. (end); will stop at (end)

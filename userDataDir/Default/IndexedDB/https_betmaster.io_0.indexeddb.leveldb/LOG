@@ -1,0 +1,5 @@
+2021/03/24-14:53:51.346 26733 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_betmaster.io_0.indexeddb.leveldb/MANIFEST-000001
+2021/03/24-14:54:06.487 2637b Level-0 table #5: started
+2021/03/24-14:54:06.498 2637b Level-0 table #5: 4096 bytes OK
+2021/03/24-14:54:06.521 2637b Delete type=0 #3
+2021/03/24-14:54:06.523 2637b Manual compaction at level-0 from (begin) .. (end); will stop at (end)

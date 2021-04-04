@@ -1,0 +1,17 @@
+2021/02/24-18:33:28.579 21c87 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/chrome-inj-ext/puppeteer/browser/userDataDir/Default/IndexedDB/https_riptutorial.com_0.indexeddb.leveldb/MANIFEST-000001
+2021/02/24-18:33:32.583 353a3 Level-0 table #5: started
+2021/02/24-18:33:32.596 353a3 Level-0 table #5: 570 bytes OK
+2021/02/24-18:33:32.620 353a3 Delete type=0 #3
+2021/02/24-18:33:32.621 353a3 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
+2021/02/24-18:33:34.617 21c87 Level-0 table #7: started
+2021/02/24-18:33:34.627 21c87 Level-0 table #7: 237 bytes OK
+2021/02/24-18:33:34.649 21c87 Delete type=0 #4
+2021/02/24-18:33:34.650 21c87 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
+2021/02/24-18:33:34.650 21c87 Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x00\x00\x002\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00' @ 21 : 0
+2021/02/24-18:33:34.651 21c87 Compacting 1@1 + 1@2 files
+2021/02/24-18:33:34.663 21c87 Generated table #8@1: 5 keys, 237 bytes
+2021/02/24-18:33:34.663 21c87 Compacted 1@1 + 1@2 files => 237 bytes
+2021/02/24-18:33:34.688 21c87 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/02/24-18:33:34.689 21c87 Delete type=2 #7
+2021/02/24-18:33:34.690 21c87 Delete type=2 #5
+2021/02/24-18:33:34.690 21c87 Manual compaction at level-1 from '\x00\x00\x00\x002\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00' @ 21 : 0 .. (end); will stop at (end)

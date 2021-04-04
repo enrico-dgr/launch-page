@@ -1,0 +1,30 @@
+2021/04/04-12:10:59.197 af03 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/IndexedDB/https_www.instagram.com_0.indexeddb.leveldb/MANIFEST-000001
+2021/04/04-12:10:59.198 af03 Recovering log #259
+2021/04/04-12:10:59.200 af03 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/IndexedDB/https_www.instagram.com_0.indexeddb.leveldb/000259.log 
+2021/04/04-13:53:23.651 1f333 Level-0 table #264: started
+2021/04/04-13:53:23.682 1f333 Level-0 table #264: 1055923 bytes OK
+2021/04/04-13:53:23.739 1f333 Delete type=0 #259
+2021/04/04-14:29:21.852 1158b Compacting 1@1 + 1@2 files
+2021/04/04-14:29:21.886 1158b Generated table #265@1: 71 keys, 19570 bytes
+2021/04/04-14:29:21.887 1158b Compacted 1@1 + 1@2 files => 19570 bytes
+2021/04/04-14:29:21.941 1158b compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/04-14:29:21.944 1158b Delete type=2 #261
+2021/04/04-14:29:21.944 1158b Delete type=2 #264
+2021/04/04-15:59:22.910 6b9b Level-0 table #267: started
+2021/04/04-15:59:22.947 6b9b Level-0 table #267: 1009809 bytes OK
+2021/04/04-15:59:22.999 6b9b Delete type=0 #263
+2021/04/04-16:29:19.988 10217 Compacting 1@1 + 1@2 files
+2021/04/04-16:29:20.008 10217 Generated table #268@1: 62 keys, 17325 bytes
+2021/04/04-16:29:20.008 10217 Compacted 1@1 + 1@2 files => 17325 bytes
+2021/04/04-16:29:20.031 10217 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/04-16:29:20.034 10217 Delete type=2 #267
+2021/04/04-16:29:20.034 10217 Delete type=2 #265
+2021/04/04-17:47:24.169 f417 Level-0 table #270: started
+2021/04/04-17:47:24.205 f417 Level-0 table #270: 1000926 bytes OK
+2021/04/04-17:47:24.258 f417 Delete type=0 #266
+2021/04/04-18:17:20.091 f007 Compacting 1@1 + 1@2 files
+2021/04/04-18:17:20.108 f007 Generated table #271@1: 62 keys, 16881 bytes
+2021/04/04-18:17:20.108 f007 Compacted 1@1 + 1@2 files => 16881 bytes
+2021/04/04-18:17:20.129 f007 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/04-18:17:20.130 f007 Delete type=2 #270
+2021/04/04-18:17:20.130 f007 Delete type=2 #268

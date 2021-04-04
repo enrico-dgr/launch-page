@@ -1,0 +1,9 @@
+START BOT: tg-instance goes to 'https://web.telegram.org/#/login' and clicks on bot chat link.
+tg-instance writes '/visit'
+ROUTINE: tg-instance finds the last button containing 'go to websites'. 
+It takes the url from the button, parses it and opens a new page with that url. 
+tg-instance waits for the new link button by taking always the last button and comparing 
+the new url to the old one.
+If the link is the same, tg-instance adds one to the counter.
+If the link is new (different), tg-instance resets the counter.
+If 'no ads' message shows up after repeated url, wait 60 seconds.

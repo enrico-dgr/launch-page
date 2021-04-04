@@ -1,0 +1,5 @@
+2021/03/22-16:40:59.702 26513 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_faucetofbob.xyz_0.indexeddb.leveldb/MANIFEST-000001
+2021/03/22-16:41:42.383 e54f Level-0 table #5: started
+2021/03/22-16:41:42.394 e54f Level-0 table #5: 1335 bytes OK
+2021/03/22-16:41:42.416 e54f Delete type=0 #3
+2021/03/22-16:41:42.417 e54f Manual compaction at level-0 from (begin) .. (end); will stop at (end)

@@ -1,0 +1,15 @@
+2021/03/24-14:41:10.655 74c3 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_www.youtube.com_0.indexeddb.leveldb/MANIFEST-000001
+2021/03/24-14:41:10.655 74c3 Recovering log #39
+2021/03/24-14:41:10.655 74c3 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_www.youtube.com_0.indexeddb.leveldb/000039.log 
+2021/03/24-14:41:53.907 3e03 Level-0 table #44: started
+2021/03/24-14:41:53.920 3e03 Level-0 table #44: 10375 bytes OK
+2021/03/24-14:41:53.947 3e03 Delete type=0 #39
+2021/03/24-14:41:53.948 3e03 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
+2021/03/24-14:41:53.949 3e03 Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x03\x02\x02\x01\x14\x00s\x00h\x00e\x00l\x00l\x00_\x00i\x00d\x00e\x00n\x00t\x00i\x00f\x00i\x00e\x00r\x00_\x00k\x00e\x00y' @ 2085 : 1
+2021/03/24-14:41:53.949 3e03 Compacting 1@1 + 1@2 files
+2021/03/24-14:41:53.966 3e03 Generated table #45@1: 131 keys, 5224 bytes
+2021/03/24-14:41:53.966 3e03 Compacted 1@1 + 1@2 files => 5224 bytes
+2021/03/24-14:41:53.998 3e03 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/03/24-14:41:53.999 3e03 Delete type=2 #41
+2021/03/24-14:41:53.999 3e03 Delete type=2 #44
+2021/03/24-14:41:53.999 3e03 Manual compaction at level-1 from '\x00\x03\x02\x02\x01\x14\x00s\x00h\x00e\x00l\x00l\x00_\x00i\x00d\x00e\x00n\x00t\x00i\x00f\x00i\x00e\x00r\x00_\x00k\x00e\x00y' @ 2085 : 1 .. (end); will stop at (end)

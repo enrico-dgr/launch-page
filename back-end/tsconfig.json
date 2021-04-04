@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "baseUrl": ".",
+    "strict": true, 
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./build",
+    "jsx": "preserve",
+    "sourceMap": true,
+    "target": "es2016",
+    "removeComments": true,
+    "typeRoots": ["src/@types", "./node_modules/@types"]
+  },
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*",
+    "./build",
+    "./node_modules/@types/mongoose/**"
+  ]
+}

@@ -1,0 +1,1 @@
+{"version":3,"file":"ConsoleLogWithTag.js","sourceRoot":"","sources":["../../src/utils/ConsoleLogWithTag.ts"],"names":[],"mappings":";;AAAA,MAAM,iBAAiB;IACrB,YAAY,GAAW;QAIvB,QAAG,GAAG,CAAC,GAAW,EAAE,EAAE,CAAC,OAAO,CAAC,GAAG,CAAC,IAAI,CAAC,GAAG,GAAG,GAAG,CAAC,CAAC;QAHjD,IAAI,CAAC,GAAG,GAAG,GAAG,CAAC;IACjB,CAAC;CAGF;AACD,kBAAe,iBAAiB,CAAC"}

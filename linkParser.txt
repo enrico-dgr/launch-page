@@ -1,0 +1,7 @@
+
+tg://unsafe_url?url=https%3A%2F%2Fdoge.click%2Fvisit%2F2yXuhx
+https://doge.click/visit/2yXuhx
+
+Prendo la stringa dopo 'url=' e traduco:
+%3A = :
+%2F = /
