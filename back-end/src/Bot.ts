@@ -30,9 +30,10 @@ class Bot {
   readonly campaignButtonConfirm: string;
   readonly campaignButtonSkip: string;
   working: boolean = false;
-  readonly CYCLE_TIME = 5000;
+  readonly CYCLE_TIME = 2 * 30000;
   readonly teleteer: Teleteer;
   readonly instateer: Instateer;
+  private errorLimit: number = 0;
   private initBot = async () => {
     await this.teleteer.init();
     await this.instateer.init();
@@ -127,6 +128,7 @@ class Bot {
     }
 
     if (result === true) {
+      this.errorLimit = 0;
       await this.confirmCampaign()
         .then(() =>
           thisLogger.info("confirmed", {
@@ -143,14 +145,18 @@ class Bot {
         text: this.teleteer.getPropertyAsString(messageHandle, "innerText"),
       });
     } else if (typeof result === "string") {
+      this.errorLimit++;
+      if (this.errorLimit > 8) {
+        throw new Error("8 errors in a row.");
+      }
       thisLogger.error(result, { link: parsedUrl });
       await this.skipCampaign();
     } else thisLogger.error("No operation run");
   };
-  private campaignInLastFive = async () => {
+  private campaignInLastTen = async () => {
     const messages = (
       await this.teleteer.message.all.byProfileName(this.profileName)
-    ).slice(-5);
+    ).slice(-10);
     for (let i = messages.length - 1; i > -1; i--) {
       if (
         (await this.teleteer.searchInElement(
@@ -166,7 +172,7 @@ class Bot {
     if (this.working === false) {
       this.working = true;
 
-      const lastCampaign = await this.campaignInLastFive();
+      const lastCampaign = await this.campaignInLastTen();
       if (lastCampaign !== undefined) {
         await this.doCampaign(lastCampaign);
       } else {

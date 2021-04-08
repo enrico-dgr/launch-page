@@ -1,3 +1,18 @@
-2021/04/04-22:08:24.654 1f903 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Session Storage/MANIFEST-000001
-2021/04/04-22:08:24.654 1f903 Recovering log #66
-2021/04/04-22:08:24.654 1f903 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Session Storage/000066.log 
+2021/04/06-02:14:13.057 fc07 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Session Storage/MANIFEST-000001
+2021/04/06-02:14:13.057 fc07 Recovering log #76
+2021/04/06-02:14:13.058 fc07 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Session Storage/000076.log 
+2021/04/06-03:17:14.638 921f Level-0 table #80: started
+2021/04/06-03:17:14.650 921f Level-0 table #80: 11609 bytes OK
+2021/04/06-03:17:14.669 921f Delete type=0 #76
+2021/04/06-07:36:21.226 1f5bf Level-0 table #82: started
+2021/04/06-07:36:21.237 1f5bf Level-0 table #82: 10883 bytes OK
+2021/04/06-07:36:21.266 1f5bf Delete type=0 #79
+2021/04/06-07:36:21.270 1f5bf Compacting 4@0 + 1@1 files
+2021/04/06-07:36:21.291 1f5bf Generated table #83@0: 609 keys, 22303 bytes
+2021/04/06-07:36:21.291 1f5bf Compacted 4@0 + 1@1 files => 22303 bytes
+2021/04/06-07:36:21.321 1f5bf compacted to: files[ 0 1 0 0 0 0 0 ]
+2021/04/06-07:36:21.322 1f5bf Delete type=2 #77
+2021/04/06-07:36:21.322 1f5bf Delete type=2 #71
+2021/04/06-07:36:21.322 1f5bf Delete type=2 #73
+2021/04/06-07:36:21.322 1f5bf Delete type=2 #80
+2021/04/06-07:36:21.322 1f5bf Delete type=2 #82

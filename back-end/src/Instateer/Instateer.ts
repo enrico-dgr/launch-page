@@ -32,7 +32,12 @@ class Instateer {
   clickLike = async () =>
     await this.page
       .waitForSelector(ToSelector.likeButton)
-      .then((button) => button?.click())
+      .then(async (button) => {
+        if (button === null) {
+          return `No like button`;
+        }
+        return button?.click();
+      })
       .then(() => true)
       .catch(() => this.checkDislike().catch(() => `Can't click like`));
   checkPrivateFollow = async () =>
@@ -62,7 +67,7 @@ class Instateer {
       .catch(() => `Can't click follow`);
   visualizeStories = async () =>
     await this.page
-      .waitForXPath(ToXPath.stories.container)
+      .waitForSelector(ToSelector.stories.container)
       .then(() =>
         this.page
           .$x(ToXPath.stories.watch_asButton)
