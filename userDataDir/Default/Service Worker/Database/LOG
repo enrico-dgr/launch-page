@@ -1,3 +1,12 @@
-2021/04/07-11:11:55.603 6c03 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Service Worker/Database/MANIFEST-000001
-2021/04/07-11:11:55.603 6c03 Recovering log #4
-2021/04/07-11:11:55.607 6c03 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Service Worker/Database/000004.log 
+2021/04/12-23:56:13.688 9303 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Service Worker/Database/MANIFEST-000001
+2021/04/12-23:56:13.689 9303 Recovering log #4
+2021/04/12-23:56:13.691 9303 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/Service Worker/Database/000004.log 
+2021/04/13-02:16:47.814 1f247 Level-0 table #8: started
+2021/04/13-02:16:47.825 1f247 Level-0 table #8: 59090 bytes OK
+2021/04/13-02:16:47.845 1f247 Delete type=0 #4
+2021/04/13-03:11:41.034 2657 Compacting 1@1 + 1@2 files
+2021/04/13-03:11:41.048 2657 Generated table #9@1: 74 keys, 3420 bytes
+2021/04/13-03:11:41.048 2657 Compacted 1@1 + 1@2 files => 3420 bytes
+2021/04/13-03:11:41.073 2657 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/13-03:11:41.074 2657 Delete type=2 #5
+2021/04/13-03:11:41.074 2657 Delete type=2 #8

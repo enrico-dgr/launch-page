@@ -1,7 +1,12 @@
 export const telegramUrlToHttpUrl = (telegramUrl: string) => {
-  const httpsPosition = telegramUrl.search("http");
-  const urlToParse = telegramUrl.slice(httpsPosition);
-  const urlToParseWithDots = urlToParse.replace("%3A", ":");
-  const urlParsed = urlToParseWithDots.replace(/%2F/g, "/");
+  const httpPosition = telegramUrl.search("http");
+  const urlToParse = telegramUrl.slice(httpPosition);
+  const urlParsed = urlToParse
+    .replace(/%3A/g, ":")
+    .replace(/%2F/g, "/")
+    .replace(/%3F/g, "?")
+    .replace(/%3D/g, "=")
+    .replace(/%26/g, "&");
+
   return urlParsed;
 };

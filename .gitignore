@@ -3,4 +3,5 @@ node_modules
 .DS_Store
 build
 package-lock.json
-start-log.txt
+*.log
+follows.log

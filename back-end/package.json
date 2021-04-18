@@ -9,7 +9,8 @@
     "build": "tsc -b",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "npm start --prefix ../front-end",
-    "prod": "node build copy/index.js"
+    "prod": "node build copy/index.js",
+    "example": "ts-node src/example.ts"
   },
   "author": "enrico-dgr",
   "license": "MIT",

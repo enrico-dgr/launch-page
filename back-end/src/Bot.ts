@@ -1,5 +1,6 @@
-import Teleteer from "./Teleteer/Teleteer";
-import Instateer from "./Instateer/Instateer";
+import Teleteer from "./Teleteer";
+import Instateer from "./Instateer";
+
 import { ElementHandle, Page } from "puppeteer";
 import { telegramUrlToHttpUrl } from "./Teleteer/parsers";
 
@@ -14,9 +15,15 @@ thisLogger.add(
     level: "silly",
   })
 );
+
 class Bot {
   constructor(tgPage: Page, igPage: Page) {
     this.profileName = "Socialgift";
+    this.campaignText = "Partecipa alla Campagna";
+    this.likeText = "Lascia un LIKE";
+    this.followText = " Segui il Profilo";
+    this.commentText = "Commento";
+    this.storyText = "Visualizza Stories";
     this.campaignButtonLink = "PARTECIPA";
     this.campaignButtonBottom = "🤑 GUADAGNA 🤑";
     this.campaignButtonConfirm = "CONFERMA";
@@ -25,12 +32,17 @@ class Bot {
     this.instateer = new Instateer(igPage);
   }
   readonly profileName: string;
+  readonly campaignText: string;
+  readonly likeText: string;
+  readonly followText: string;
+  readonly commentText: string;
+  readonly storyText: string;
   readonly campaignButtonLink: string;
   readonly campaignButtonBottom: string;
   readonly campaignButtonConfirm: string;
   readonly campaignButtonSkip: string;
   working: boolean = false;
-  readonly CYCLE_TIME = 2 * 30000;
+  readonly CYCLE_TIME = 3 * 30000;
   readonly teleteer: Teleteer;
   readonly instateer: Instateer;
   private errorLimit: number = 0;
@@ -93,13 +105,13 @@ class Bot {
     );
     await this.instateer.goToIgPage(parsedUrl);
     var instagramAction: string;
-    var result: boolean | string | "skip" = false;
+    var result: boolean | string = false;
     if (
       (await this.teleteer.searchInElement(messageHandle, "Lascia un LIKE")) >
       -1
     ) {
       instagramAction = "like";
-      result = await this.instateer.clickLike();
+      result = await this.instateer.like.clickLike();
     } else if (
       (await this.teleteer.searchInElement(
         messageHandle,
@@ -107,12 +119,12 @@ class Bot {
       )) > -1
     ) {
       instagramAction = "follow";
-      result = await this.instateer.clickFollow();
+      result = await this.instateer.follow.clickFollow();
     } else if (
       (await this.teleteer.searchInElement(messageHandle, "Commento")) > -1
     ) {
       instagramAction = "comment";
-      result = "skip";
+      result = false;
     } else if (
       (await this.teleteer.searchInElement(
         messageHandle,
@@ -123,7 +135,7 @@ class Bot {
       result = await this.instateer.visualizeStories();
     } else {
       instagramAction = "unknown";
-      result = "skip";
+      result = false;
       return;
     }
 
@@ -137,21 +149,30 @@ class Bot {
           })
         )
         .catch(() => thisLogger.error("failed to confirm"));
-    } else if (result === "skip") {
+    } else if (result === false) {
       await this.skipCampaign();
-      thisLogger.info(result, {
+      if (instagramAction === "comment") {
+        console.log(instagramAction);
+      }
+      thisLogger.info("skip", {
         instagramAction: instagramAction,
         link: parsedUrl,
         text: this.teleteer.getPropertyAsString(messageHandle, "innerText"),
       });
     } else if (typeof result === "string") {
       this.errorLimit++;
+      thisLogger.error(result, { link: parsedUrl });
       if (this.errorLimit > 8) {
         throw new Error("8 errors in a row.");
       }
-      thisLogger.error(result, { link: parsedUrl });
       await this.skipCampaign();
-    } else thisLogger.error("No operation run");
+    } else {
+      thisLogger.error("No operation run");
+      this.errorLimit++;
+      if (this.errorLimit > 8) {
+        throw new Error("8 errors in a row.");
+      }
+    }
   };
   private campaignInLastTen = async () => {
     const messages = (

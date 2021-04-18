@@ -8,13 +8,18 @@ export class ToSelector {
 
 export class ToXPath {
   static followButton = {
-    publicProfile: "//div[1]/div[1]/div/div/div/span/span[1]/button",
-    privateProfile: `//section/div[1]/div[1]/div/div/button`,
-    officialProfile: `//section/div[2]/div/div/div/div/span/span[1]/button`,
+    publicProfile:
+      "//div[1]/div[1]/div/div/div/span/span[1]/button[contains(.,'Segui')]",
+    privateProfile: `//section/div/div/div/div/button[contains(.,'Segui')]`,
+    officialProfile: `//section/div/div/div/div/div/span/span/button[contains(.,'Segui')]`,
+    alreadyFollowed: `//div/div/span/span/button[./div/span[@aria-label='Segui già']]`,
   };
   static stories = {
     container: `//section/div[1]/div/section/div/div`,
 
-    watch_asButton: `//section/div/div[1]/div/div/div/div[3]/button`,
+    watch_asButton: `//button[contains(.,'Visualizza la storia')]`,
   };
+  static likeButton = `//section/span/button[./div/span/*[name()='svg' and @aria-label='Mi piace']]`;
+  static commentTextarea = `//textarea[@aria-label='Aggiungi un commento...']`;
+  static dislikeButton = `//section/span/button[./div/span/*[name()='svg' and @aria-label='Non mi piace più']]`;
 }

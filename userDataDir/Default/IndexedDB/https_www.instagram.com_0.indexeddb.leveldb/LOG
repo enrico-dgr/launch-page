@@ -1,3 +1,75 @@
-2021/04/06-09:57:57.918 7603 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/IndexedDB/https_www.instagram.com_0.indexeddb.leveldb/MANIFEST-000001
-2021/04/06-09:57:57.919 7603 Recovering log #438
-2021/04/06-09:57:57.919 7603 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/IndexedDB/https_www.instagram.com_0.indexeddb.leveldb/000438.log 
+2021/04/12-23:56:19.526 e803 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/IndexedDB/https_www.instagram.com_0.indexeddb.leveldb/MANIFEST-000001
+2021/04/12-23:56:19.526 e803 Recovering log #582
+2021/04/12-23:56:19.532 e803 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/telegram/userDataDir/Default/IndexedDB/https_www.instagram.com_0.indexeddb.leveldb/000582.log 
+2021/04/13-00:07:38.408 fb9f Level-0 table #587: started
+2021/04/13-00:07:38.440 fb9f Level-0 table #587: 1060070 bytes OK
+2021/04/13-00:07:38.493 fb9f Delete type=0 #582
+2021/04/13-00:12:43.901 1e56f Compacting 1@1 + 1@2 files
+2021/04/13-00:12:43.916 1e56f Generated table #588@1: 77 keys, 23666 bytes
+2021/04/13-00:12:43.920 1e56f Compacted 1@1 + 1@2 files => 23666 bytes
+2021/04/13-00:12:43.981 1e56f compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/13-00:12:43.981 1e56f Delete type=2 #587
+2021/04/13-00:12:43.982 1e56f Delete type=2 #584
+2021/04/13-00:40:16.249 1072f Level-0 table #590: started
+2021/04/13-00:40:16.275 1072f Level-0 table #590: 1071558 bytes OK
+2021/04/13-00:40:16.330 1072f Delete type=0 #586
+2021/04/13-00:46:14.272 fbbb Compacting 1@1 + 1@2 files
+2021/04/13-00:46:14.288 fbbb Generated table #591@1: 71 keys, 22501 bytes
+2021/04/13-00:46:14.288 fbbb Compacted 1@1 + 1@2 files => 22501 bytes
+2021/04/13-00:46:14.316 fbbb compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/13-00:46:14.316 fbbb Delete type=2 #588
+2021/04/13-00:46:14.316 fbbb Delete type=2 #590
+2021/04/13-01:17:49.207 950f Level-0 table #593: started
+2021/04/13-01:17:49.254 950f Level-0 table #593: 1076973 bytes OK
+2021/04/13-01:17:49.305 950f Delete type=0 #589
+2021/04/13-01:22:54.438 15c3b Compacting 1@1 + 1@2 files
+2021/04/13-01:22:54.458 15c3b Generated table #594@1: 71 keys, 22140 bytes
+2021/04/13-01:22:54.458 15c3b Compacted 1@1 + 1@2 files => 22140 bytes
+2021/04/13-01:22:54.477 15c3b compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/13-01:22:54.478 15c3b Delete type=2 #593
+2021/04/13-01:22:54.479 15c3b Delete type=2 #591
+2021/04/13-01:47:17.878 1193f Level-0 table #596: started
+2021/04/13-01:47:17.910 1193f Level-0 table #596: 1055021 bytes OK
+2021/04/13-01:47:17.960 1193f Delete type=0 #592
+2021/04/13-01:53:20.974 fd23 Compacting 1@1 + 1@2 files
+2021/04/13-01:53:20.995 fd23 Generated table #597@1: 80 keys, 27381 bytes
+2021/04/13-01:53:20.996 fd23 Compacted 1@1 + 1@2 files => 27381 bytes
+2021/04/13-01:53:21.018 fd23 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/13-01:53:21.020 fd23 Delete type=2 #594
+2021/04/13-01:53:21.020 fd23 Delete type=2 #596
+2021/04/13-02:21:51.650 170a3 Level-0 table #599: started
+2021/04/13-02:21:51.697 170a3 Level-0 table #599: 1014969 bytes OK
+2021/04/13-02:21:51.751 170a3 Delete type=0 #595
+2021/04/13-02:26:56.625 2617 Compacting 1@1 + 1@2 files
+2021/04/13-02:26:56.644 2617 Generated table #600@1: 59 keys, 15923 bytes
+2021/04/13-02:26:56.644 2617 Compacted 1@1 + 1@2 files => 15923 bytes
+2021/04/13-02:26:56.662 2617 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/13-02:26:56.663 2617 Delete type=2 #599
+2021/04/13-02:26:56.666 2617 Delete type=2 #597
+2021/04/13-02:52:22.703 14f13 Level-0 table #602: started
+2021/04/13-02:52:22.739 14f13 Level-0 table #602: 995599 bytes OK
+2021/04/13-02:52:22.781 14f13 Delete type=0 #598
+2021/04/13-02:57:26.560 1f79b Compacting 1@1 + 1@2 files
+2021/04/13-02:57:26.564 1f79b Level-0 table #605: started
+2021/04/13-02:57:26.581 1f79b Level-0 table #605: 166352 bytes OK
+2021/04/13-02:57:26.603 1f79b Delete type=0 #601
+2021/04/13-02:57:26.618 1f79b Generated table #603@1: 71 keys, 20910 bytes
+2021/04/13-02:57:26.618 1f79b Compacted 1@1 + 1@2 files => 20910 bytes
+2021/04/13-02:57:26.645 1f79b compacted to: files[ 1 0 1 0 0 0 0 ]
+2021/04/13-02:57:26.646 1f79b Delete type=2 #600
+2021/04/13-02:57:26.647 1f79b Delete type=2 #602
+2021/04/13-02:57:26.648 1e507 Manual compaction at level-0 from (begin) .. (end); will stop at '\x00\x01\x01\x03\x01\x0b\x00u\x00s\x00e\x00r\x00s\x00.\x00u\x00s\x00e\x00r\x00s' @ 507614 : 0
+2021/04/13-02:57:26.648 1e507 Compacting 1@0 + 0@1 files
+2021/04/13-02:57:26.659 1e507 Generated table #606@0: 259 keys, 15126 bytes
+2021/04/13-02:57:26.659 1e507 Compacted 1@0 + 0@1 files => 15126 bytes
+2021/04/13-02:57:26.686 1e507 compacted to: files[ 0 1 1 0 0 0 0 ]
+2021/04/13-02:57:26.687 1e507 Delete type=2 #605
+2021/04/13-02:57:26.687 1e507 Manual compaction at level-0 from '\x00\x01\x01\x03\x01\x0b\x00u\x00s\x00e\x00r\x00s\x00.\x00u\x00s\x00e\x00r\x00s' @ 507614 : 0 .. (end); will stop at (end)
+2021/04/13-02:57:26.688 1e507 Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x01\x01\x03\x01\x0b\x00u\x00s\x00e\x00r\x00s\x00.\x00u\x00s\x00e\x00r\x00s' @ 508243 : 1
+2021/04/13-02:57:26.688 1e507 Compacting 1@1 + 1@2 files
+2021/04/13-02:57:26.697 1e507 Generated table #607@1: 56 keys, 13971 bytes
+2021/04/13-02:57:26.697 1e507 Compacted 1@1 + 1@2 files => 13971 bytes
+2021/04/13-02:57:26.720 1e507 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/04/13-02:57:26.721 1e507 Delete type=2 #606
+2021/04/13-02:57:26.722 1e507 Delete type=2 #603
+2021/04/13-02:57:26.722 1e507 Manual compaction at level-1 from '\x00\x01\x01\x03\x01\x0b\x00u\x00s\x00e\x00r\x00s\x00.\x00u\x00s\x00e\x00r\x00s' @ 508243 : 1 .. (end); will stop at (end)
