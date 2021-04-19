@@ -22,4 +22,6 @@ export class ToXPath {
   static likeButton = `//section/span/button[./div/span/*[name()='svg' and @aria-label='Mi piace']]`;
   static commentTextarea = `//textarea[@aria-label='Aggiungi un commento...']`;
   static dislikeButton = `//section/span/button[./div/span/*[name()='svg' and @aria-label='Non mi piace più']]`;
+  static profilePostsButtonLink = `//a[./*[name()='span']/*[name()='svg' and @aria-label='Post'] and contains(.,'Post')]`;
+  static profilePostedPhotos = `//div[@class='KL4Bh']/img`;
 }

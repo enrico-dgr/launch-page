@@ -1,8 +1,0 @@
-2021/03/24-14:24:31.929 15c03 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_twitter.com_0.indexeddb.leveldb/MANIFEST-000001
-2021/03/24-14:24:31.930 15c03 Recovering log #7
-2021/03/24-14:24:31.930 15c03 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_twitter.com_0.indexeddb.leveldb/000007.log 
-2021/03/24-14:25:16.911 e237 Level-0 table #11: started
-2021/03/24-14:25:16.911 e237 Level-0 table #11: 0 bytes OK
-2021/03/24-14:25:16.941 e237 Delete type=0 #7
-2021/03/24-14:25:16.942 e237 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
-2021/03/24-14:25:16.943 e237 Manual compaction at level-1 from (begin) .. (end); will stop at (end)

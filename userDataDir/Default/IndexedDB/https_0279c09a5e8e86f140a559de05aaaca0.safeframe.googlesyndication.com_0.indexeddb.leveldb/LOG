@@ -1,5 +1,0 @@
-2021/02/23-15:38:21.196 1f907 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/chrome-inj-ext/puppeteer/browser/userDataDir/Default/IndexedDB/https_0279c09a5e8e86f140a559de05aaaca0.safeframe.googlesyndication.com_0.indexeddb.leveldb/MANIFEST-000001
-2021/02/23-15:38:28.583 ec07 Level-0 table #5: started
-2021/02/23-15:38:28.597 ec07 Level-0 table #5: 460 bytes OK
-2021/02/23-15:38:28.622 ec07 Delete type=0 #3
-2021/02/23-15:38:28.623 ec07 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

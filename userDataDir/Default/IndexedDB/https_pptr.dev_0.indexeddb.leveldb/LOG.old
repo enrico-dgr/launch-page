@@ -1,8 +1,0 @@
-2021/02/23-16:27:23.065 15f1b Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/chrome-inj-ext/puppeteer/browser/userDataDir/Default/IndexedDB/https_pptr.dev_0.indexeddb.leveldb/MANIFEST-000001
-2021/02/23-16:27:23.066 15f1b Recovering log #4
-2021/02/23-16:27:23.066 15f1b Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/chrome-inj-ext/puppeteer/browser/userDataDir/Default/IndexedDB/https_pptr.dev_0.indexeddb.leveldb/000004.log 
-2021/02/23-16:27:26.802 10007 Level-0 table #8: started
-2021/02/23-16:27:26.802 10007 Level-0 table #8: 0 bytes OK
-2021/02/23-16:27:26.827 10007 Delete type=0 #4
-2021/02/23-16:27:26.828 10007 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
-2021/02/23-16:27:26.828 10007 Manual compaction at level-1 from (begin) .. (end); will stop at (end)

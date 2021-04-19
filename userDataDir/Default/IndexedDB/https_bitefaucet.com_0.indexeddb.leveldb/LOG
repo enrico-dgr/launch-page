@@ -1,8 +1,0 @@
-2021/03/24-14:24:31.289 e503 Reusing MANIFEST /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_bitefaucet.com_0.indexeddb.leveldb/MANIFEST-000001
-2021/03/24-14:24:31.289 e503 Recovering log #4
-2021/03/24-14:24:31.289 e503 Reusing old log /Users/enricodigrazia/Desktop/desktopContent/projects/bots/puppeteer/userDataDir/Default/IndexedDB/https_bitefaucet.com_0.indexeddb.leveldb/000004.log 
-2021/03/24-14:24:33.630 e503 Level-0 table #8: started
-2021/03/24-14:24:33.630 e503 Level-0 table #8: 0 bytes OK
-2021/03/24-14:24:33.661 e503 Delete type=0 #4
-2021/03/24-14:24:33.661 e503 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
-2021/03/24-14:24:33.661 e503 Manual compaction at level-1 from (begin) .. (end); will stop at (end)

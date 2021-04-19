@@ -4,4 +4,6 @@ node_modules
 build
 package-lock.json
 *.log
-follows.log
+**.log
+userDataDir
+photos

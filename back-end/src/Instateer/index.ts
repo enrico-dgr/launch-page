@@ -1,6 +1,9 @@
 import { ElementHandle, Page } from "puppeteer";
 import { ToXPath, ToSelector } from "./toPaths";
+import fetch from "node-fetch";
+import fs from "fs";
 import logger from "../WinstonLogger/Winston";
+import { getPropertyAsString } from "../Tooleteer";
 
 const thisLogger = logger("Instateer");
 
@@ -177,11 +180,8 @@ class Instateer {
     await this.sendMessage(ToXPath.commentTextarea, comment)
       .then(() => true)
       .catch(() => `Can't write comment`);
-  visualizeStories = async () => {
+  visualizeStories = async () =>
     await this.page
-      .waitForXPath(`//a[@id='test']`)
-      .then((link) => link?.click());
-    return await this.page
       .waitForSelector(ToSelector.stories.container)
       .then(
         async () =>
@@ -199,6 +199,68 @@ class Instateer {
         return true;
       })
       .catch(() => `No story to visualize`);
+  /**
+   *
+   * @param profileUrl
+   * @param photosPath
+   * @returns
+   * 1) true if all downloaded
+   * 2) string msg if error
+   */
+  downloadPostedUserPhotos = async (profileUrl: string, photosPath: string) => {
+    await this.page.goto(profileUrl);
+    //
+    // shot posted photos
+    const showPosts = await this.page
+      .waitForXPath(ToXPath.profilePostsButtonLink)
+      .then((btn) => btn?.click)
+      .catch(() => "No Post button");
+    //
+    if (typeof showPosts === "string") {
+      return showPosts;
+    }
+    // find photos
+    await this.page.waitForXPath(ToXPath.profilePostedPhotos);
+    let photos = await this.page.$x(ToXPath.profilePostedPhotos);
+    for (let i = 0; i < 4; i++) {
+      await this.page.evaluate(() => window.scroll(0, 10000));
+      await this.page.waitForTimeout(3000);
+      let newPhotos = await this.page.$x(ToXPath.profilePostedPhotos);
+      const lastUrl = await getPropertyAsString(
+        photos[photos.length - 1],
+        "src"
+      );
+      for (let j = 0; j < newPhotos.length; j++) {
+        const url = await getPropertyAsString(newPhotos[j], "src");
+        if (url === lastUrl) {
+          j++;
+          if (j === newPhotos.length) {
+            break;
+          }
+
+          photos = photos.concat(newPhotos.slice(j));
+          break;
+        }
+      }
+    }
+
+    if (photos.length === undefined) {
+      return "No photos found";
+    }
+    const length = photos.length;
+    //
+    // save all photos
+    for (let i = 0; i < length; i++) {
+      const src = await getPropertyAsString(photos[i], "src");
+      const response = await fetch(src);
+      const photo = await response.buffer();
+      fs.writeFile(`${photosPath}/photoN${i + 1}.jpg`, photo, (e) =>
+        e === null ? undefined : console.log(e)
+      );
+      console.log(i + 1);
+    }
+    //
+    return true;
   };
 }
 

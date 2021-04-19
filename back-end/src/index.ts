@@ -18,37 +18,29 @@ import newBot from "./newBot";
   //   await browser.newPage()
   // );
   // await socialgiftOld.startBot();
-  // const socialgift = new newBot(
-  //   await browser.newPage(),
-  //   await browser.newPage(),
-  //   "Socialgift",
-  //   ["Partecipa alla Campagna"],
-  //   "Lascia un LIKE",
-  //   " Segui il Profilo",
-  //   "Commento",
-  //   "Visualizza Stories",
-  //   "PARTECIPA",
-  //   "🤑 GUADAGNA 🤑",
-  //   "CONFERMA",
-  //   "SALTA"
-  // );
-  // await socialgift.start();
-  const socialmoney = new newBot(
+  const socialgift = new newBot(
     await browser.newPage(),
     await browser.newPage(),
-    "Social Money",
-    ["Partecipa alla Campagna", "Guarda la Storia"],
+    "Socialgift",
+    ["Partecipa alla Campagna"],
     "Lascia un LIKE",
-    "fake string", //" Segui il Profilo",
-    "Commento Specifico al post",
-    "Commenta con il seguente testo: ",
-    "\\n",
-    "Guarda la Storia",
+    " Segui il Profilo",
+    "",
+    "Commento",
+    "",
+    "Visualizza Stories",
     "PARTECIPA",
     "🤑 GUADAGNA 🤑",
     "CONFERMA",
-    "SALTA",
-    61000
+    "SALTA"
   );
-  await socialmoney.start();
+  const url = "https://www.instagram.com/enrico_di_grazia98/";
+  console.log(
+    await socialgift.instateer.downloadPostedUserPhotos(
+      url,
+      `../photos/enrico_di_grazia98`
+    )
+  );
+  // await socialgift.start();
+  await browser.close();
 })();
