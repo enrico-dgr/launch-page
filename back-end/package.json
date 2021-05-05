@@ -7,9 +7,8 @@
     "start": "ts-node build/index.js",
     "start:ts": "ts-node src/index.ts",
     "server": "nodemon",
+    "ob": "ts-node src/openBrowser.ts",
     "build": "tsc -b",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "client": "npm start --prefix ../front-end",
     "prod": "node build copy/index.js",
     "test": "jest"
   },

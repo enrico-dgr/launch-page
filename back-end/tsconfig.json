@@ -16,6 +16,7 @@
     "node_modules",
     "**/node_modules/*",
     "./build",
-    "./node_modules/@types/mongoose/**"
+    "./node_modules/@types/mongoose/**",
+    "./srcOld"
   ]
 }

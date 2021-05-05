@@ -2,7 +2,7 @@ import E from "fp-ts/lib/Either";
 import { flow, pipe } from "fp-ts/lib/function";
 import T from "fp-ts/Task";
 import TE from "fp-ts/TaskEither";
-import { ElementHandle, HTTPResponse, Page } from "puppeteer";
+import { Page } from "puppeteer";
 
 /**
  * @category model
@@ -44,68 +44,64 @@ export const match = <E, B, A>(
   onRight: (a: Ball<A>) => B
 ): ((ma: TaskEitherBall<E, A>) => T.Task<B>) => TE.match(onLeft, onRight);
 /**
- * Function accepted by the `chain` of this file.
- *
  * @category model
  */
-export type SideEffectBall<E, A, B> = (
-  ball: Ball<A>,
-  right: (ball: Ball<B>) => EitherBall<E, B>,
-  left: (e: Error) => EitherBall<E, B>
-) => TaskEitherBall<E, B>;
-// Other types
 export type XPaths = Record<string, string>;
+/**
+ * @category model
+ */
 export type Selectors = Record<string, string>;
+/**
+ * @category model
+ */
 export type Urls = Record<string, URL>;
 /**
- * Abstraction of `chainError`. You can specify
+ * Abstraction of `chain`. You can specify
  * the left side type `E` of the `TaskEitherBall<E,A>`
  *
  * @param f
  * @returns
  */
-export const chain = <E, A, B>(
-  f: (
-    ball: Ball<A>,
-    right: (b: Ball<B>) => EitherBall<E, B>,
-    left: (e: E) => EitherBall<E, B>
-  ) => TaskEitherBall<E, B>
+export const chainE = <E, A, B>(
+  f: (ball: Ball<A>) => TaskEitherBall<E, B>
 ): ((tepa: TaskEitherBall<E, A>) => TaskEitherBall<E, B>) =>
   flow(
     T.chain<EitherBall<E, A>, EitherBall<E, B>>(
       E.match<E, Ball<A>, TaskEitherBall<E, B>>(
         (e) => left(e),
-        (ball) => f(ball, E.right, E.left)
+        (ball) => f(ball)
       )
     )
   );
+
 /**
- *
+ * Eventual error will fall through a pipe, without any execution.
+ * 
  * @param f
  * ```
  * f: (
     ball: Ball<A>,
     right: (b: Ball<B>) => EitherBall<B>,
     left: (e: Error) => EitherBall<B>
-  ) => TaskEitherBall<B>
+  ) => TaskEitherBall<Error, B>
   // SAME AS
-   f: SideEffectBall<A, B>
+   f: SideEffectBall<Error, A, B>
  * ```
  * @returns ```
- * (tepa: TaskEitherBall<A>) => TaskEitherBall<B>
+ * (tepa: TaskEitherBall<Error, A>) => TaskEitherBall<Error, B>
  * ```
  * @description 
  * Arguments `left` and `right` are E.left and E.right
  * from "fp-ts/lib/Either", so you don't have to import
- * them in every brand new morphism of `TaskEitherBall<A>`.
+ * them in every brand new morphism of `TaskEitherBall<Error, A>`.
  * @types
  * ```
  * interface Ball<A> {
  *  page: Page // from "puppeteer"
  *  a: A 
  * }
- * type EitherBall<A> = Either<Error, Ball<A>>; // from "fp-ts/lib/Either"
- * type TaskEitherBall<A> = TaskEither<Error, Ball<A>>; // from "fp-ts/lib/TaskEither"
+ * type EitherBall<E, A> = Either<E, Ball<A>>; // from "fp-ts/lib/Either"
+ * type TaskEitherBall<E, A> = TaskEither<E, Ball<A>>; // from "fp-ts/lib/TaskEither"
  * ```
  * @example
  * flow(
@@ -127,69 +123,60 @@ export const chain = <E, A, B>(
  *   page
  *     .goto(url)
  *     .then((res) => right({ page, a: res }))
- *     .catch((error) => {
+ *     .catch((e) => {
  *       const err: Error = {
  *         name: "Error name: page.goto(url) throws error.",
- *         message: JSON.stringify(error),
+ *         message: JSON.stringify(e),
  *       };
  *       return left(err);
  *     })
  * );
  */
-export const chainError = <A, B>(f: SideEffectBall<Error, A, B>) =>
-  chain<Error, A, B>(f);
-// export const goto = chainError<string, HTTPResponse>(
-//   ({ page, a: url }: Ball<string>, right, left) => () =>
-//     page
-//       .goto(url)
-//       .then((res) => right({ page, a: res }))
-//       .catch((error) => {
-//         const err: Error = {
-//           name: "Error name: page.goto(url) throws error.",
-//           message: JSON.stringify(error),
-//         };
-//         return left(err);
-//       })
-// );
+export const chain = <A, B>(f: (ball: Ball<A>) => TaskEitherBall<Error, B>) =>
+  chainE<Error, A, B>(f);
 
 /**
+ * Will left the Either only on `catch`.
+ * Every good result for puppeteer will be `right`.
  *
  * @param f
  * ```
- * const f: (ball: Ball<A>) => T.Task<B>
+ * const f: (ball: Ball<A>) => Promise<B>
  * ```
  * @param errorName
+ * @returns
+ * @example
  * ```
- * const errorName: string
+ * // Refactoring puppeteer page.goto
+ * const goto = chain(
+ *  fromPuppeteer(
+ *    ({page, a: url}: Ball<string>) => page.goto(url),
+ *    "Error name: page.goto(url) throws error."
+ *  )
+ * )
  * ```
- * @returns a refactored puppeteer standard `Promise`
  */
-export const chainPuSt = <A, B>(
-  f: (ball: Ball<A>) => T.Task<B>,
+export const fromPuppeteer = <A, B>(
+  f: (ball: Ball<A>) => Promise<B>,
   errorName: string
-): ((tepa: TaskEitherBall<Error, A>) => TaskEitherBall<Error, B>) =>
-  flow(
-    T.chain<EitherBall<Error, A>, EitherBall<Error, B>>(
-      E.match<Error, Ball<A>, TaskEitherBall<Error, B>>(
-        (e) => left(e),
-        (ball) => () =>
-          f(ball)()
-            .then((b) => E.right({ page: ball.page, a: b }))
-            .catch((e) => {
-              const err: Error = {
-                name: errorName,
-                message: JSON.stringify(e),
-              };
-              return E.left(err);
-            })
-      )
-    )
-  );
-const goto = chainPuSt(
-  ({ page, a: url }: Ball<string>) => () => page.goto(url),
-  "Error name: page.goto(url) throws error."
-);
-const click = chainPuSt(
-  ({ page, a: handle }: Ball<ElementHandle<Element>>) => () => handle.click(),
-  ``
-);
+): ((ball: Ball<A>) => TaskEitherBall<Error, B>) => (ball) => () =>
+  f(ball)
+    .then((b) => E.right<Error, Ball<B>>({ ...ball, a: b }))
+    .catch((e) => {
+      const err: Error = {
+        name: errorName,
+        message: JSON.stringify(e),
+      };
+
+      return E.left<Error, Ball<B>>(err);
+    });
+/**
+ * From function `fromPuppeteer()`:
+ *
+ * *"Will left the Either only on `catch`.
+ * Every good result for puppeteer will be `right`."*
+ * ```
+ * f => chain(fromPuppeteer(f))
+ * ```
+ */
+export const chainFromPuppeteer = flow(fromPuppeteer, chain);
