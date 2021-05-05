@@ -1,72 +1,67 @@
-import Teleteer from "./Teleteer";
-import Instateer from "./Instateer";
+import Teleteer from "../Teleteer";
+import Instateer from "../Instateer";
+import { CampaignInfo, BrowserOpts } from "./Types";
 
-import { ElementHandle, Page } from "puppeteer";
-import { telegramUrlToHttpUrl } from "./Teleteer/parsers";
+import { ElementHandle, Page, launch } from "puppeteer";
+import { telegramUrlToHttpUrl } from "../Teleteer/parsers";
 
 import winston, { transports } from "winston";
-import logger from "./WinstonLogger/Winston";
-import { ToXPath } from "./Teleteer/toPaths";
-import { containsText, getPropertyAsString } from "./Tooleteer";
+import logger from "../WinstonLogger/Winston";
+import { ToXPath } from "../Teleteer/toPaths";
+import { containsText, getPropertyAsString } from "../Tooleteer";
 
 class Bot {
   constructor(
     tgPage: Page,
     igPage: Page,
-    profileName: string,
-    campaignText: string[],
-    likeText: string,
-    followText: string,
-    commentText: string,
-    beforeComment: string,
-    afterComment: string,
-    storyText: string,
-    campaignButtonLink: string,
-    campaignButtonBottom: string,
-    campaignButtonConfirm: string,
-    campaignButtonSkip: string,
+    botName: string,
+    campaignInfo: CampaignInfo,
     speedMS?: number
   ) {
-    this.profileName = profileName;
-    this.campaignText = campaignText;
-    this.likeText = likeText;
-    this.followText = followText;
-    this.commentText = commentText;
-    this.beforeComment = beforeComment;
-    this.afterComment = afterComment;
-    this.storyText = storyText;
-    this.campaignButtonLink = campaignButtonLink;
-    this.campaignButtonBottom = campaignButtonBottom;
-    this.campaignButtonConfirm = campaignButtonConfirm;
-    this.campaignButtonSkip = campaignButtonSkip;
     this.teleteer = new Teleteer(tgPage);
     this.instateer = new Instateer(igPage);
-    this.logger = logger(profileName);
+    this.botName = botName;
+    this.campaignInfo = campaignInfo;
+    this.logger = logger(botName);
     if (speedMS !== undefined) {
       this.CYCLE_TIME = speedMS;
     }
   }
+
+  //
+  readonly teleteer: Teleteer;
+  readonly instateer: Instateer;
   // tg-bot vars
-  readonly profileName: string;
-  readonly campaignText: string[];
-  readonly likeText: string;
-  readonly followText: string;
-  readonly commentText: string;
-  readonly beforeComment: string;
-  readonly afterComment: string;
-  readonly storyText: string;
-  readonly campaignButtonLink: string;
-  readonly campaignButtonBottom: string;
-  readonly campaignButtonConfirm: string;
-  readonly campaignButtonSkip: string;
+  readonly botName: string;
+  readonly campaignInfo: CampaignInfo;
   //
   working: boolean = false;
   readonly CYCLE_TIME = 3 * 30000;
-  readonly teleteer: Teleteer;
-  readonly instateer: Instateer;
   private errorLimit: number = 0;
   // logger
   readonly logger: winston.Logger;
+  //
+  static init = async (
+    { userDataDir, headless }: BrowserOpts,
+    botName: string,
+    campaignInfo: CampaignInfo,
+    speedMS?: number
+  ) => {
+    const browser = await launch({
+      headless: headless,
+      userDataDir: userDataDir,
+      args: ["--lang=it"],
+    });
+
+    return new Bot(
+      await browser.newPage(),
+      await browser.newPage(),
+      botName,
+      campaignInfo,
+      speedMS
+    );
+  };
+  //
   private initBot = async () => {
     await this.teleteer.init();
     await this.instateer.init();
@@ -77,14 +72,14 @@ class Bot {
       })
     );
 
-    await this.teleteer.openDialog(this.profileName);
+    await this.teleteer.openDialog(this.botName);
     await this.teleteer.page.waitForTimeout(1500);
   };
 
   private campaignUrlFromButton = async () => {
     const buttonLinks = await this.teleteer.message.button.all.linkByProfileNameAndText(
-      this.profileName,
-      this.campaignButtonLink
+      this.botName,
+      this.campaignInfo.button.link
     );
 
     return await this.teleteer.getPropertyAsString(
@@ -94,12 +89,12 @@ class Bot {
   };
 
   private campaignUrl = async () => {
-    for (let i = 0; i < this.campaignText.length; i++) {
-      const text = this.campaignText[i];
+    for (let i = 0; i < this.campaignInfo.text.length; i++) {
+      const text = this.campaignInfo.text[i];
 
       const storiesUrl = await this.teleteer
         .checkReadyXPath(
-          ToXPath.messageWithText(this.profileName, text) + `//a`,
+          ToXPath.messageWithText(this.botName, text) + `//a`,
           "No stories url"
         )
         .catch(() => undefined);
@@ -113,8 +108,12 @@ class Bot {
     throw new Error("No campaign url found");
   };
   private fetchSpecificComment = (innerText: string) => {
-    const start = innerText.search(this.beforeComment);
-    const end = innerText.search(this.afterComment);
+    const { pre, post } = this.campaignInfo.comment;
+    if (pre === undefined || post === undefined) {
+      throw new Error("Pre and/or post comment not defined");
+    }
+    const start = innerText.search(pre);
+    const end = innerText.search(post);
     if (start < 0 || end < 0) {
       return false;
     }
@@ -123,16 +122,16 @@ class Bot {
   private confirmCampaign = async () => {
     await this.teleteer.page.bringToFront();
     const buttons = await this.teleteer.message.button.all.byProfileNameAndText(
-      this.profileName,
-      this.campaignButtonConfirm
+      this.botName,
+      this.campaignInfo.button.confirm
     );
     buttons[buttons.length - 1].click();
   };
   private skipCampaign = async () => {
     await this.teleteer.page.bringToFront();
     const buttons = await this.teleteer.message.button.all.byProfileNameAndText(
-      this.profileName,
-      this.campaignButtonSkip
+      this.botName,
+      this.campaignInfo.button.skip
     );
     buttons[buttons.length - 1].click();
   };
@@ -143,17 +142,22 @@ class Bot {
    */
   private doCampaign = async (messageHandle: ElementHandle<Element>) => {
     const parsedUrl = telegramUrlToHttpUrl(await this.campaignUrl());
+    const { like, follow, comment, story } = this.campaignInfo;
     await this.instateer.goToIgPage(parsedUrl);
     var instagramAction: string;
     var result: boolean | string = false;
 
-    if (await containsText(messageHandle, this.likeText)) {
+    if (await containsText(messageHandle, like)) {
       instagramAction = "like";
       result = await this.instateer.like.clickLike();
-    } else if (await containsText(messageHandle, this.followText)) {
+    } else if (await containsText(messageHandle, follow)) {
       instagramAction = "follow";
       result = await this.instateer.follow.clickFollow();
-    } else if (await containsText(messageHandle, this.commentText)) {
+    } else if (
+      comment.text !== undefined
+        ? await containsText(messageHandle, comment.text)
+        : "skip"
+    ) {
       instagramAction = "comment";
       const innerText = await getPropertyAsString(messageHandle, "innerText");
       const comment = this.fetchSpecificComment(innerText);
@@ -162,7 +166,7 @@ class Bot {
       } else {
         result = await this.instateer.sendComment(comment);
       }
-    } else if (await containsText(messageHandle, this.storyText)) {
+    } else if (await containsText(messageHandle, story)) {
       instagramAction = "story";
       result = await this.instateer.visualizeStories();
     } else {
@@ -204,11 +208,11 @@ class Bot {
     }
   };
   private lastCampaign = async () => {
-    for (let i = 0; i < this.campaignText.length; i++) {
-      const text = this.campaignText[i];
+    for (let i = 0; i < this.campaignInfo.text.length; i++) {
+      const text = this.campaignInfo.text[i];
 
       const messages = await this.teleteer.message.all
-        .byProfileNameAndText(this.profileName, text)
+        .byProfileNameAndText(this.botName, text)
         .catch(() => undefined);
       if (messages !== undefined) {
         return messages[messages.length - 1];
@@ -224,7 +228,9 @@ class Bot {
       if (lastCampaign !== undefined) {
         await this.doCampaign(lastCampaign);
       } else {
-        await this.teleteer.bottomPanel.sendMessage(this.campaignButtonBottom);
+        await this.teleteer.bottomPanel.sendMessage(
+          this.campaignInfo.button.bottom
+        );
       }
       //
       // let new campaign load
@@ -240,4 +246,7 @@ class Bot {
     const timer = setInterval(this.routine, this.CYCLE_TIME);
   };
 }
+
 export default Bot;
+export * from "./Configs";
+export * from "./Types";

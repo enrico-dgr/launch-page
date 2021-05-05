@@ -16,7 +16,7 @@ thisLogger.add(
   })
 );
 
-class Bot {
+class oldBot {
   constructor(tgPage: Page, igPage: Page) {
     this.profileName = "Socialgift";
     this.campaignText = "Partecipa alla Campagna";
@@ -210,4 +210,4 @@ class Bot {
     const timer = setInterval(this.routineBot, this.CYCLE_TIME);
   };
 }
-export default Bot;
+export default oldBot;
