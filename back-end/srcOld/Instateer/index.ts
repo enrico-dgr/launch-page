@@ -1,20 +1,20 @@
-import { ElementHandle, Page, devices, Browser } from "puppeteer";
+import { ElementHandle, Page, devices } from "puppeteer";
 import { ToXPath, ToSelector } from "./toPaths";
 import fetch from "node-fetch";
 import fs from "fs";
-import { ElementHandleTools } from "../fp-lib/Tooleteer";
+import logger from "../WinstonLogger/Winston";
+import { getPropertyAsString } from "../Tooleteer";
+
+const thisLogger = logger("Instateer");
 
 class Instateer {
-  private constructor(page: Page) {
+  constructor(page: Page) {
     this.page = page;
   }
   readonly page: Page;
 
-  static init = async (browser: Browser) => {
-    const page = await browser.newPage();
-    page.setDefaultTimeout(15000);
-
-    return new Instateer(page);
+  init = async () => {
+    this.page.setDefaultTimeout(15000);
   };
   goToPage = async (url: string) => {
     await this.page.bringToFront();
@@ -22,8 +22,9 @@ class Instateer {
       .goto(url, {
         waitUntil: "networkidle0",
       })
-      .catch((err) => {
-        throw new Error(`Can't load ${url} \n ${err}`);
+      .catch((reason) => {
+        thisLogger.error(`Can't load ${url}`);
+        return reason;
       });
   };
   goToMainPage = async () => await this.goToPage("https://www.instagram.com");
