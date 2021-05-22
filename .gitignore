@@ -5,6 +5,5 @@ build
 package-lock.json
 *.log
 **.log
-
 photos
 srcOld
