@@ -1,5 +1,6 @@
 import { ElementHandle } from "puppeteer";
-import { WebDeps, waitFor$x } from "..";
+import { WebDeps } from "..";
+import { waitFor$x } from "../Page";
 import { click } from "../ElementHandle";
 import * as Follow from "./Follow";
 const profilePageXPaths = {

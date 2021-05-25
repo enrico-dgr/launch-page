@@ -2,7 +2,7 @@
 import P from "puppeteer";
 import * as TE from "fp-ts/TaskEither";
 
-import { follow } from "./fp-lib/WebTeer/Instagram/index";
+import { follow } from "./fp-libs/WebTeer/Instagram/index";
 import { pipe } from "fp-ts/lib/function";
 import { log } from "fp-ts/lib/Console";
 //waverener12

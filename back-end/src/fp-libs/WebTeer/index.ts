@@ -1,65 +1,32 @@
-import { ElementHandle, Page } from "puppeteer";
-import * as E from "fp-ts/Either";
-import * as TE from "fp-ts/TaskEither";
+import { Page } from "puppeteer";
 import * as RTE from "fp-ts/ReaderTaskEither";
-import {} from "fp-ts";
+import * as S from "fp-ts/Semigroup";
 import { pipe } from "fp-ts/lib/function";
-
 export interface WebDeps {
   page: Page;
 }
 
+export interface WebProgram<A>
+  extends RTE.ReaderTaskEither<WebDeps, Error, A> {}
 /**
- * @param xPath
- * @returns Array or empty array.
- * @description Runs `page.waitForXPath` and then `page.$x`
+ * @category Pointed
  */
-export const waitFor$x = (
-  xPath: string
-): RTE.ReaderTaskEither<WebDeps, Error, ElementHandle<Element>[]> =>
-  pipe(
-    RTE.ask<WebDeps, Error>(),
-    RTE.chainTaskK((r) => () =>
-      r.page
-        .waitForXPath(xPath)
-        .then(() => r)
-        .catch(() => r)
-    ),
-    RTE.chainTaskEitherK((r) => () =>
-      r.page
-        .$x(xPath)
-        .then((els) => E.right(els))
-        .catch((err) =>
-          err instanceof Error
-            ? E.left(err)
-            : E.left(new Error(JSON.stringify(err)))
-        )
-    )
-  );
+export const of: <A = never>(a: A) => WebProgram<A> = RTE.of;
 /**
- * @param selector
- * @returns Array or empty array.
- * @description Runs `page.waitForSelector` and then `page.$$`
+ * Composes computations in sequence, using the return value of one computation to determine the next computation.
+ *
+ * @category Monad
  */
-export const waitFor$$ = (
-  selector: string
-): RTE.ReaderTaskEither<WebDeps, Error, ElementHandle<Element>[]> =>
-  pipe(
-    RTE.ask<WebDeps, Error>(),
-    RTE.chainTaskK((r) => () =>
-      r.page
-        .waitForSelector(selector)
-        .then(() => r)
-        .catch(() => r)
+export const chain: <A, B>(
+  f: (a: A) => WebProgram<B>
+) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chain;
+/**
+ * @category semigroup instance
+ */
+export const semigroupCheckLefts: S.Semigroup<WebProgram<void>> = {
+  concat: (x, y) =>
+    pipe(
+      x,
+      chain(() => y)
     ),
-    RTE.chainTaskEitherK((r) => () =>
-      r.page
-        .$$(selector)
-        .then((els) => E.right(els))
-        .catch((err) =>
-          err instanceof Error
-            ? E.left(err)
-            : E.left(new Error(JSON.stringify(err)))
-        )
-    )
-  );
+};
