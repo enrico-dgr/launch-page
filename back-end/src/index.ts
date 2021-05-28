@@ -2,7 +2,7 @@
 import P from "puppeteer";
 import * as TE from "fp-ts/TaskEither";
 
-import { follow } from "./fp-libs/WebTeer/Instagram/index";
+import { followedOfProfile } from "./fp-libs/WebTeer/Applications/Instagram/index";
 import { pipe } from "fp-ts/lib/function";
 import { log } from "fp-ts/lib/Console";
 //waverener12
@@ -35,7 +35,7 @@ const INSTAGRAM_PAGE = instagram.pages[5];
 
   const program = pipe(
     { page },
-    follow.followedOfProfile(4000),
+    followedOfProfile(4000),
     TE.match(
       (e) => log("[Error] Follow followed of Profile finished: " + e)(),
       () => log("Follow followed of Profile finished")()

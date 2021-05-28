@@ -1,19 +1,20 @@
-import { WebDeps, WebProgram } from "../../index";
+import { WebProgram } from "../../../index";
 import { ElementHandle } from "puppeteer";
-import { flow, pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function";
 export * from "./FollowedOfProfile";
 // $x(`//*[contains(text(),'privato')]`)
 // Richiesta effettuata
 
-interface Deps {
+export interface Deps {
+  readonly preAndAfterFollowChecks: WebProgram<void>[];
   readonly preFollowChecks: WebProgram<void>[];
-  readonly follow: WebProgram<ElementHandle<Element>>;
-  readonly postFollowChecks: (el: ElementHandle<Element>) => WebProgram<void>[];
+  readonly postFollowChecks: WebProgram<void>[];
+  readonly clickFollowButton: WebProgram<void>;
   readonly chain: <A, B>(
     f: (a: A) => WebProgram<B>
   ) => (ma: WebProgram<A>) => WebProgram<B>;
   readonly of: <A = never>(a: A) => WebProgram<A>;
-  readonly concatAll: <A>(mas: WebProgram<void>[]) => WebProgram<void>;
+  readonly concatAll: (mas: WebProgram<void>[]) => WebProgram<void>;
 }
 /**
  *
@@ -23,10 +24,12 @@ interface Deps {
 export const follow = (D: Deps) => {
   return pipe(
     D.concatAll(D.preFollowChecks),
-    D.chain(() => D.follow),
+    D.chain(() => D.concatAll(D.preAndAfterFollowChecks)),
+    D.chain(() => D.clickFollowButton),
+    D.chain(() => D.concatAll(D.preAndAfterFollowChecks)),
     D.chain((el) =>
       pipe(
-        D.concatAll(D.postFollowChecks(el)),
+        D.concatAll(D.postFollowChecks),
         D.chain(() => D.of(el))
       )
     )

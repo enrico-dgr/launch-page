@@ -7,6 +7,7 @@
     "start": "ts-node build/index.js",
     "start:ts": "ts-node src/index.ts",
     "server": "nodemon",
+    "example": "ts-node src/example.ts",
     "ob": "ts-node src/openBrowser.ts",
     "build": "tsc -b",
     "prod": "node build copy/index.js",

@@ -1,5 +1,5 @@
-import { ElementHandle, Page } from "puppeteer";
-import { WebDeps } from "..";
+import { ElementHandle } from "puppeteer";
+import * as WebTeer from "../..";
 import * as E from "fp-ts/Either";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
@@ -10,9 +10,9 @@ import { pipe } from "fp-ts/lib/function";
  */
 export const waitFor$x = (
   xPath: string
-): RTE.ReaderTaskEither<WebDeps, Error, ElementHandle<Element>[]> =>
+): WebTeer.WebProgram<ElementHandle<Element>[]> =>
   pipe(
-    RTE.ask<WebDeps, Error>(),
+    RTE.ask<WebTeer.WebDeps, Error>(),
     RTE.chainTaskK((r) => () =>
       r.page
         .waitForXPath(xPath)
@@ -37,9 +37,9 @@ export const waitFor$x = (
  */
 export const waitFor$$ = (
   selector: string
-): RTE.ReaderTaskEither<WebDeps, Error, ElementHandle<Element>[]> =>
+): WebTeer.WebProgram<ElementHandle<Element>[]> =>
   pipe(
-    RTE.ask<WebDeps, Error>(),
+    RTE.ask<WebTeer.WebDeps, Error>(),
     RTE.chainTaskK((r) => () =>
       r.page
         .waitForSelector(selector)

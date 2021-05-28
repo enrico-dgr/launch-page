@@ -4,7 +4,7 @@ import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import * as A from "fp-ts/Array";
 import { ElementHandle } from "puppeteer";
-import { WebDeps } from "../../..";
+import { WebDeps } from "../../../..";
 import { log } from "fp-ts/lib/Console";
 
 interface FollowAllFollowedDeps {

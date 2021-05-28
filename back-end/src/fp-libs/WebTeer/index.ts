@@ -1,7 +1,10 @@
 import { Page } from "puppeteer";
 import * as RTE from "fp-ts/ReaderTaskEither";
+import * as TE from "fp-ts/TaskEither";
+import * as E from "fp-ts/Either";
 import * as S from "fp-ts/Semigroup";
 import { pipe } from "fp-ts/lib/function";
+
 export interface WebDeps {
   page: Page;
 }
@@ -20,6 +23,19 @@ export const of: <A = never>(a: A) => WebProgram<A> = RTE.of;
 export const chain: <A, B>(
   f: (a: A) => WebProgram<B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chain;
+
+export const fromTaskEither: <A>(ma: TE.TaskEither<Error, A>) => WebProgram<A> =
+  RTE.fromTaskEither;
+/**
+ * @category constructors
+ */
+export const right: <A = never>(a: A) => WebProgram<A> = RTE.right;
+/**
+ * @category constructors
+ */
+export const left: <A = never>(e: Error) => WebProgram<A> = RTE.left;
+export const leftAny: <A = never>(err: any) => E.Either<Error, A> = (err) =>
+  err instanceof Error ? E.left(err) : E.left(new Error(JSON.stringify(err)));
 /**
  * @category semigroup instance
  */
