@@ -3,7 +3,7 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
 import * as S from "fp-ts/Semigroup";
-import { pipe } from "fp-ts/lib/function";
+import { pipe, Predicate } from "fp-ts/lib/function";
 
 export interface WebDeps {
   page: Page;
@@ -46,3 +46,7 @@ export const semigroupCheckLefts: S.Semigroup<WebProgram<void>> = {
       chain(() => y)
     ),
 };
+export const fromPredicate: <A>(
+  predicate: Predicate<A>,
+  onFalse: (a: A) => Error
+) => (a: A) => WebProgram<A> = RTE.fromPredicate;

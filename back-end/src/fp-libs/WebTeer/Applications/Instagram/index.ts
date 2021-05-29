@@ -27,36 +27,51 @@ export const followedOfProfile = (
  * @todo select checks through options
  */
 export const follow = (el: ElementHandle<Element>) => {
-  type ErrorMessages = "Follow request found" | "Private Profile";
-  const leftOnTextMatch = (text: string, errorMessage: ErrorMessages) => (
-    element_inScope: ElementHandle<Element>
-  ) =>
+  type ErrorMessages =
+    | "Follow request found"
+    | "Private Profile"
+    | "Profile not followed";
+  const innerTextMatcher = (has: boolean) => (
+    text: string,
+    errorMessage: ErrorMessages
+  ) => (this_el: ElementHandle<Element>) =>
     pipe(
-      ElementUtils.getProperty(element_inScope)<string>("innerText"),
-      WebTeer.chain((innerText) =>
-        innerText.search(text) < 0
-          ? WebTeer.right(undefined)
-          : WebTeer.left(new Error(errorMessage))
-      )
+      ElementUtils.getProperty(this_el)<string>("innerText"),
+      WebTeer.chain(
+        WebTeer.fromPredicate(
+          (innerText) => (innerText.search(text) > -1 ? has : !has),
+          () => new Error(errorMessage)
+        )
+      ),
+      WebTeer.chain(() => WebTeer.of(undefined))
     );
+  const has = innerTextMatcher(true);
+  const hasNot = innerTextMatcher(false);
   return Follow.follow({
     preAndAfterFollowChecks: [
-      leftOnTextMatch("Richiesta effettuata", "Follow request found")(el),
+      pipe(el, hasNot("Richiesta effettuata", "Follow request found")),
     ],
     preFollowChecks: [
       pipe(
         PageUtils.waitFor$x(`//*`),
+        WebTeer.chain(
+          WebTeer.fromPredicate(
+            (html) => html.length > 0,
+            () => new Error("No html found pre-follow")
+          )
+        ),
         WebTeer.chain((html) =>
-          html.length > 0
-            ? leftOnTextMatch("privato", "Private Profile")(html[0])
-            : WebTeer.right(undefined)
+          pipe(html[0], hasNot("privato", "Private Profile"))
         )
       ),
     ],
-    postFollowChecks: [WebTeer.of(undefined)],
+    postFollowChecks: [pipe(el, hasNot("segui", "Profile not followed"))],
     clickFollowButton: ElementUtils.click(el),
+    concatAll: pipe(
+      WebTeer.of(undefined),
+      S.concatAll(WebTeer.semigroupCheckLefts)
+    ),
     chain: WebTeer.chain,
     of: WebTeer.of,
-    concatAll: S.concatAll(WebTeer.semigroupCheckLefts)(WebTeer.of(undefined)),
   });
 };

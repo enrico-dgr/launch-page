@@ -10,11 +10,11 @@ export interface Deps {
   readonly preFollowChecks: WebProgram<void>[];
   readonly postFollowChecks: WebProgram<void>[];
   readonly clickFollowButton: WebProgram<void>;
+  readonly concatAll: (mas: WebProgram<void>[]) => WebProgram<void>;
   readonly chain: <A, B>(
     f: (a: A) => WebProgram<B>
   ) => (ma: WebProgram<A>) => WebProgram<B>;
   readonly of: <A = never>(a: A) => WebProgram<A>;
-  readonly concatAll: (mas: WebProgram<void>[]) => WebProgram<void>;
 }
 /**
  *
