@@ -6,7 +6,6 @@ export * from "./FollowedOfProfile";
 // Richiesta effettuata
 
 export interface Deps {
-  readonly preAndAfterFollowChecks: WebProgram<void>[];
   readonly preFollowChecks: WebProgram<void>[];
   readonly postFollowChecks: WebProgram<void>[];
   readonly clickFollowButton: WebProgram<void>;
@@ -24,9 +23,7 @@ export interface Deps {
 export const follow = (D: Deps) => {
   return pipe(
     D.concatAll(D.preFollowChecks),
-    D.chain(() => D.concatAll(D.preAndAfterFollowChecks)),
     D.chain(() => D.clickFollowButton),
-    D.chain(() => D.concatAll(D.preAndAfterFollowChecks)),
     D.chain((el) =>
       pipe(
         D.concatAll(D.postFollowChecks),

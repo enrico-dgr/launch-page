@@ -6,8 +6,9 @@ export const followed = {
   divUl: `//div[./ul/div/li/div/div/button[contains(.,'Segui')]]`,
 };
 export const followButton = {
-  public: `//div[1]/div[1]/div/div/div/span/span[1]/button[contains(.,'Segui')]`,
+  // public: `//div[1]/div[1]/div/div/div/span/span[1]/button[contains(.,'Segui')]`,
+  toClick: `//header//*/button[contains(text(),'Segui')]`,
   private: `//section/div/div/div/div/button[contains(.,'Segui')]`,
   official: `//section/div/div/div/div/div/span/span/button[contains(.,'Segui')]`,
-  already: `//button[./div/span[@aria-label='Segui già']]`,
+  clicked: `//header//*/button[./div/span[@aria-label='Segui già']]`,
 };

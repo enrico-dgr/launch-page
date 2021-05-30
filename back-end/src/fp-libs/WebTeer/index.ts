@@ -1,6 +1,8 @@
 import { Page } from "puppeteer";
 import * as RTE from "fp-ts/ReaderTaskEither";
+import * as RT from "fp-ts/ReaderTask";
 import * as TE from "fp-ts/TaskEither";
+import * as T from "fp-ts/Task";
 import * as E from "fp-ts/Either";
 import * as S from "fp-ts/Semigroup";
 import { pipe, Predicate } from "fp-ts/lib/function";
@@ -23,7 +25,19 @@ export const of: <A = never>(a: A) => WebProgram<A> = RTE.of;
 export const chain: <A, B>(
   f: (a: A) => WebProgram<B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chain;
-
+export const match: <B, A>(
+  onLeft: (e: Error) => B,
+  onRight: (a: A) => B
+) => <R>(ma: WebProgram<A>) => RT.ReaderTask<WebDeps, B> = RTE.match;
+/**
+ * @category combinators
+ */
+export const fromTaskK: <A extends readonly unknown[], B>(
+  f: (...a: A) => T.Task<B>
+) => (...a: A) => WebProgram<B> = RTE.fromTaskK;
+/**
+ * @category constructors
+ */
 export const fromTaskEither: <A>(ma: TE.TaskEither<Error, A>) => WebProgram<A> =
   RTE.fromTaskEither;
 /**
@@ -50,3 +64,9 @@ export const fromPredicate: <A>(
   predicate: Predicate<A>,
   onFalse: (a: A) => Error
 ) => (a: A) => WebProgram<A> = RTE.fromPredicate;
+export const asks: <A = never>(f: (r: WebDeps) => A) => WebProgram<A> =
+  RTE.asks;
+export const ask: () => WebProgram<WebDeps> = RTE.ask;
+export const orElse: <A>(
+  onLeft: (e: Error) => WebProgram<A>
+) => (ma: WebProgram<A>) => WebProgram<A> = RTE.orElse;

@@ -1,10 +1,32 @@
-// upfollow.it
-import P from "puppeteer";
+import P, { Page } from "puppeteer";
 import * as TE from "fp-ts/TaskEither";
-
-import { followedOfProfile } from "./fp-libs/WebTeer/Applications/Instagram/index";
+import * as WebTeer from "./fp-libs/WebTeer";
+import {
+  followedOfProfile,
+  followOnProfilePage,
+} from "./fp-libs/WebTeer/Applications/Instagram/index";
 import { pipe } from "fp-ts/lib/function";
 import { log } from "fp-ts/lib/Console";
+const runAndLog = (wp: WebTeer.WebProgram<any>) =>
+  pipe(
+    wp,
+    WebTeer.match(
+      (e) =>
+        log(
+          `--------- --------- --------- ---------\n` +
+            `Program run with error.\n` +
+            `--------- Message: ${e}\n` +
+            `--------- --------- --------- ---------`
+        )(),
+      (a) =>
+        log(
+          `--------- --------- --------- ---------\n` +
+            `Program run to the end.\n` +
+            `--------- Returned object: ${JSON.stringify(a)}\n` +
+            `--------- --------- --------- ---------`
+        )()
+    )
+  );
 //waverener12
 //newmener2
 const instagram = {
@@ -20,26 +42,39 @@ const instagram = {
   myProfiles: ["waverener12", "newmener2"],
 };
 
-const PROFILE = instagram.myProfiles[1];
+const PROFILE = instagram.myProfiles[0];
 const INSTAGRAM_PAGE = instagram.pages[5];
+/**
+ * Main
+ */
 (async () => {
   const browser = await P.launch({
-    headless: false,
+    headless: true,
     userDataDir: `./userDataDirs/folders/${PROFILE}`,
     args: ["--lang=it"],
     defaultViewport: { width: 1350, height: 768 },
   });
   const page = await browser.newPage();
   page.setDefaultTimeout(15000);
-  await page.goto(INSTAGRAM_PAGE);
+  const follow = pipe({ page }, runAndLog(followOnProfilePage));
+  await page.goto("https://www.instagram.com/fil_black_vibes/");
+  await follow();
+  await page.goto("https://www.instagram.com/filippo_morari/");
+  await follow();
+  await page.goto("https://www.instagram.com/williamlucacosta11/");
+  await follow();
+})();
+/**
+ *
+ */
 
-  const program = pipe(
+const followAllFollowed = ({ page }: WebTeer.WebDeps) =>
+  pipe(
     { page },
-    followedOfProfile(4000),
-    TE.match(
+    WebTeer.fromTaskK(({ page: page_ }) => () => page_.goto(INSTAGRAM_PAGE)),
+    WebTeer.chain(() => followedOfProfile(4000)),
+    WebTeer.match(
       (e) => log("[Error] Follow followed of Profile finished: " + e)(),
       () => log("Follow followed of Profile finished")()
     )
   );
-  await program();
-})();

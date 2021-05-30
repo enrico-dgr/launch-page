@@ -19,6 +19,13 @@ export const waitFor$x = (
         .then(() => r)
         .catch(() => r)
     ),
+    RTE.chain(() => $x(xPath))
+  );
+export const $x = (
+  xPath: string
+): WebTeer.WebProgram<ElementHandle<Element>[]> =>
+  pipe(
+    RTE.ask<WebTeer.WebDeps, Error>(),
     RTE.chainTaskEitherK((r) => () =>
       r.page
         .$x(xPath)

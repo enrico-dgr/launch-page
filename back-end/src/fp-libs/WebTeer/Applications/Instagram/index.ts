@@ -48,9 +48,6 @@ export const follow = (el: ElementHandle<Element>) => {
   const has = innerTextMatcher(true);
   const hasNot = innerTextMatcher(false);
   return Follow.follow({
-    preAndAfterFollowChecks: [
-      pipe(el, hasNot("Richiesta effettuata", "Follow request found")),
-    ],
     preFollowChecks: [
       pipe(
         PageUtils.waitFor$x(`//*`),
@@ -75,3 +72,41 @@ export const follow = (el: ElementHandle<Element>) => {
     of: WebTeer.of,
   });
 };
+export const followOnProfilePage = pipe(
+  WebTeer.ask(),
+  WebTeer.chain(({ page }) =>
+    pipe(
+      PageXPaths.followButton.toClick,
+      PageUtils.waitFor$x,
+      WebTeer.chain(
+        WebTeer.fromPredicate(
+          (els) => els.length === 1,
+          (els) =>
+            new Error(
+              `Found "${
+                els.length
+              }" follow-button(s) on profile page ${page.url()}`
+            )
+        )
+      ),
+      WebTeer.orElse((e) =>
+        pipe(
+          PageXPaths.followButton.clicked,
+          PageUtils.$x,
+          WebTeer.chain(
+            WebTeer.fromPredicate(
+              (els) => els.length === 0,
+              (els) =>
+                new Error(
+                  `${e}\nProfile already followed. Found "${
+                    els.length
+                  }" alreadyFollow-button(s) on profile page ${page.url()}`
+                )
+            )
+          )
+        )
+      )
+    )
+  ),
+  WebTeer.chain((els) => follow(els[0]))
+);
