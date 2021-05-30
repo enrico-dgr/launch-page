@@ -17,7 +17,7 @@ export const oldClick: RTE.ReaderTaskEither<
     el
       .evaluate((el: HTMLButtonElement) => el.click())
       .then(E.right)
-      .catch(WebTeer.leftAny)
+      .catch((err) => E.left(WebTeer.anyToError(err)))
   )
 );
 export const click = (el: ElementHandle<Element>): WebTeer.WebProgram<void> =>
@@ -25,7 +25,7 @@ export const click = (el: ElementHandle<Element>): WebTeer.WebProgram<void> =>
     el
       .evaluate((el: HTMLButtonElement) => el.click())
       .then(E.right)
-      .catch(WebTeer.leftAny)
+      .catch((err) => E.left(WebTeer.anyToError(err)))
   );
 
 export const getProperty = (el: ElementHandle<Element>) => <T = unknown>(
@@ -40,5 +40,23 @@ export const getProperty = (el: ElementHandle<Element>) => <T = unknown>(
           ? E.left(new Error(`Property of name '${property}', NOT FOUND`))
           : E.right<Error, T>(json)
       )
-      .catch(WebTeer.leftAny)
+      .catch((err) => E.left(WebTeer.anyToError(err)))
   );
+export const isNElementArray = (n: number) => (
+  errorMessage: (els: ElementHandle<Element>[], r: WebTeer.WebDeps) => string
+) => (els: ElementHandle<Element>[]) =>
+  pipe(
+    WebTeer.ask(),
+    WebTeer.chain((r) =>
+      pipe(
+        r,
+        WebTeer.fromPredicate(
+          () => els.length === 1,
+          () => new Error(errorMessage(els, r))
+        )
+      )
+    ),
+    WebTeer.chain(() => WebTeer.of(els))
+  );
+export const isOneElementArray = isNElementArray(1);
+export const isZeroElementArray = isNElementArray(0);

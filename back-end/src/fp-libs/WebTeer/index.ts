@@ -25,6 +25,9 @@ export const of: <A = never>(a: A) => WebProgram<A> = RTE.of;
 export const chain: <A, B>(
   f: (a: A) => WebProgram<B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chain;
+export const chainTaskEitherK: <A, B>(
+  f: (a: A) => TE.TaskEither<Error, B>
+) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chainTaskEitherK;
 export const match: <B, A>(
   onLeft: (e: Error) => B,
   onRight: (a: A) => B
@@ -40,6 +43,8 @@ export const fromTaskK: <A extends readonly unknown[], B>(
  */
 export const fromTaskEither: <A>(ma: TE.TaskEither<Error, A>) => WebProgram<A> =
   RTE.fromTaskEither;
+export const fromEither: <A>(e: E.Either<Error, A>) => WebProgram<A> =
+  RTE.fromEither;
 /**
  * @category constructors
  */
@@ -48,8 +53,12 @@ export const right: <A = never>(a: A) => WebProgram<A> = RTE.right;
  * @category constructors
  */
 export const left: <A = never>(e: Error) => WebProgram<A> = RTE.left;
-export const leftAny: <A = never>(err: any) => E.Either<Error, A> = (err) =>
-  err instanceof Error ? E.left(err) : E.left(new Error(JSON.stringify(err)));
+export const anyToError: (err: any) => Error = (err) =>
+  err instanceof Error ? err : new Error(JSON.stringify(err));
+export const leftAny: <A = never>(err: any) => WebProgram<A> = (err) =>
+  fromEither(
+    err instanceof Error ? E.left(err) : E.left(new Error(JSON.stringify(err)))
+  );
 /**
  * @category semigroup instance
  */

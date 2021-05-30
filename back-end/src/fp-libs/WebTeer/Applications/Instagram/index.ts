@@ -79,14 +79,11 @@ export const followOnProfilePage = pipe(
       PageXPaths.followButton.toClick,
       PageUtils.waitFor$x,
       WebTeer.chain(
-        WebTeer.fromPredicate(
-          (els) => els.length === 1,
-          (els) =>
-            new Error(
-              `Found "${
-                els.length
-              }" follow-button(s) on profile page ${page.url()}`
-            )
+        ElementUtils.isOneElementArray(
+          (els, r) =>
+            `Found "${
+              els.length
+            }" follow-button(s) on profile page ${r.page.url()}`
         )
       ),
       WebTeer.orElse((e) =>
@@ -94,14 +91,11 @@ export const followOnProfilePage = pipe(
           PageXPaths.followButton.clicked,
           PageUtils.$x,
           WebTeer.chain(
-            WebTeer.fromPredicate(
-              (els) => els.length === 0,
-              (els) =>
-                new Error(
-                  `${e}\nProfile already followed. Found "${
-                    els.length
-                  }" alreadyFollow-button(s) on profile page ${page.url()}`
-                )
+            ElementUtils.isZeroElementArray(
+              (els, r) =>
+                `${e}\nProfile already followed. Found "${
+                  els.length
+                }" alreadyFollow-button(s) on profile page ${r.page.url()}`
             )
           )
         )

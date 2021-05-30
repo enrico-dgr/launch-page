@@ -30,11 +30,7 @@ export const $x = (
       r.page
         .$x(xPath)
         .then((els) => E.right(els))
-        .catch((err) =>
-          err instanceof Error
-            ? E.left(err)
-            : E.left(new Error(JSON.stringify(err)))
-        )
+        .catch((err) => E.left(WebTeer.anyToError(err)))
     )
   );
 /**
@@ -57,10 +53,19 @@ export const waitFor$$ = (
       r.page
         .$$(selector)
         .then((els) => E.right(els))
-        .catch((err) =>
-          err instanceof Error
-            ? E.left(err)
-            : E.left(new Error(JSON.stringify(err)))
-        )
+        .catch((err) => E.left(WebTeer.anyToError(err)))
+    )
+  );
+/**
+ *
+ */
+export const goto = (url: string): WebTeer.WebProgram<void> =>
+  pipe(
+    WebTeer.ask(),
+    WebTeer.chainTaskEitherK((r) => () =>
+      r.page
+        .goto(url)
+        .then(() => E.right(undefined))
+        .catch((err) => E.left(WebTeer.anyToError(err)))
     )
   );

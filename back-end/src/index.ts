@@ -7,6 +7,7 @@ import {
 } from "./fp-libs/WebTeer/Applications/Instagram/index";
 import { pipe } from "fp-ts/lib/function";
 import { log } from "fp-ts/lib/Console";
+import { initFreeFollower } from "./fp-libs/WebTeer/Applications/MrInsta";
 const runAndLog = (wp: WebTeer.WebProgram<any>) =>
   pipe(
     wp,
@@ -49,20 +50,23 @@ const INSTAGRAM_PAGE = instagram.pages[5];
  */
 (async () => {
   const browser = await P.launch({
-    headless: true,
+    headless: false,
     userDataDir: `./userDataDirs/folders/${PROFILE}`,
     args: ["--lang=it"],
     defaultViewport: { width: 1350, height: 768 },
   });
   const page = await browser.newPage();
   page.setDefaultTimeout(15000);
-  const follow = pipe({ page }, runAndLog(followOnProfilePage));
-  await page.goto("https://www.instagram.com/fil_black_vibes/");
-  await follow();
-  await page.goto("https://www.instagram.com/filippo_morari/");
-  await follow();
-  await page.goto("https://www.instagram.com/williamlucacosta11/");
-  await follow();
+  const _follow = (profileUrl: string) =>
+    runAndLog(
+      pipe(
+        WebTeer.ask(),
+        WebTeer.chain(WebTeer.fromTaskK((r) => () => r.page.goto(profileUrl))),
+        WebTeer.chain(() => followOnProfilePage)
+      )
+    );
+  const activateFreeFollowersPlan = runAndLog(initFreeFollower);
+  await pipe({ page }, activateFreeFollowersPlan)();
 })();
 /**
  *
