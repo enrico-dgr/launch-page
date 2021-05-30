@@ -28,8 +28,8 @@ export const click = (el: ElementHandle<Element>): WebTeer.WebProgram<void> =>
       .catch((err) => E.left(WebTeer.anyToError(err)))
   );
 
-export const getProperty = (el: ElementHandle<Element>) => <T = unknown>(
-  property: string
+export const getProperty = <T = unknown>(property: string) => (
+  el: ElementHandle<Element>
 ): WebTeer.WebProgram<T> =>
   WebTeer.fromTaskEither(() =>
     el
@@ -42,6 +42,8 @@ export const getProperty = (el: ElementHandle<Element>) => <T = unknown>(
       )
       .catch((err) => E.left(WebTeer.anyToError(err)))
   );
+export const getInnerText = getProperty<string>("innerText");
+export const getHref = getProperty<string>("href");
 export const isNElementArray = (n: number) => (
   errorMessage: (els: ElementHandle<Element>[], r: WebTeer.WebDeps) => string
 ) => (els: ElementHandle<Element>[]) =>

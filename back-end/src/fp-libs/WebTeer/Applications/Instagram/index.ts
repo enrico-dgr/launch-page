@@ -1,4 +1,4 @@
-import * as PageUtils from "../../Utils/Page";
+import * as WebDepsUtils from "../../Utils/WebDeps";
 import * as ElementUtils from "../../Utils/ElementHandle";
 import * as Follow from "./Follow";
 import * as WebTeer from "../../index";
@@ -18,13 +18,14 @@ export const followedOfProfile = (
     followFollowed_XPath_OR_selector: PageXPaths.followed.follow,
     unfollowFollowed_XPath_OR_selector: PageXPaths.followed.unfollow,
     scroller_XPath_OR_selector: PageXPaths.followed.divUl,
-    getElementHandles: PageUtils.waitFor$x,
+    getElementHandles: WebDepsUtils.waitFor$x,
     click: ElementUtils.oldClick,
     msDelayBetweenFollows: msDelayBetweenFollows,
   });
 
 /**
  * @todo select checks through options
+ * @todo !!Important: check for N seconds the follow is successful
  */
 export const follow = (el: ElementHandle<Element>) => {
   type ErrorMessages =
@@ -36,7 +37,8 @@ export const follow = (el: ElementHandle<Element>) => {
     errorMessage: ErrorMessages
   ) => (this_el: ElementHandle<Element>) =>
     pipe(
-      ElementUtils.getProperty(this_el)<string>("innerText"),
+      this_el,
+      ElementUtils.getProperty<string>("innerText"),
       WebTeer.chain(
         WebTeer.fromPredicate(
           (innerText) => (innerText.search(text) > -1 ? has : !has),
@@ -50,7 +52,7 @@ export const follow = (el: ElementHandle<Element>) => {
   return Follow.follow({
     preFollowChecks: [
       pipe(
-        PageUtils.waitFor$x(`//*`),
+        WebDepsUtils.waitFor$x(`//*`),
         WebTeer.chain(
           WebTeer.fromPredicate(
             (html) => html.length > 0,
@@ -77,7 +79,7 @@ export const followOnProfilePage = pipe(
   WebTeer.chain(({ page }) =>
     pipe(
       PageXPaths.followButton.toClick,
-      PageUtils.waitFor$x,
+      WebDepsUtils.waitFor$x,
       WebTeer.chain(
         ElementUtils.isOneElementArray(
           (els, r) =>
@@ -89,7 +91,7 @@ export const followOnProfilePage = pipe(
       WebTeer.orElse((e) =>
         pipe(
           PageXPaths.followButton.clicked,
-          PageUtils.$x,
+          WebDepsUtils.$x,
           WebTeer.chain(
             ElementUtils.isZeroElementArray(
               (els, r) =>

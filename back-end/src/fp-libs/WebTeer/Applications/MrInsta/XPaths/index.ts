@@ -10,3 +10,8 @@ export const XPaths = {
 export const plansPage = {
   freeFollower: `//div[contains(.,'Free Followers')]/*/*/*/button[@type='submit' and @class='btn btn-primary red']`,
 };
+
+export const freeFollower = {
+  followProfileButton: `//*[@class='follow-list d-flex']//a[text()='Follow Profile']`,
+  confirmButton: `//*[@class='follow-list d-flex']//button[contains(.,'Confirm')]`,
+};

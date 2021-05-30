@@ -22,12 +22,19 @@ export const of: <A = never>(a: A) => WebProgram<A> = RTE.of;
  *
  * @category Monad
  */
+
 export const chain: <A, B>(
   f: (a: A) => WebProgram<B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chain;
+export const chainTaskK: <A, B>(
+  f: (a: A) => T.Task<B>
+) => (first: WebProgram<A>) => WebProgram<B> = RTE.chainTaskK;
 export const chainTaskEitherK: <A, B>(
   f: (a: A) => TE.TaskEither<Error, B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chainTaskEitherK;
+export const chainFirst: <A, B>(
+  f: (a: A) => WebProgram<B>
+) => (ma: WebProgram<A>) => WebProgram<A> = RTE.chainFirst;
 export const match: <B, A>(
   onLeft: (e: Error) => B,
   onRight: (a: A) => B

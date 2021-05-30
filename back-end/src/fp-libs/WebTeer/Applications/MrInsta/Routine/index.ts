@@ -1,15 +1,17 @@
 import { WebProgram } from "../../../index";
 import { pipe } from "fp-ts/lib/function";
 
-export interface Deps {
+export interface RoutineDeps<ProfileType> {
+  readonly retrieveProfile: WebProgram<ProfileType>;
+  readonly follow: (p: ProfileType) => WebProgram<void>;
+  readonly confirm: WebProgram<void>;
   readonly chain: <A, B>(
     f: (a: A) => WebProgram<B>
   ) => (ma: WebProgram<A>) => WebProgram<B>;
-  readonly of: <A = never>(a: A) => WebProgram<A>;
 }
 /**
  *
- * @param D
- * @returns The element used to follow.
  */
-export const follow = (D: Deps) => {};
+export const routine = <ProfileType>(D: RoutineDeps<ProfileType>) => {
+  return pipe(D.retrieveProfile, D.chain(D.follow));
+};
