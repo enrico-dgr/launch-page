@@ -7,7 +7,10 @@ import {
 } from "./fp-libs/WebTeer/Applications/Instagram/index";
 import { pipe } from "fp-ts/lib/function";
 import { log } from "fp-ts/lib/Console";
-import { initFreeFollower } from "./fp-libs/WebTeer/Applications/MrInsta";
+import {
+  freeFollowerPlan,
+  initFreeFollower,
+} from "./fp-libs/WebTeer/Applications/MrInsta";
 const runAndLog = (wp: WebTeer.WebProgram<any>) =>
   pipe(
     wp,
@@ -66,7 +69,9 @@ const INSTAGRAM_PAGE = instagram.pages[5];
       )
     );
   const activateFreeFollowersPlan = runAndLog(initFreeFollower);
-  await pipe({ page }, activateFreeFollowersPlan)();
+  const mrInsta = runAndLog(freeFollowerPlan);
+  // await pipe({ page }, _follow("https://www.instagram.com/fr.ancesca2074/"))();
+  await pipe({ page }, mrInsta)();
 })();
 /**
  *

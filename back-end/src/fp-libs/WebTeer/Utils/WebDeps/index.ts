@@ -68,3 +68,9 @@ export const openNewPageToUrl: (url: string) => WebTeer.WebProgram<Page> = (
   url
 ) => onReaderPage(PageUtils.openNewPageToUrl(url));
 export const closeOtherPages = onReaderPage(PageUtils.closeOtherPages);
+/**
+ *
+ */
+export const bringToFront: WebTeer.WebProgram<void> = onReaderPage(
+  PageUtils.bringToFront
+);

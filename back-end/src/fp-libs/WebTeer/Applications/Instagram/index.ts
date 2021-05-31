@@ -24,33 +24,22 @@ export const followedOfProfile = (
   });
 
 /**
- * @todo select checks through options
- * @todo !!Important: check for N seconds the follow is successful
+ * @todo !!Important: check for N seconds the follow is successful.
+ *  Edit. postFollowChecks dep should be good now.
  */
 export const follow = (el: ElementHandle<Element>) => {
   type ErrorMessages =
     | "Follow request found"
     | "Private Profile"
     | "Profile not followed";
-  const innerTextMatcher = (has: boolean) => (
-    text: string,
-    errorMessage: ErrorMessages
-  ) => (this_el: ElementHandle<Element>) =>
-    pipe(
-      this_el,
-      ElementUtils.getProperty<string>("innerText"),
-      WebTeer.chain(
-        WebTeer.fromPredicate(
-          (innerText) => (innerText.search(text) > -1 ? has : !has),
-          () => new Error(errorMessage)
-        )
-      ),
-      WebTeer.chain(() => WebTeer.of(undefined))
-    );
-  const has = innerTextMatcher(true);
-  const hasNot = innerTextMatcher(false);
+
+  const has = (text: string, errorMessage: ErrorMessages) =>
+    ElementUtils.innerTextMatcher(true)(text, errorMessage);
+  const hasNot = (text: string, errorMessage: ErrorMessages) =>
+    ElementUtils.innerTextMatcher(false)(text, errorMessage);
   return Follow.follow({
     preFollowChecks: [
+      WebDepsUtils.bringToFront,
       pipe(
         WebDepsUtils.waitFor$x(`//*`),
         WebTeer.chain(
@@ -64,7 +53,37 @@ export const follow = (el: ElementHandle<Element>) => {
         )
       ),
     ],
-    postFollowChecks: [pipe(el, hasNot("segui", "Profile not followed"))],
+    postFollowChecks: [
+      pipe(
+        {},
+        WebTeer.tryNTimes<any, void>(
+          2000,
+          4
+        )(() =>
+          pipe(
+            WebDepsUtils.$x(PageXPaths.followButton.clicked),
+            WebTeer.chain(
+              ElementUtils.isOneElementArray(
+                (els, r) =>
+                  `Found "${els.length}" confirm-buttons at ${r.page.url()}`
+              )
+            ),
+            WebTeer.chain(() => WebTeer.of(undefined))
+          )
+        )
+      ),
+      /**
+       * maybe he can't see the 'segui' while loading
+       * NOTE: maybe is a useless check
+       */
+      pipe(
+        el,
+        WebTeer.tryNTimes<ElementHandle<Element>, undefined>(
+          2000,
+          4
+        )(hasNot("segui", "Profile not followed"))
+      ),
+    ],
     clickFollowButton: ElementUtils.click(el),
     concatAll: pipe(
       WebTeer.of(undefined),
@@ -75,30 +94,27 @@ export const follow = (el: ElementHandle<Element>) => {
   });
 };
 export const followOnProfilePage = pipe(
-  WebTeer.ask(),
-  WebTeer.chain(({ page }) =>
-    pipe(
-      PageXPaths.followButton.toClick,
-      WebDepsUtils.waitFor$x,
-      WebTeer.chain(
-        ElementUtils.isOneElementArray(
-          (els, r) =>
-            `Found "${
-              els.length
-            }" follow-button(s) on profile page ${r.page.url()}`
-        )
-      ),
-      WebTeer.orElse((e) =>
-        pipe(
-          PageXPaths.followButton.clicked,
-          WebDepsUtils.$x,
-          WebTeer.chain(
-            ElementUtils.isZeroElementArray(
-              (els, r) =>
-                `${e}\nProfile already followed. Found "${
-                  els.length
-                }" alreadyFollow-button(s) on profile page ${r.page.url()}`
-            )
+  pipe(
+    PageXPaths.followButton.toClick,
+    WebDepsUtils.waitFor$x,
+    WebTeer.chain(
+      ElementUtils.isOneElementArray(
+        (els, r) =>
+          `Found "${
+            els.length
+          }" follow-button(s) on profile page ${r.page.url()}`
+      )
+    ),
+    WebTeer.orElse((e) =>
+      pipe(
+        PageXPaths.followButton.clicked,
+        WebDepsUtils.$x,
+        WebTeer.chain(
+          ElementUtils.isZeroElementArray(
+            (els, r) =>
+              `${e}\nProfile already followed. Found "${
+                els.length
+              }" alreadyFollow-button(s) on profile page ${r.page.url()}`
           )
         )
       )

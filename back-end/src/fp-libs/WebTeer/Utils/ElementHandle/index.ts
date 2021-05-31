@@ -1,9 +1,10 @@
-import { ElementHandle } from "puppeteer";
+import { ElementHandle, EvaluateFn, SerializableOrJSHandle } from "puppeteer";
 import * as WebTeer from "../../index";
 import * as E from "fp-ts/Either";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import {} from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
+import { flow, pipe } from "fp-ts/lib/function";
+import { fromTaskK } from "fp-ts/lib/TaskEither";
 /**
  * @deprecated
  */
@@ -44,16 +45,22 @@ export const getProperty = <T = unknown>(property: string) => (
   );
 export const getInnerText = getProperty<string>("innerText");
 export const getHref = getProperty<string>("href");
-export const isNElementArray = (n: number) => (
+export const isNElementArray: (
+  n: number
+) => (
   errorMessage: (els: ElementHandle<Element>[], r: WebTeer.WebDeps) => string
-) => (els: ElementHandle<Element>[]) =>
+) => (
+  els: ElementHandle<Element>[]
+) => WebTeer.WebProgram<ElementHandle<Element>[]> = (n) => (errorMessage) => (
+  els
+) =>
   pipe(
     WebTeer.ask(),
     WebTeer.chain((r) =>
       pipe(
         r,
         WebTeer.fromPredicate(
-          () => els.length === 1,
+          () => els.length === n,
           () => new Error(errorMessage(els, r))
         )
       )
@@ -62,3 +69,35 @@ export const isNElementArray = (n: number) => (
   );
 export const isOneElementArray = isNElementArray(1);
 export const isZeroElementArray = isNElementArray(0);
+export const evaluate = <T extends EvaluateFn<any>>(
+  pageFunction: string | T,
+  ...args: SerializableOrJSHandle[]
+) => (el: ElementHandle<Element>) =>
+  pipe(
+    el.evaluate(pageFunction, ...args),
+    (prom) => () => () => prom,
+    WebTeer.fromTaskK
+  );
+/**
+ * @description
+ * @param has ...
+ * - If *true*, you expect text to be found in innerText.
+ * - If *false*, you don't want the text to be in the innerText.
+ * @returns - right(undefined) if the *has* condition has been respected.
+ * - left(errorMessage) otherwise.
+ */
+export const innerTextMatcher = (has: boolean) => (
+  text: string,
+  errorMessage: string
+) => (this_el: ElementHandle<Element>) =>
+  pipe(
+    this_el,
+    getProperty<string>("innerText"),
+    WebTeer.chain(
+      WebTeer.fromPredicate(
+        (innerText) => (innerText.search(text) > -1 ? has : !has),
+        () => new Error(errorMessage)
+      )
+    ),
+    WebTeer.chain(() => WebTeer.of(undefined))
+  );

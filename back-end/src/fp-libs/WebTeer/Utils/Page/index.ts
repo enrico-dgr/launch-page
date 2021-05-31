@@ -121,3 +121,5 @@ export const closeOtherPages: (page: Page) => WebTeer.WebProgram<Page> = (
       }
     })
   );
+export const bringToFront = (page: Page): WebTeer.WebProgram<void> =>
+  WebTeer.fromTaskK(() => () => page.bringToFront())();

@@ -1,4 +1,4 @@
-import { pipe } from "fp-ts/lib/function";
+import { flow, pipe } from "fp-ts/lib/function";
 import * as WebTeer from "../../index";
 import * as Instagram from "../Instagram";
 import * as WebDepsUtils from "../../Utils/WebDeps";
@@ -9,6 +9,7 @@ import { freeFollower, plansPage } from "./XPaths";
 import { Page } from "puppeteer";
 import { init } from "./Init";
 import { routine } from "./Routine";
+import { concatAll } from "fp-ts/lib/Semigroup";
 
 export const initFreeFollower = pipe(Urls.base.href, (url: string) =>
   init({
@@ -61,5 +62,34 @@ export const routineFreeFollower = routine<Page>({
     ),
     WebTeer.chain((els) => ElementUtils.click(els[0]))
   ),
+  preRetrieveChecks: [
+    pipe(
+      {},
+      WebTeer.tryNTimes<any, void>(
+        2000,
+        4
+      )(() =>
+        pipe(
+          WebDepsUtils.$x(freeFollower.confirmButton),
+          WebTeer.chain(
+            ElementUtils.isZeroElementArray(
+              (els, r) =>
+                `Found "${els.length}" confirm-buttons at ${r.page.url()}`
+            )
+          ),
+          WebTeer.chain(() => WebTeer.of(undefined))
+        )
+      )
+    ),
+  ],
   chain: WebTeer.chain,
+  concatAll: pipe(
+    WebTeer.of(undefined),
+    concatAll(WebTeer.semigroupCheckLefts)
+  ),
 });
+
+export const freeFollowerPlan = pipe(
+  initFreeFollower,
+  WebTeer.chain(() => routineFreeFollower)
+);

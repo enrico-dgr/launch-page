@@ -5,7 +5,7 @@ import * as TE from "fp-ts/TaskEither";
 import * as T from "fp-ts/Task";
 import * as E from "fp-ts/Either";
 import * as S from "fp-ts/Semigroup";
-import { pipe, Predicate } from "fp-ts/lib/function";
+import { flow, pipe, Predicate } from "fp-ts/lib/function";
 
 export interface WebDeps {
   page: Page;
@@ -38,7 +38,11 @@ export const chainFirst: <A, B>(
 export const match: <B, A>(
   onLeft: (e: Error) => B,
   onRight: (a: A) => B
-) => <R>(ma: WebProgram<A>) => RT.ReaderTask<WebDeps, B> = RTE.match;
+) => (ma: WebProgram<A>) => RT.ReaderTask<WebDeps, B> = RTE.match;
+export const matchW: <B, A, C>(
+  onLeft: (e: Error) => B,
+  onRight: (a: A) => C
+) => (ma: WebProgram<A>) => RT.ReaderTask<WebDeps, B | C> = RTE.matchW;
 /**
  * @category combinators
  */
@@ -86,3 +90,61 @@ export const ask: () => WebProgram<WebDeps> = RTE.ask;
 export const orElse: <A>(
   onLeft: (e: Error) => WebProgram<A>
 ) => (ma: WebProgram<A>) => WebProgram<A> = RTE.orElse;
+/**
+ *
+ * @param millis
+ * @returns
+ */
+export const delay: <A>(millis: number) => (first: A) => WebProgram<A> = (
+  millis
+) => fromTaskK((a) => T.delay(millis)(T.of(a)));
+// const wait = <A>(a: A): T.Task<A> => T.delay(millis)(T.of(a));
+/**
+ *
+ * @param millis n-seconds would be millis/1000 = n
+ * @param attempts number of try before returning the real Either, even on *left*
+ * @returns
+ */
+export const tryNTimes: <A, B>(
+  millis: number,
+  attempts: number
+) => (awp: (a: A) => WebProgram<B>) => (a: A) => WebProgram<B> = <A, B>(
+  millis: number,
+  attempts: number
+) => (awp: (a: A) => WebProgram<B>) => (a: A) =>
+  pipe(
+    a,
+    awp,
+    orElse((e) =>
+      attempts > 1
+        ? pipe(
+            undefined,
+            delay(millis),
+            chain(() => tryNTimes<A, B>(millis, attempts - 1)(awp)(a))
+          )
+        : left(e)
+    )
+  );
+/**
+ *
+ */
+export const repeatNTimes: <A, B>(
+  millis: number,
+  attempts: number
+) => (awp: (a: A) => WebProgram<B>) => (a: A) => WebProgram<B> = <A, B>(
+  millis: number,
+  numberOfTimes: number
+) => (awp: (a: A) => WebProgram<B>) => (a: A) =>
+  pipe(
+    a,
+    awp,
+    chain((b) =>
+      numberOfTimes > 0
+        ? pipe(
+            undefined,
+            delay(millis),
+            chain(() => tryNTimes<A, B>(millis, numberOfTimes - 1)(awp)(a))
+          )
+        : right(b)
+    )
+  );

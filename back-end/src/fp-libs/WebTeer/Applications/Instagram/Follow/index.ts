@@ -24,10 +24,10 @@ export const follow = (D: Deps) => {
   return pipe(
     D.concatAll(D.preFollowChecks),
     D.chain(() => D.clickFollowButton),
-    D.chain((el) =>
+    D.chain(() =>
       pipe(
         D.concatAll(D.postFollowChecks),
-        D.chain(() => D.of(el))
+        D.chain(() => D.of(undefined))
       )
     )
   );
