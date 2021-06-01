@@ -90,6 +90,9 @@ export const routineFreeFollower = routine<Page>({
     ),
     WebTeer.delay<void>(2000)(undefined),
   ],
+  /**
+   * Doesn't work
+   */
   skip: pipe(
     WebTeer.delay(1000)(undefined),
     WebTeer.chain(() => WebDepsUtils.closeOtherPages),
