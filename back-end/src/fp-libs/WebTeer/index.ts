@@ -63,6 +63,7 @@ export const right: <A = never>(a: A) => WebProgram<A> = RTE.right;
 /**
  * @category constructors
  */
+export type Left = <A = never>(e: Error) => WebProgram<A>;
 export const left: <A = never>(e: Error) => WebProgram<A> = RTE.left;
 export const anyToError: (err: any) => Error = (err) =>
   err instanceof Error ? err : new Error(JSON.stringify(err));
@@ -108,10 +109,12 @@ export const delay: <A>(millis: number) => (first: A) => WebProgram<A> = (
 export const tryNTimes: <A, B>(
   millis: number,
   attempts: number
+) => (
+  left: <A = never>(e: Error) => WebProgram<A>
 ) => (awp: (a: A) => WebProgram<B>) => (a: A) => WebProgram<B> = <A, B>(
   millis: number,
   attempts: number
-) => (awp: (a: A) => WebProgram<B>) => (a: A) =>
+) => (left_) => (awp: (a: A) => WebProgram<B>) => (a: A) =>
   pipe(
     a,
     awp,
@@ -120,9 +123,9 @@ export const tryNTimes: <A, B>(
         ? pipe(
             undefined,
             delay(millis),
-            chain(() => tryNTimes<A, B>(millis, attempts - 1)(awp)(a))
+            chain(() => tryNTimes<A, B>(millis, attempts - 1)(left_)(awp)(a))
           )
-        : left(e)
+        : left_(e)
     )
   );
 /**
@@ -139,11 +142,11 @@ export const repeatNTimes: <A, B>(
     a,
     awp,
     chain((b) =>
-      numberOfTimes > 0
+      numberOfTimes > 1
         ? pipe(
             undefined,
             delay(millis),
-            chain(() => tryNTimes<A, B>(millis, numberOfTimes - 1)(awp)(a))
+            chain(() => repeatNTimes<A, B>(millis, numberOfTimes - 1)(awp)(a))
           )
         : right(b)
     )

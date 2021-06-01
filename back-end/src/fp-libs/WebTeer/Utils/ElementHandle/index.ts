@@ -24,7 +24,7 @@ export const oldClick: RTE.ReaderTaskEither<
 export const click = (el: ElementHandle<Element>): WebTeer.WebProgram<void> =>
   RTE.fromTaskEither(() =>
     el
-      .evaluate((el: HTMLButtonElement) => el.click())
+      .evaluate((el: HTMLElement) => el.click())
       .then(E.right)
       .catch((err) => E.left(WebTeer.anyToError(err)))
   );
@@ -46,29 +46,29 @@ export const getProperty = <T = unknown>(property: string) => (
 export const getInnerText = getProperty<string>("innerText");
 export const getHref = getProperty<string>("href");
 export const isNElementArray: (
-  n: number
+  howMany: (n: number) => boolean
 ) => (
   errorMessage: (els: ElementHandle<Element>[], r: WebTeer.WebDeps) => string
 ) => (
   els: ElementHandle<Element>[]
-) => WebTeer.WebProgram<ElementHandle<Element>[]> = (n) => (errorMessage) => (
-  els
-) =>
+) => WebTeer.WebProgram<ElementHandle<Element>[]> = (
+  howMany: (n: number) => boolean
+) => (errorMessage) => (els) =>
   pipe(
     WebTeer.ask(),
     WebTeer.chain((r) =>
       pipe(
         r,
         WebTeer.fromPredicate(
-          () => els.length === n,
+          () => howMany(els.length),
           () => new Error(errorMessage(els, r))
         )
       )
     ),
     WebTeer.chain(() => WebTeer.of(els))
   );
-export const isOneElementArray = isNElementArray(1);
-export const isZeroElementArray = isNElementArray(0);
+export const isOneElementArray = isNElementArray((n) => n === 1);
+export const isZeroElementArray = isNElementArray((n) => n === 0);
 export const evaluate = <T extends EvaluateFn<any>>(
   pageFunction: string | T,
   ...args: SerializableOrJSHandle[]
@@ -88,15 +88,20 @@ export const evaluate = <T extends EvaluateFn<any>>(
  */
 export const innerTextMatcher = (has: boolean) => (
   text: string,
-  errorMessage: string
+  errorMessage: (el: ElementHandle<Element>, deps: WebTeer.WebDeps) => string
 ) => (this_el: ElementHandle<Element>) =>
   pipe(
     this_el,
     getProperty<string>("innerText"),
-    WebTeer.chain(
-      WebTeer.fromPredicate(
-        (innerText) => (innerText.search(text) > -1 ? has : !has),
-        () => new Error(errorMessage)
+    WebTeer.chain((innerText) =>
+      pipe(
+        WebTeer.ask(),
+        WebTeer.chain((r) =>
+          WebTeer.fromPredicate<string>(
+            (innerText_) => (innerText_.search(text) > -1 ? has : !has),
+            () => new Error(errorMessage(this_el, r))
+          )(innerText)
+        )
       )
     ),
     WebTeer.chain(() => WebTeer.of(undefined))

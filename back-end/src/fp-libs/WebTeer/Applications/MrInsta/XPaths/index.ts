@@ -12,6 +12,8 @@ export const plansPage = {
 };
 
 export const freeFollower = {
-  followProfileButton: `//*[@class='follow-list d-flex']//a[text()='Follow Profile']`,
-  confirmButton: `//*[@class='follow-list d-flex']//button[contains(.,'Confirm')]`,
+  followProfileButton: `//div[@class='follow-list d-flex']//a[text()='Follow Profile']`,
+  confirmButton: `//div[@class='follow-list d-flex']//button[contains(.,'Confirm')]`,
+  hiddenConfirmButton: `//div[@class='follow-list d-flex']//div[@class='d-flex' and @style="display: none !important;"]//button[contains(.,'Confirm')]`,
+  validate: `//button[text()='Validate']`,
 };

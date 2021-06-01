@@ -4,14 +4,24 @@ import * as Instagram from "../Instagram";
 import * as WebDepsUtils from "../../Utils/WebDeps";
 import * as PageUtils from "../../Utils/Page";
 import * as ElementUtils from "../../Utils/ElementHandle";
-import { Urls } from "./Urls";
+import { UrlsMI, UrlsTM } from "./Urls";
 import { freeFollower, plansPage } from "./XPaths";
 import { Page } from "puppeteer";
 import { init } from "./Init";
 import { routine } from "./Routine";
 import { concatAll } from "fp-ts/lib/Semigroup";
+import { plan } from "./Plan";
+type SocialPlatform = "MrInsta" | "TurboMedia";
+const getBaseUrl = (socialPlatform: SocialPlatform): string => {
+  switch (socialPlatform) {
+    case "MrInsta":
+      return UrlsMI.base.href;
 
-export const initFreeFollower = pipe(Urls.base.href, (url: string) =>
+    case "TurboMedia":
+      return UrlsTM.base.href;
+  }
+};
+export const initFreeFollower = flow(getBaseUrl, (url: string) =>
   init({
     goToGrowthPlansPage: WebDepsUtils.goto(url),
     activatePlan: pipe(
@@ -32,7 +42,7 @@ export const initFreeFollower = pipe(Urls.base.href, (url: string) =>
 );
 /**
  *
- * @todo !!Important: check for N seconds the confirm is ended before start again the routine
+ * @todo avoid click on freeFollower.followProfileButton and check reload page before new routine
  */
 export const routineFreeFollower = routine<Page>({
   retrieveProfile: pipe(
@@ -65,31 +75,66 @@ export const routineFreeFollower = routine<Page>({
   preRetrieveChecks: [
     pipe(
       {},
-      WebTeer.tryNTimes<any, void>(
-        2000,
-        4
-      )(() =>
+      WebTeer.tryNTimes<any, void>(1000, 18)(WebTeer.left)(() =>
         pipe(
-          WebDepsUtils.$x(freeFollower.confirmButton),
+          WebDepsUtils.$x(`//*[contains(.,'Processing')]`),
           WebTeer.chain(
             ElementUtils.isZeroElementArray(
               (els, r) =>
-                `Found "${els.length}" confirm-buttons at ${r.page.url()}`
+                `Found "${els.length}" processing-text at ${r.page.url()}`
             )
           ),
           WebTeer.chain(() => WebTeer.of(undefined))
         )
       )
     ),
+    WebTeer.delay<void>(2000)(undefined),
   ],
-  chain: WebTeer.chain,
+  skip: pipe(
+    WebTeer.delay(1000)(undefined),
+    WebTeer.chain(() => WebDepsUtils.closeOtherPages),
+    WebTeer.chainFirst(WebTeer.delay(1000)),
+    WebTeer.chain(() => WebDepsUtils.bringToFront),
+    WebTeer.chainFirst(WebTeer.delay(1000)),
+    WebTeer.chainTaskK(() => () =>
+      new Promise((resolve) => resolve(console.log("bring")))
+    ),
+    WebTeer.tryNTimes<any, void>(1000, 4)(WebTeer.left)(() =>
+      pipe(
+        WebDepsUtils.$x(`//*//a[contains(.,'Skip')]`),
+        WebTeer.chain(
+          ElementUtils.isOneElementArray(
+            (els, r) => `Found "${els.length}" skip-button at ${r.page.url()}`
+          )
+        ),
+        WebTeer.chain(() => WebTeer.of(undefined))
+      )
+    )
+  ),
   concatAll: pipe(
     WebTeer.of(undefined),
     concatAll(WebTeer.semigroupCheckLefts)
   ),
 });
 
-export const freeFollowerPlan = pipe(
-  initFreeFollower,
-  WebTeer.chain(() => routineFreeFollower)
-);
+export const freeFollowerPlan = (socialPlatform: SocialPlatform) =>
+  plan({
+    init: initFreeFollower(socialPlatform),
+    routine: routineFreeFollower,
+    end: pipe(
+      {},
+      WebTeer.tryNTimes<any, void>(1000, 60)(WebTeer.left)(() =>
+        pipe(
+          WebDepsUtils.$x(`//button[text()='Validate']`),
+          WebTeer.chain(
+            ElementUtils.isOneElementArray(
+              (els, r) =>
+                `Found "${els.length}" validate-button at ${r.page.url()}`
+            )
+          ),
+          WebTeer.chain((els) => ElementUtils.click(els[0])),
+          WebTeer.chain(() => WebTeer.of(undefined))
+        )
+      )
+    ),
+  });

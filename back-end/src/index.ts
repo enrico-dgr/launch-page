@@ -68,10 +68,9 @@ const INSTAGRAM_PAGE = instagram.pages[5];
         WebTeer.chain(() => followOnProfilePage)
       )
     );
-  const activateFreeFollowersPlan = runAndLog(initFreeFollower);
-  const mrInsta = runAndLog(freeFollowerPlan);
-  // await pipe({ page }, _follow("https://www.instagram.com/fr.ancesca2074/"))();
-  await pipe({ page }, mrInsta)();
+
+  const freeFPlan = runAndLog(freeFollowerPlan("TurboMedia"));
+  await pipe({ page }, freeFPlan)();
 })();
 /**
  *

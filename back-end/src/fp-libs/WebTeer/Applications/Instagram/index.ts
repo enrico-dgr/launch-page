@@ -28,44 +28,41 @@ export const followedOfProfile = (
  *  Edit. postFollowChecks dep should be good now.
  */
 export const follow = (el: ElementHandle<Element>) => {
-  type ErrorMessages =
-    | "Follow request found"
-    | "Private Profile"
-    | "Profile not followed";
-
-  const has = (text: string, errorMessage: ErrorMessages) =>
-    ElementUtils.innerTextMatcher(true)(text, errorMessage);
-  const hasNot = (text: string, errorMessage: ErrorMessages) =>
-    ElementUtils.innerTextMatcher(false)(text, errorMessage);
+  const has = (
+    text: string,
+    errorMessage: (el: ElementHandle<Element>, deps: WebTeer.WebDeps) => string
+  ) => ElementUtils.innerTextMatcher(true)(text, errorMessage);
+  const hasNot = (
+    text: string,
+    errorMessage: (el: ElementHandle<Element>, deps: WebTeer.WebDeps) => string
+  ) => ElementUtils.innerTextMatcher(false)(text, errorMessage);
   return Follow.follow({
     preFollowChecks: [
-      WebDepsUtils.bringToFront,
       pipe(
-        WebDepsUtils.waitFor$x(`//*`),
+        WebDepsUtils.$x(`//*[contains(.,'privato')]`),
         WebTeer.chain(
-          WebTeer.fromPredicate(
-            (html) => html.length > 0,
-            () => new Error("No html found pre-follow")
+          ElementUtils.isZeroElementArray(
+            (els, r) =>
+              `Found "${
+                els.length
+              }" element(s) with XPath '//*[contains(.,'privato')]' at ${r.page.url()}`
           )
         ),
-        WebTeer.chain((html) =>
-          pipe(html[0], hasNot("privato", "Private Profile"))
-        )
+        WebTeer.chain(() => WebTeer.of(undefined))
       ),
     ],
     postFollowChecks: [
       pipe(
         {},
-        WebTeer.tryNTimes<any, void>(
-          2000,
-          4
-        )(() =>
+        WebTeer.tryNTimes<any, void>(2000, 4)(WebTeer.left)(() =>
           pipe(
             WebDepsUtils.$x(PageXPaths.followButton.clicked),
             WebTeer.chain(
               ElementUtils.isOneElementArray(
                 (els, r) =>
-                  `Found "${els.length}" confirm-buttons at ${r.page.url()}`
+                  `Found "${
+                    els.length
+                  }" clickedFollow-buttons at ${r.page.url()}`
               )
             ),
             WebTeer.chain(() => WebTeer.of(undefined))
@@ -81,7 +78,9 @@ export const follow = (el: ElementHandle<Element>) => {
         WebTeer.tryNTimes<ElementHandle<Element>, undefined>(
           2000,
           4
-        )(hasNot("segui", "Profile not followed"))
+        )(WebTeer.left)(
+          hasNot("segui", (el, r) => `Profile not followed at ${r.page.url()}`)
+        )
       ),
     ],
     clickFollowButton: ElementUtils.click(el),

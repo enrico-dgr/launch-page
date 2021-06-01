@@ -1,4 +1,12 @@
-import { WebProgram } from "../../../index";
+import {
+  WebProgram,
+  orElse,
+  chain,
+  chainTaskK,
+  tryNTimes,
+  left,
+  delay,
+} from "../../../index";
 import { pipe } from "fp-ts/lib/function";
 
 export interface RoutineDeps<ProfileType> {
@@ -6,19 +14,32 @@ export interface RoutineDeps<ProfileType> {
   readonly retrieveProfile: WebProgram<ProfileType>;
   readonly follow: (p: ProfileType) => WebProgram<void>;
   readonly confirm: WebProgram<void>;
-  readonly chain: <A, B>(
-    f: (a: A) => WebProgram<B>
-  ) => (ma: WebProgram<A>) => WebProgram<B>;
+  readonly skip: WebProgram<void>;
   readonly concatAll: (mas: WebProgram<void>[]) => WebProgram<void>;
 }
 /**
- *
+ * @todo check the 'ciao' log. Because now it's working.
  */
 export const routine = <ProfileType>(D: RoutineDeps<ProfileType>) => {
   return pipe(
     D.concatAll(D.preRetrieveChecks),
-    D.chain(() => D.retrieveProfile),
-    D.chain(D.follow),
-    D.chain(() => D.confirm)
+    chain(
+      tryNTimes<void, void>(1000, 5)(left)(() =>
+        pipe(
+          D.retrieveProfile,
+          chain(D.follow),
+          orElse((e) =>
+            pipe(
+              D.skip,
+              chainTaskK(() => () =>
+                new Promise((resolve) => resolve(console.log("Ciao!")))
+              ),
+              chain(() => left(e))
+            )
+          )
+        )
+      )
+    ),
+    chain(() => D.confirm)
   );
 };
