@@ -3,7 +3,7 @@ import {
   orElse,
   chain,
   chainTaskK,
-  tryNTimes,
+  chainNOrElse,
   left,
   delay,
 } from "../../../index";
@@ -23,19 +23,20 @@ export interface RoutineDeps<ProfileType> {
 export const routine = <ProfileType>(D: RoutineDeps<ProfileType>) => {
   return pipe(
     D.concatAll(D.preRetrieveChecks),
-    chain(
-      tryNTimes<void, void>(1000, 5)(left)(() =>
-        pipe(
-          D.retrieveProfile,
-          chain(D.follow),
-          orElse((e) =>
-            pipe(
-              D.skip,
-              chainTaskK(() => () =>
-                new Promise((resolve) => resolve(console.log("Ciao!")))
-              ),
-              chain(() => left(e))
-            )
+    chainNOrElse<void, void>(
+      1000,
+      5
+    )(() =>
+      pipe(
+        D.retrieveProfile,
+        chain(D.follow),
+        orElse((e) =>
+          pipe(
+            D.skip,
+            chainTaskK(() => () =>
+              new Promise((resolve) => resolve(console.log("Ciao!")))
+            ),
+            chain(() => left(e))
           )
         )
       )

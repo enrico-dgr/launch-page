@@ -1,4 +1,4 @@
-import { WebProgram, chain, repeatNTimes } from "../../../index";
+import { WebProgram, chain, chainN } from "../../../index";
 import { pipe } from "fp-ts/lib/function";
 
 export interface PlanDeps {
@@ -12,7 +12,7 @@ export interface PlanDeps {
 export const plan = (D: PlanDeps) => {
   return pipe(
     D.init,
-    chain(repeatNTimes(100, 10)(() => D.routine)),
+    chainN<void>(100, 10)(() => D.routine),
     chain(() => D.end)
   );
 };

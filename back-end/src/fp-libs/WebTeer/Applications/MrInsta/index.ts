@@ -42,7 +42,6 @@ export const initFreeFollower = flow(getBaseUrl, (url: string) =>
 );
 /**
  *
- * @todo avoid click on freeFollower.followProfileButton and check reload page before new routine
  */
 export const routineFreeFollower = routine<Page>({
   retrieveProfile: pipe(
@@ -74,8 +73,11 @@ export const routineFreeFollower = routine<Page>({
   ),
   preRetrieveChecks: [
     pipe(
-      {},
-      WebTeer.tryNTimes<any, void>(1000, 18)(WebTeer.left)(() =>
+      WebTeer.of(undefined),
+      WebTeer.chainNOrElse<void, void>(
+        1000,
+        18
+      )(() =>
         pipe(
           WebDepsUtils.$x(`//*[contains(.,'Processing')]`),
           WebTeer.chain(
@@ -91,18 +93,16 @@ export const routineFreeFollower = routine<Page>({
     WebTeer.delay<void>(2000)(undefined),
   ],
   /**
-   * Doesn't work
+   *  @todo waiting to check if it works always
    */
   skip: pipe(
-    WebTeer.delay(1000)(undefined),
-    WebTeer.chain(() => WebDepsUtils.closeOtherPages),
+    WebDepsUtils.closeOtherPages,
     WebTeer.chainFirst(WebTeer.delay(1000)),
     WebTeer.chain(() => WebDepsUtils.bringToFront),
-    WebTeer.chainFirst(WebTeer.delay(1000)),
-    WebTeer.chainTaskK(() => () =>
-      new Promise((resolve) => resolve(console.log("bring")))
-    ),
-    WebTeer.tryNTimes<any, void>(1000, 4)(WebTeer.left)(() =>
+    WebTeer.chainNOrElse<void, void>(
+      1000,
+      5
+    )(() =>
       pipe(
         WebDepsUtils.$x(`//*//a[contains(.,'Skip')]`),
         WebTeer.chain(
@@ -119,14 +119,21 @@ export const routineFreeFollower = routine<Page>({
     concatAll(WebTeer.semigroupCheckLefts)
   ),
 });
-
+/**
+ *
+ * @param socialPlatform
+ * @returns
+ */
 export const freeFollowerPlan = (socialPlatform: SocialPlatform) =>
   plan({
     init: initFreeFollower(socialPlatform),
     routine: routineFreeFollower,
     end: pipe(
-      {},
-      WebTeer.tryNTimes<any, void>(1000, 60)(WebTeer.left)(() =>
+      WebTeer.of(undefined),
+      WebTeer.chainNOrElse<any, void>(
+        1000,
+        60
+      )(() =>
         pipe(
           WebDepsUtils.$x(`//button[text()='Validate']`),
           WebTeer.chain(
