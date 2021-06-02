@@ -93,7 +93,7 @@ export const routineFreeFollower = routine<Page>({
     WebTeer.delay<void>(2000)(undefined),
   ],
   /**
-   *  @todo waiting to check if it works always
+   *
    */
   skip: pipe(
     WebDepsUtils.closeOtherPages,
@@ -110,6 +110,7 @@ export const routineFreeFollower = routine<Page>({
             (els, r) => `Found "${els.length}" skip-button at ${r.page.url()}`
           )
         ),
+        WebTeer.chain((els) => ElementUtils.click(els[0])),
         WebTeer.chain(() => WebTeer.of(undefined))
       )
     )
@@ -130,7 +131,7 @@ export const freeFollowerPlan = (socialPlatform: SocialPlatform) =>
     routine: routineFreeFollower,
     end: pipe(
       WebTeer.of(undefined),
-      WebTeer.chainNOrElse<any, void>(
+      WebTeer.chainNOrElse<undefined, void>(
         1000,
         60
       )(() =>

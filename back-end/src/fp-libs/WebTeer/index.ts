@@ -84,13 +84,13 @@ export const left: <A = never>(e: Error) => WebProgram<A> = RTE.left;
 /**
  * @category constructors
  */
-export const anyToError: (err: any) => Error = (err) =>
+export const anyToError: <E>(err: E) => Error = (err) =>
   err instanceof Error ? err : new Error(JSON.stringify(err));
 /**
  * Derivable from `anyToError`
  * @category constructors
  */
-export const leftAny: <A = never>(err: any) => WebProgram<A> = (err) =>
+export const leftAny: <E = never, A = never>(err: E) => WebProgram<A> = (err) =>
   fromEither(
     err instanceof Error ? E.left(err) : E.left(new Error(JSON.stringify(err)))
   );
@@ -206,18 +206,17 @@ const dummyRepeat: <A>(
 ) => (awp: (a: A) => WebProgram<A>) => (a: A) => WebProgram<A> = <A>(
   millis: number,
   numberOfTimes: number
-) => (awp: (a: A) => WebProgram<A>) => (a: A) =>
-  pipe(
-    a,
+) => (awp: (a: A) => WebProgram<A>) =>
+  flow(
     awp,
-    chain((aSnd) =>
+    chain((a) =>
       numberOfTimes > 1
         ? pipe(
             undefined,
             delay(millis),
             chain(() => dummyRepeat<A>(millis, numberOfTimes - 1)(awp)(a))
           )
-        : right(aSnd)
+        : right(a)
     )
   );
 /**

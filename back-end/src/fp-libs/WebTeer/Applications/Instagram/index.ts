@@ -24,8 +24,7 @@ export const followedOfProfile = (
   });
 
 /**
- * @todo !!Important: check for N seconds the follow is successful.
- *  Edit. postFollowChecks dep should be good now.
+ *
  */
 export const follow = (el: ElementHandle<Element>) => {
   const has = (
@@ -53,8 +52,11 @@ export const follow = (el: ElementHandle<Element>) => {
     ],
     postFollowChecks: [
       pipe(
-        {},
-        WebTeer.tryNTimes<any, void>(2000, 4)(WebTeer.left)(() =>
+        WebTeer.of(undefined),
+        WebTeer.chainNOrElse<undefined, void>(
+          2000,
+          4
+        )(() =>
           pipe(
             WebDepsUtils.$x(PageXPaths.followButton.clicked),
             WebTeer.chain(
@@ -74,13 +76,11 @@ export const follow = (el: ElementHandle<Element>) => {
        * NOTE: maybe is a useless check
        */
       pipe(
-        el,
-        WebTeer.tryNTimes<ElementHandle<Element>, undefined>(
+        WebTeer.of(el),
+        WebTeer.chainNOrElse<ElementHandle<Element>, undefined>(
           2000,
           4
-        )(WebTeer.left)(
-          hasNot("segui", (el, r) => `Profile not followed at ${r.page.url()}`)
-        )
+        )(hasNot("segui", (el, r) => `Profile not followed at ${r.page.url()}`))
       ),
     ],
     clickFollowButton: ElementUtils.click(el),

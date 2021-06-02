@@ -1,5 +1,4 @@
 import P, { Page } from "puppeteer";
-import * as TE from "fp-ts/TaskEither";
 import * as WebTeer from "./fp-libs/WebTeer";
 import {
   followedOfProfile,
@@ -11,7 +10,7 @@ import {
   freeFollowerPlan,
   initFreeFollower,
 } from "./fp-libs/WebTeer/Applications/MrInsta";
-const runAndLog = (wp: WebTeer.WebProgram<any>) =>
+const runAndLog = <A>(wp: WebTeer.WebProgram<A>) =>
   pipe(
     wp,
     WebTeer.match(
@@ -46,7 +45,7 @@ const instagram = {
   myProfiles: ["waverener12", "newmener2"],
 };
 
-const PROFILE = instagram.myProfiles[0];
+const PROFILE = instagram.myProfiles[1];
 const INSTAGRAM_PAGE = instagram.pages[5];
 /**
  * Main
@@ -69,7 +68,7 @@ const INSTAGRAM_PAGE = instagram.pages[5];
       )
     );
 
-  const freeFPlan = runAndLog(freeFollowerPlan("TurboMedia"));
+  const freeFPlan = runAndLog(freeFollowerPlan("MrInsta"));
   await pipe({ page }, freeFPlan)();
 })();
 /**
