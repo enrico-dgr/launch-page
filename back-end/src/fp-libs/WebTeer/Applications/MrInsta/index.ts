@@ -2,14 +2,12 @@ import { flow, pipe } from "fp-ts/lib/function";
 import * as WebTeer from "../../index";
 import * as Instagram from "../Instagram";
 import * as WebDepsUtils from "../../Utils/WebDeps";
-import * as PageUtils from "../../Utils/Page";
 import * as ElementUtils from "../../Utils/ElementHandle";
 import { UrlsMI, UrlsTM } from "./Urls";
 import { freeFollower, plansPage } from "./XPaths";
 import { Page } from "puppeteer";
 import { init } from "./Init";
 import { routine } from "./Routine";
-import { concatAll } from "fp-ts/lib/Semigroup";
 import { plan } from "./Plan";
 type SocialPlatform = "MrInsta" | "TurboMedia";
 const getBaseUrl = (socialPlatform: SocialPlatform): string => {
@@ -37,7 +35,6 @@ export const initFreeFollower = flow(getBaseUrl, (url: string) =>
       ),
       WebTeer.chain((els) => ElementUtils.click(els[0]))
     ),
-    chain: WebTeer.chain,
   })
 );
 /**
@@ -58,7 +55,7 @@ export const routineFreeFollower = routine<Page>({
     pipe(
       WebTeer.ask(),
       WebTeer.chainTaskEitherK((r) =>
-        pipe({ ...r, page: p }, Instagram.followOnProfilePage)
+        pipe({ ...r, page: p }, Instagram.Follow.followOnProfilePage)
       )
     ),
   confirm: pipe(
@@ -114,10 +111,6 @@ export const routineFreeFollower = routine<Page>({
         WebTeer.chain(() => WebTeer.of(undefined))
       )
     )
-  ),
-  concatAll: pipe(
-    WebTeer.of(undefined),
-    concatAll(WebTeer.semigroupCheckLefts)
   ),
 });
 /**

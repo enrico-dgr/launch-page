@@ -1,46 +1,36 @@
-import {
-  WebProgram,
-  orElse,
-  chain,
-  chainTaskK,
-  chainNOrElse,
-  left,
-  delay,
-} from "../../../index";
+import * as WT from "../../../index";
 import { pipe } from "fp-ts/lib/function";
+import * as S from "fp-ts/lib/Semigroup";
 
 export interface RoutineDeps<ProfileType> {
-  readonly preRetrieveChecks: WebProgram<void>[];
-  readonly retrieveProfile: WebProgram<ProfileType>;
-  readonly follow: (p: ProfileType) => WebProgram<void>;
-  readonly confirm: WebProgram<void>;
-  readonly skip: WebProgram<void>;
-  readonly concatAll: (mas: WebProgram<void>[]) => WebProgram<void>;
+  readonly preRetrieveChecks: WT.WebProgram<void>[];
+  readonly retrieveProfile: WT.WebProgram<ProfileType>;
+  readonly follow: (p: ProfileType) => WT.WebProgram<void>;
+  readonly confirm: WT.WebProgram<void>;
+  readonly skip: WT.WebProgram<void>;
 }
+const concatAll = S.concatAll(WT.getSemigroupChain<void>(WT.chain));
 /**
- * @todo check the 'ciao' log. Because now it's working.
+ *
  */
 export const routine = <ProfileType>(D: RoutineDeps<ProfileType>) => {
   return pipe(
-    D.concatAll(D.preRetrieveChecks),
-    chainNOrElse<void, void>(
+    concatAll(WT.of(undefined))(D.preRetrieveChecks),
+    WT.chainNOrElse<void, void>(
       1000,
       5
     )(() =>
       pipe(
         D.retrieveProfile,
-        chain(D.follow),
-        orElse((e) =>
+        WT.chain(D.follow),
+        WT.orElse((e) =>
           pipe(
             D.skip,
-            chainTaskK(() => () =>
-              new Promise((resolve) => resolve(console.log("Ciao!")))
-            ),
-            chain(() => left(e))
+            WT.chain(() => WT.left(e))
           )
         )
       )
     ),
-    chain(() => D.confirm)
+    WT.chain(() => D.confirm)
   );
 };

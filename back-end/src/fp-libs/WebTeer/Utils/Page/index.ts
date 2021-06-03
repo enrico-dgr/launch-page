@@ -20,13 +20,17 @@ export const waitFor$x = (xPath: string) => (
     ),
     WebTeer.chain(() => $x(xPath)(page))
   );
-export const $x = (xPath: string) => (
+export const $x = (XPath: string) => (
   page: Page
 ): WebTeer.WebProgram<ElementHandle<Element>[]> =>
   WebTeer.fromTaskEither(() =>
     page
-      .$x(xPath)
-      .then((els) => E.right(els))
+      .$x(XPath)
+      .then((els) =>
+        els !== undefined
+          ? E.right(els)
+          : E.left(new Error(`No element found at XPath ${XPath}`))
+      )
       .catch((err) => E.left(WebTeer.anyToError(err)))
   );
 /**

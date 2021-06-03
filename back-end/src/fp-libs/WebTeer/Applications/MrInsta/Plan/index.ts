@@ -1,10 +1,10 @@
-import { WebProgram, chain, chainN } from "../../../index";
+import * as WT from "../../../index";
 import { pipe } from "fp-ts/lib/function";
 
 export interface PlanDeps {
-  readonly init: WebProgram<void>;
-  readonly routine: WebProgram<void>;
-  readonly end: WebProgram<void>;
+  readonly init: WT.WebProgram<void>;
+  readonly routine: WT.WebProgram<void>;
+  readonly end: WT.WebProgram<void>;
 }
 /**
  *
@@ -12,7 +12,7 @@ export interface PlanDeps {
 export const plan = (D: PlanDeps) => {
   return pipe(
     D.init,
-    chainN<void>(100, 10)(() => D.routine),
-    chain(() => D.end)
+    WT.chainN<void>(100, 10)(() => D.routine),
+    WT.chain(() => D.end)
   );
 };

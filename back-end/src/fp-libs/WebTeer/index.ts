@@ -97,13 +97,16 @@ export const leftAny: <E = never, A = never>(err: E) => WebProgram<A> = (err) =>
 /**
  * @category semigroup instance
  */
-export const semigroupCheckLefts: S.Semigroup<WebProgram<void>> = {
+
+export const getSemigroupChain: <A>(
+  chain_: typeof chain
+) => S.Semigroup<WebProgram<A>> = (chain_) => ({
   concat: (x, y) =>
     pipe(
       x,
-      chain(() => y)
+      chain_(() => y)
     ),
-};
+});
 /**
  * @category constructors
  */

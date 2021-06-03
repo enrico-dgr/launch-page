@@ -4,7 +4,7 @@ import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import * as A from "fp-ts/Array";
 import { ElementHandle } from "puppeteer";
-import { WebDeps } from "../../../..";
+import * as WT from "../../../../index";
 import { log } from "fp-ts/lib/Console";
 
 interface FollowAllFollowedDeps {
@@ -14,14 +14,14 @@ interface FollowAllFollowedDeps {
   scroller_XPath_OR_selector: string;
   getElementHandles: (
     xPath_OR_selector: string
-  ) => RTE.ReaderTaskEither<WebDeps, Error, ElementHandle[] | []>;
+  ) => WT.WebProgram<ElementHandle[] | []>;
   click: RTE.ReaderTaskEither<ElementHandle<Element>, Error, void>;
   msDelayBetweenFollows: number;
 }
 
-export const fAF_fAFDeps = (
+export const getFollowFollowedOfProfile = (
   deps: FollowAllFollowedDeps
-): RTE.ReaderTaskEither<WebDeps, Error, void> => {
+): WT.WebProgram<void> => {
   /**
    * -------------- Element
    */
@@ -173,9 +173,7 @@ export const fAF_fAFDeps = (
    * -------------- Follow the whole list
    */
   /** */
-  const followAll = (
-    attempts: number
-  ): RTE.ReaderTaskEither<WebDeps, Error, void> =>
+  const followAll = (attempts: number): WT.WebProgram<void> =>
     attempts > 1
       ? pipe(
           getFollowButtons,

@@ -5,8 +5,9 @@
   "main": "index.ts",
   "scripts": {
     "start": "ts-node build/index.js",
-    "start:ts": "ts-node src/index.ts --trace-warnings",
+    "start:ts": "ts-node src/index.ts",
     "nodemon": "nodemon",
+    "debug": "ts-node src/debug.ts",
     "example": "ts-node src/example.ts",
     "ob": "ts-node src/openBrowser.ts",
     "build": "tsc -b",
