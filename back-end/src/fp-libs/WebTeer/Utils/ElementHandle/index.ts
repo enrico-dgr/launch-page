@@ -73,7 +73,7 @@ export const evaluate = <T extends EvaluateFn<any>>(
     el.evaluate(pageFunction, ...args),
     (prom) => () => () => prom,
     WT.fromTaskK
-  );
+  )();
 /**
  * @description
  * @param has ...
@@ -93,12 +93,12 @@ export const innerTextMatcher = (has: boolean) => (
       pipe(
         WT.ask(),
         WT.chain((r) =>
-          WT.fromPredicate<string>(
-            (innerText_) => (innerText_.search(text) > -1 ? has : !has),
+          WT.fromPredicate(
+            () => (innerText.search(text) > -1 ? has : !has),
             () => new Error(errorMessage(this_el, r))
-          )(innerText)
+          )(undefined)
         )
       )
     ),
-    WT.chain(() => WT.of(undefined))
+    WT.chain(() => WT.of(this_el))
   );
