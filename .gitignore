@@ -11,4 +11,4 @@ docs
 .*.md
 example.ts
 openBrowser.ts
-debug.ts
+debug

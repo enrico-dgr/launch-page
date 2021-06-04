@@ -1,11 +1,11 @@
-import { Page } from "puppeteer";
-import * as RTE from "fp-ts/ReaderTaskEither";
-import * as RT from "fp-ts/ReaderTask";
-import * as TE from "fp-ts/TaskEither";
-import * as T from "fp-ts/Task";
-import * as E from "fp-ts/Either";
-import * as S from "fp-ts/Semigroup";
-import { flow, pipe, Predicate } from "fp-ts/lib/function";
+import * as E from 'fp-ts/Either';
+import { flow, pipe, Predicate } from 'fp-ts/lib/function';
+import * as RT from 'fp-ts/ReaderTask';
+import * as RTE from 'fp-ts/ReaderTaskEither';
+import * as S from 'fp-ts/Semigroup';
+import * as T from 'fp-ts/Task';
+import * as TE from 'fp-ts/TaskEither';
+import { Page } from 'puppeteer';
 
 export interface WebDeps {
   page: Page;
