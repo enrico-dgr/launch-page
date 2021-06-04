@@ -1,15 +1,10 @@
-import P, { Page } from "puppeteer";
-import * as WebTeer from "./fp-libs/WebTeer";
-import {
-  followedOfProfile,
-  followOnProfilePage,
-} from "./fp-libs/WebTeer/Applications/Instagram/index";
-import { pipe } from "fp-ts/lib/function";
-import { log } from "fp-ts/lib/Console";
-import {
-  freeFollowerPlan,
-  initFreeFollower,
-} from "./fp-libs/WebTeer/Applications/MrInsta";
+import { log } from 'fp-ts/lib/Console';
+import { pipe } from 'fp-ts/lib/function';
+import P from 'puppeteer';
+
+import * as WebTeer from './fp-libs/WebTeer';
+import { freeFollowerPlan } from './fp-libs/WebTeer/Applications/MrInsta';
+
 const runAndLog = <A>(wp: WebTeer.WebProgram<A>) =>
   pipe(
     wp,
@@ -55,33 +50,22 @@ const INSTAGRAM_PAGE = instagram.pages[5];
     headless: false,
     userDataDir: `./userDataDirs/folders/${PROFILE}`,
     args: ["--lang=it"],
-    defaultViewport: { width: 1350, height: 768 },
+    defaultViewport: {
+      width: 1350,
+      height: 768,
+    },
   });
   const page = await browser.newPage();
   page.setDefaultTimeout(15000);
-  const _follow = (profileUrl: string) =>
-    runAndLog(
-      pipe(
-        WebTeer.ask(),
-        WebTeer.chain(WebTeer.fromTaskK((r) => () => r.page.goto(profileUrl))),
-        WebTeer.chain(() => followOnProfilePage)
-      )
-    );
 
   const freeFPlan = runAndLog(freeFollowerPlan("MrInsta"));
-  await pipe({ page }, freeFPlan)();
+  await pipe(
+    {
+      page,
+    },
+    freeFPlan
+  )();
 })();
 /**
  *
  */
-
-const followAllFollowed = ({ page }: WebTeer.WebDeps) =>
-  pipe(
-    { page },
-    WebTeer.fromTaskK(({ page: page_ }) => () => page_.goto(INSTAGRAM_PAGE)),
-    WebTeer.chain(() => followedOfProfile(4000)),
-    WebTeer.match(
-      (e) => log("[Error] Follow followed of Profile finished: " + e)(),
-      () => log("Follow followed of Profile finished")()
-    )
-  );

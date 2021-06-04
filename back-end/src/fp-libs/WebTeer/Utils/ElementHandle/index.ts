@@ -1,10 +1,10 @@
-import { ElementHandle, EvaluateFn, SerializableOrJSHandle } from "puppeteer";
-import * as WebTeer from "../../index";
-import * as E from "fp-ts/Either";
-import * as RTE from "fp-ts/ReaderTaskEither";
-import {} from "fp-ts";
-import { flow, pipe } from "fp-ts/lib/function";
-import { fromTaskK } from "fp-ts/lib/TaskEither";
+import * as E from 'fp-ts/Either';
+import { pipe } from 'fp-ts/lib/function';
+import * as RTE from 'fp-ts/ReaderTaskEither';
+import { ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
+
+import * as WT from '../../index';
+
 /**
  * @deprecated
  */
@@ -18,21 +18,17 @@ export const oldClick: RTE.ReaderTaskEither<
     el
       .evaluate((el: HTMLButtonElement) => el.click())
       .then(E.right)
-      .catch((err) => E.left(WebTeer.anyToError(err)))
+      .catch((err) => E.left(WT.anyToError(err)))
   )
 );
-export const click = (el: ElementHandle<Element>): WebTeer.WebProgram<void> =>
-  RTE.fromTaskEither(() =>
-    el
-      .evaluate((el: HTMLElement) => el.click())
-      .then(E.right)
-      .catch((err) => E.left(WebTeer.anyToError(err)))
-  );
+export const click: (el: ElementHandle<Element>) => WT.WebProgram<void> = (
+  el
+) => WT.fromTaskK(() => () => el.evaluate((el: HTMLElement) => el.click()))();
 
-export const getProperty = <T = unknown>(property: string) => (
-  el: ElementHandle<Element>
-): WebTeer.WebProgram<T> =>
-  WebTeer.fromTaskEither(() =>
+export const getProperty = <T = never, El extends HTMLElement = never>(
+  property: keyof El & string
+) => (el: ElementHandle<Element>): WT.WebProgram<T> =>
+  WT.fromTaskEither(() =>
     el
       .getProperty(property)
       .then((jsh) => jsh?.jsonValue<T>())
@@ -41,31 +37,31 @@ export const getProperty = <T = unknown>(property: string) => (
           ? E.left(new Error(`Property of name '${property}', NOT FOUND`))
           : E.right<Error, T>(json)
       )
-      .catch((err) => E.left(WebTeer.anyToError(err)))
+      .catch((err) => E.left(WT.anyToError(err)))
   );
 export const getInnerText = getProperty<string>("innerText");
-export const getHref = getProperty<string>("href");
+export const getHref = getProperty<string, HTMLAnchorElement>("href");
 export const isNElementArray: (
   howMany: (n: number) => boolean
 ) => (
-  errorMessage: (els: ElementHandle<Element>[], r: WebTeer.WebDeps) => string
+  errorMessage: (els: ElementHandle<Element>[], r: WT.WebDeps) => string
 ) => (
   els: ElementHandle<Element>[]
-) => WebTeer.WebProgram<ElementHandle<Element>[]> = (
+) => WT.WebProgram<ElementHandle<Element>[]> = (
   howMany: (n: number) => boolean
 ) => (errorMessage) => (els) =>
   pipe(
-    WebTeer.ask(),
-    WebTeer.chain((r) =>
+    WT.ask(),
+    WT.chain((r) =>
       pipe(
         r,
-        WebTeer.fromPredicate(
+        WT.fromPredicate(
           () => howMany(els.length),
           () => new Error(errorMessage(els, r))
         )
       )
     ),
-    WebTeer.chain(() => WebTeer.of(els))
+    WT.chain(() => WT.of(els))
   );
 export const isOneElementArray = isNElementArray((n) => n === 1);
 export const isZeroElementArray = isNElementArray((n) => n === 0);
@@ -76,7 +72,7 @@ export const evaluate = <T extends EvaluateFn<any>>(
   pipe(
     el.evaluate(pageFunction, ...args),
     (prom) => () => () => prom,
-    WebTeer.fromTaskK
+    WT.fromTaskK
   );
 /**
  * @description
@@ -88,21 +84,21 @@ export const evaluate = <T extends EvaluateFn<any>>(
  */
 export const innerTextMatcher = (has: boolean) => (
   text: string,
-  errorMessage: (el: ElementHandle<Element>, deps: WebTeer.WebDeps) => string
+  errorMessage: (el: ElementHandle<Element>, deps: WT.WebDeps) => string
 ) => (this_el: ElementHandle<Element>) =>
   pipe(
     this_el,
     getProperty<string>("innerText"),
-    WebTeer.chain((innerText) =>
+    WT.chain((innerText) =>
       pipe(
-        WebTeer.ask(),
-        WebTeer.chain((r) =>
-          WebTeer.fromPredicate<string>(
+        WT.ask(),
+        WT.chain((r) =>
+          WT.fromPredicate<string>(
             (innerText_) => (innerText_.search(text) > -1 ? has : !has),
             () => new Error(errorMessage(this_el, r))
           )(innerText)
         )
       )
     ),
-    WebTeer.chain(() => WebTeer.of(undefined))
+    WT.chain(() => WT.of(undefined))
   );
