@@ -32,7 +32,7 @@ describe("Utils/ElementHandle", () => {
   describe("click", () => {
     it("right", async () => {
       await expect(
-        pipe({ page }, _.click(inputSearch))()
+        pipe({ page }, _.evaluateClick(inputSearch))()
       ).resolves.toStrictEqual(E.right<Error, void>(undefined));
     });
   });

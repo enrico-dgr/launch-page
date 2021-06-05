@@ -108,6 +108,15 @@ export const getSemigroupChain: <A>(
     ),
 });
 /**
+ *
+ */
+export const chainArray: <A>(
+  startWith: WebProgram<A>
+) => (as: readonly WebProgram<A>[]) => WebProgram<A> = S.concatAll(
+  getSemigroupChain(chain)
+);
+
+/**
  * @category constructors
  */
 export const fromPredicate: <A>(

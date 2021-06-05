@@ -1,14 +1,16 @@
-import { flow, pipe } from "fp-ts/lib/function";
-import * as WebTeer from "../../index";
-import * as Instagram from "../Instagram";
-import * as WebDepsUtils from "../../Utils/WebDeps";
-import * as ElementUtils from "../../Utils/ElementHandle";
-import { UrlsMI, UrlsTM } from "./Urls";
-import { freeFollower, plansPage } from "./XPaths";
-import { Page } from "puppeteer";
-import { init } from "./Init";
-import { routine } from "./Routine";
-import { plan } from "./Plan";
+import { flow, pipe } from 'fp-ts/lib/function';
+import { Page } from 'puppeteer';
+
+import * as WebTeer from '../../index';
+import * as ElementUtils from '../../Utils/ElementHandle';
+import * as WebDepsUtils from '../../Utils/WebDeps';
+import * as Instagram from '../Instagram';
+import { init } from './Init';
+import { plan } from './Plan';
+import { routine } from './Routine';
+import { UrlsMI, UrlsTM } from './Urls';
+import { freeFollower, plansPage } from './XPaths';
+
 type SocialPlatform = "MrInsta" | "TurboMedia";
 const getBaseUrl = (socialPlatform: SocialPlatform): string => {
   switch (socialPlatform) {
@@ -33,7 +35,7 @@ export const initFreeFollower = flow(getBaseUrl, (url: string) =>
             `Expected page: ${url}`
         )
       ),
-      WebTeer.chain((els) => ElementUtils.click(els[0]))
+      WebTeer.chain((els) => ElementUtils.evaluateClick(els[0]))
     ),
   })
 );
@@ -66,7 +68,7 @@ export const routineFreeFollower = routine<Page>({
         (els, r) => `Found "${els.length}" confirm-buttons at ${r.page.url()}`
       )
     ),
-    WebTeer.chain((els) => ElementUtils.click(els[0]))
+    WebTeer.chain((els) => ElementUtils.evaluateClick(els[0]))
   ),
   preRetrieveChecks: [
     pipe(
@@ -107,7 +109,7 @@ export const routineFreeFollower = routine<Page>({
             (els, r) => `Found "${els.length}" skip-button at ${r.page.url()}`
           )
         ),
-        WebTeer.chain((els) => ElementUtils.click(els[0])),
+        WebTeer.chain((els) => ElementUtils.evaluateClick(els[0])),
         WebTeer.chain(() => WebTeer.of(undefined))
       )
     )
@@ -136,7 +138,7 @@ export const freeFollowerPlan = (socialPlatform: SocialPlatform) =>
                 `Found "${els.length}" validate-button at ${r.page.url()}`
             )
           ),
-          WebTeer.chain((els) => ElementUtils.click(els[0])),
+          WebTeer.chain((els) => ElementUtils.evaluateClick(els[0])),
           WebTeer.chain(() => WebTeer.of(undefined))
         )
       )

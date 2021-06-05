@@ -21,9 +21,15 @@ export const oldClick: RTE.ReaderTaskEither<
       .catch((err) => E.left(WT.anyToError(err)))
   )
 );
+
 export const click: (el: ElementHandle<Element>) => WT.WebProgram<void> = (
   el
-) => WT.fromTaskK(() => () => el.evaluate((el: HTMLElement) => el.click()))();
+) => WT.fromTaskK(() => () => el.click())();
+
+export const evaluateClick: (
+  el: ElementHandle<Element>
+) => WT.WebProgram<void> = (el) =>
+  WT.fromTaskK(() => () => el.evaluate((el: HTMLElement) => el.click()))();
 
 export const getProperty = <T = never, El extends HTMLElement = never>(
   property: keyof El & string

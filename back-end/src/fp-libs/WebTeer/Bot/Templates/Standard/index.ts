@@ -1,12 +1,11 @@
-import * as Bot from 'WebTeer/Bot';
-
+import * as Bot from '../../bot';
 import { clean } from './Clean';
 import { init } from './Init';
 import { main } from './Main';
 
-const ActionsForInstagram = Bot.get({
+const random_Bot_Name = Bot.get({
   init,
   main,
   clean,
 });
-export { ActionsForInstagram };
+export { random_Bot_Name };
