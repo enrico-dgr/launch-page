@@ -1,7 +1,9 @@
-import { Browser, ElementHandle, Page } from "puppeteer";
-import * as WebTeer from "../..";
-import * as PageUtils from "../Page";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from 'fp-ts/lib/function';
+import { Browser, ElementHandle, Page } from 'puppeteer';
+
+import * as WebTeer from '../..';
+import * as PageUtils from '../Page';
+
 /**
  *
  */
@@ -54,7 +56,7 @@ export const browser: WebTeer.WebProgram<Browser> = onReaderPage(
   PageUtils.browser
 );
 /**
- *
+ * @returns the new page
  */
 export const openNewPage: WebTeer.WebProgram<Page> = onReaderPage(
   PageUtils.openNewPage
@@ -73,4 +75,10 @@ export const closeOtherPages = onReaderPage(PageUtils.closeOtherPages);
  */
 export const bringToFront: WebTeer.WebProgram<void> = onReaderPage(
   PageUtils.bringToFront
+);
+/**
+ *
+ */
+export const otherPages: WebTeer.WebProgram<Page[]> = onReaderPage(
+  PageUtils.otherPages
 );

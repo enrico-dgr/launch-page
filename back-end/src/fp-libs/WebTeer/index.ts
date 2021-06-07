@@ -27,6 +27,22 @@ export const chain: <A, B>(
   f: (a: A) => WebProgram<B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chain;
 /**
+ * Composes computations in sequence,
+ * using the return value of one computation to determine the next computation.
+ * The final value will be
+ *
+ * @category Monad
+ */
+export const chainAdd: <A, B>(
+  f: (a: A) => WebProgram<B>
+) => (ma: WebProgram<A>) => WebProgram<A & B> = (f) =>
+  chain((a) =>
+    pipe(
+      f(a),
+      RTE.chain((b) => of({ ...a, ...b }))
+    )
+  );
+/**
  * @category combinators
  */
 export const chainTaskK: <A, B>(

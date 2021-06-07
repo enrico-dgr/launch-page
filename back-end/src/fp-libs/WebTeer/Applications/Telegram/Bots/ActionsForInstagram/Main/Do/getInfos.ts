@@ -2,20 +2,23 @@ import { pipe } from 'fp-ts/function';
 import { ElementHandle } from 'puppeteer';
 import { MainResult } from 'WebTeer/Bot/main';
 import * as WT from 'WebTeer/index';
-import { getHref, isOneElementArray } from 'WebTeer/Utils/ElementHandle';
+import { $x, getHref, isOneElementArray } from 'WebTeer/Utils/ElementHandle';
 import { waitFor$x } from 'WebTeer/Utils/WebDeps';
 import * as Telegram from 'WT-Telegram/index';
 
-import { Action, BotDeps } from '../..';
+import { BotDeps } from '../..';
+import { Action } from '../../actions';
 
 type ActionTuple = [string, Action];
 interface ATE {
   ats: ActionTuple[];
   el?: ElementHandle<Element>;
 }
-type AHref = {
+export type ActionInfo = {
   action: Action;
   href: string;
+  skipBtn: ElementHandle<Element>;
+  confirmBtn: ElementHandle<Element>;
 };
 /**
  *
@@ -28,11 +31,55 @@ const getMessages: (
 /**
  *
  */
-
+const getActionHref: (
+  el: ElementHandle<Element>,
+  m: BotDeps
+) => WT.WebProgram<string> = (el, m) =>
+  pipe(
+    $x(`//div[@class='im_message_text']//a[contains(@href,'http')]`)(el),
+    WT.chain(
+      isOneElementArray(
+        (els, r) =>
+          `Found ${els.length} HTMLAnchorElement(s) containing 'http'. Info:\n` +
+          JSON.stringify({ bot: m.botChatName, url: r.page.url() })
+      )
+    ),
+    WT.chain((els) => getHref(els[0]))
+  );
+const getSkipButton: (
+  el: ElementHandle<Element>,
+  m: BotDeps
+) => WT.WebProgram<ElementHandle<Element>> = (el, m) =>
+  pipe(
+    $x(`//button[contains(text(),'${m.botChatButtons.skip}')]`)(el),
+    WT.chain(
+      isOneElementArray(
+        (els, r) =>
+          `Found ${els.length} HTMLButtonElement(s) containing '${m.botChatButtons.skip}'. Info:\n` +
+          JSON.stringify({ bot: m.botChatName, url: r.page.url() })
+      )
+    ),
+    WT.chain((els) => WT.of(els[0]))
+  );
+const getConfirmButton: (
+  el: ElementHandle<Element>,
+  m: BotDeps
+) => WT.WebProgram<ElementHandle<Element>> = (el, m) =>
+  pipe(
+    $x(`//button[contains(text(),'${m.botChatButtons.confirm}')]`)(el),
+    WT.chain(
+      isOneElementArray(
+        (els, r) =>
+          `Found ${els.length} HTMLButtonElement(s) containing '${m.botChatButtons.confirm}'. Info:\n` +
+          JSON.stringify({ bot: m.botChatName, url: r.page.url() })
+      )
+    ),
+    WT.chain((els) => WT.of(els[0]))
+  );
 /**
  *
  */
-const getInfos: (m: BotDeps) => WT.WebProgram<AHref> = (m) =>
+export const getInfos: (m: BotDeps) => WT.WebProgram<ActionInfo> = (m) =>
   pipe(
     /**
      * get action from messages
@@ -61,14 +108,27 @@ const getInfos: (m: BotDeps) => WT.WebProgram<AHref> = (m) =>
       el === undefined
         ? WT.left(
             new Error(
-              `Impossible situation, element undefined at ${JSON.stringify(
+              `Impossible situation type due to recursive function type, element undefined at ${JSON.stringify(
                 ats[0][1]
               )}`
             )
           )
         : pipe(
-            getHref(el),
-            WT.chain((href) => WT.of({ action: ats[0][1], href }))
+            getActionHref(el, m),
+            WT.chain((url) => WT.of({ href: url })),
+            WT.chainAdd(() =>
+              pipe(
+                getSkipButton(el, m),
+                WT.chain((el) => WT.of({ skipBtn: el }))
+              )
+            ),
+            WT.chainAdd(() =>
+              pipe(
+                getConfirmButton(el, m),
+                WT.chain((el) => WT.of({ confirmBtn: el }))
+              )
+            ),
+            WT.chain((s) => WT.of<ActionInfo>({ action: ats[0][1], ...s }))
           )
     )
   );

@@ -79,7 +79,7 @@ export const goto = (url: string) => (page: Page): WT.WebProgram<void> =>
 export const browser = (page: Page): WT.WebProgram<Browser> =>
   WT.of(page.browser());
 /**
- *
+ * @returns the new page
  */
 export const openNewPage: (page: Page) => WT.WebProgram<Page> = flow(
   browser,
@@ -105,6 +105,32 @@ export const openNewPageToUrl: (
   );
 export const close: (page: Page) => WT.WebProgram<void> = (page) =>
   WT.fromTaskK(() => () => page.close())();
+export const otherPages: (page: Page) => WT.WebProgram<Page[]> = (page: Page) =>
+  pipe(
+    page,
+    browser,
+    WT.chainTaskK((b) => () => b.pages()),
+    WT.chain((pages) => {
+      const pageIndex = pages.findIndex((page_) => page === page_);
+      if (pageIndex < 0) {
+        return WT.left(
+          new Error(
+            `Impossible case. No main page in pages found. pageIndex =${pageIndex}`
+          )
+        );
+      } else {
+        const lastIndex = pages.length - 1;
+        if (lastIndex > pageIndex) {
+          return WT.of(pages.slice(pageIndex + 1));
+        } else {
+          return WT.right([]);
+        }
+      }
+    })
+  );
+/**
+ * @todo refactoring using *otherPages* abstraction
+ */
 export const closeOtherPages: (page: Page) => WT.WebProgram<Page> = (
   page: Page
 ) =>
