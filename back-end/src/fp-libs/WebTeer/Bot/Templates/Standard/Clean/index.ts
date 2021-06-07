@@ -1,9 +1,9 @@
 import * as WT from '../../../../index';
-import { get } from '../../../clean';
+import { get } from '../../../conclusion';
 
-const clean = get({
+const conclusion = get({
   do: () => WT.of(undefined),
   checksAfterDo: () => [WT.of(undefined)],
 });
 
-export { clean };
+export { conclusion };

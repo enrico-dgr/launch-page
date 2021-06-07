@@ -2,7 +2,7 @@ import * as Bot from 'WebTeer/Bot';
 import { WebProgram } from 'WebTeer/index';
 
 import { Comment, Follow, Like, Story } from './actions';
-import { clean } from './Clean';
+import { conclusion } from './Conclusion';
 import { init } from './Init';
 import { main } from './Main';
 
@@ -53,5 +53,5 @@ export const ActionsForInstagram: (
 ) => WebProgram<undefined> = Bot.get({
   init,
   main,
-  clean,
+  conclusion: conclusion,
 });

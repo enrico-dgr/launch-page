@@ -1,9 +1,9 @@
-import { get } from 'WebTeer/Bot/clean';
+import { get } from 'WebTeer/Bot/conclusion';
 import * as WT from 'WebTeer/index';
 
-const clean = get({
+const conclusion = get({
   do: () => WT.of(undefined),
   checksAfterDo: () => [WT.of(undefined)],
 });
 
-export { clean };
+export { conclusion };

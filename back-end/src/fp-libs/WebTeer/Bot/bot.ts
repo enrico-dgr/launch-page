@@ -7,7 +7,7 @@ import * as WT from 'WebTeer/index';
 export interface Deps<I, M, C, F> {
   init: (i: I) => WT.WebProgram<M>;
   main: (m: M) => WT.WebProgram<C>;
-  clean: (c: C) => WT.WebProgram<F>;
+  conclusion: (c: C) => WT.WebProgram<F>;
 }
 /**
  * GetBot
@@ -19,4 +19,4 @@ export type Get = <I, M, C, F>(
  * getBot function
  */
 export const get: Get = (D) =>
-  flow(D.init, WT.chain(D.main), WT.chain(D.clean));
+  flow(D.init, WT.chain(D.main), WT.chain(D.conclusion));
