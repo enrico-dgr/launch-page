@@ -108,3 +108,15 @@ export const innerTextMatcher = (has: boolean) => (
     ),
     WT.chain(() => WT.of(this_el))
   );
+/**
+ *
+ */
+export const $x = (XPath: string) => (
+  el: ElementHandle<Element>
+): WT.WebProgram<ElementHandle<Element>[]> =>
+  WT.fromTaskEither(() =>
+    el
+      .$x(XPath)
+      .then((els) => (els !== undefined ? E.right(els) : E.right([])))
+      .catch((err) => E.left(WT.anyToError(err)))
+  );

@@ -1,3 +1,4 @@
+import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import { flow, pipe, Predicate } from 'fp-ts/lib/function';
 import * as RT from 'fp-ts/ReaderTask';

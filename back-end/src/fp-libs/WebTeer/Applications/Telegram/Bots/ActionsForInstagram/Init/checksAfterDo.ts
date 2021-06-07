@@ -4,17 +4,17 @@ import { isNElementArray } from 'WebTeer/Utils/ElementHandle';
 import { waitFor$x } from 'WebTeer/Utils/WebDeps';
 import * as Telegram from 'WT-Telegram/index';
 
+import { BotDeps } from '../';
+
 const XPathAnyMessage = (botChatName: string) =>
   Telegram.XPaths.messageWithText(botChatName, "");
-const checksAfterDo: (botChatName: string) => WT.WebProgram<void>[] = (
-  botChatName
-) => [
+const checksAfterDo: (bd: BotDeps) => WT.WebProgram<void>[] = (bd) => [
   pipe(
-    waitFor$x(XPathAnyMessage(botChatName)),
+    waitFor$x(XPathAnyMessage(bd.botChatName)),
     WT.chain(
       pipe(
         (els, r) =>
-          `Found ${els.length} messages for bot-name: "${botChatName}" \n` +
+          `Found ${els.length} messages for bot-name: "${bd.botChatName}" \n` +
           `URL: ${r.page.url()}`,
         isNElementArray((n) => n > 0)
       )
