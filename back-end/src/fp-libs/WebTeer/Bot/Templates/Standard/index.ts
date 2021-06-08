@@ -1,5 +1,5 @@
 import * as Bot from '../../bot';
-import { conclusion } from './Clean';
+import { conclusion } from './Conclusion';
 import { init } from './Init';
 import { main } from './Main';
 
