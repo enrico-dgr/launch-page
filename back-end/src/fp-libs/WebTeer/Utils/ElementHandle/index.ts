@@ -1,5 +1,5 @@
 import * as E from 'fp-ts/Either';
-import { pipe } from 'fp-ts/lib/function';
+import { flow, pipe } from 'fp-ts/lib/function';
 import * as RTE from 'fp-ts/ReaderTaskEither';
 import { ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
 
@@ -120,3 +120,13 @@ export const $x = (XPath: string) => (
       .then((els) => (els !== undefined ? E.right(els) : E.right([])))
       .catch((err) => E.left(WT.anyToError(err)))
   );
+/**
+ *
+ */
+export const exists: (
+  el: ElementHandle<Element>
+) => WT.WebProgram<boolean> = flow(
+  getInnerText,
+  WT.chain(() => WT.of<boolean>(true)),
+  WT.orElse(() => WT.of<boolean>(false))
+);
