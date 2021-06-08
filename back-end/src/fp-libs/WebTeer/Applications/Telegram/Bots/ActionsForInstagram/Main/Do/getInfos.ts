@@ -7,7 +7,7 @@ import { waitFor$x } from 'WebTeer/Utils/WebDeps';
 import * as Telegram from 'WT-Telegram/index';
 
 import { BotDeps } from '../..';
-import { Action } from '../../actions';
+import { Action } from '../../Action';
 
 type ActionTuple = [string, Action];
 interface ATE {

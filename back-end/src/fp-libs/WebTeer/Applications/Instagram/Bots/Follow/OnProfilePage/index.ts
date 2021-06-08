@@ -1,6 +1,8 @@
 import { get } from 'WebTeer/Bot';
 
-import { BasicFollowDeps, ByElementDeps, ByElementResult, Private } from '../ByElement';
+import {
+    BasicFollowDeps, ByElementDeps, ByElementResult, Followed, match as match_, NotFollowed, Private
+} from '../ByElement';
 import { conclusion } from './conclusion';
 // import { conclusion } from './conclusion';
 import { init } from './init';

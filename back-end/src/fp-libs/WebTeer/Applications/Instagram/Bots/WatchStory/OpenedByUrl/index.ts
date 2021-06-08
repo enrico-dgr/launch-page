@@ -17,15 +17,15 @@ export interface Permission_MaxStories extends MaxStories {
  */
 
 interface tag {
-  tag_: string;
+  _tag: string;
 }
 interface Shown extends tag, MaxStories {
-  tag_: "Shown";
+  _tag: "Shown";
   buttonNext: ElementHandle<HTMLButtonElement>;
   maxStories: number;
 }
 interface NotShown extends tag, MaxStories {
-  tag_: "NotShown";
+  _tag: "NotShown";
   maxStories: number;
 }
 
@@ -35,7 +35,7 @@ export const matchTransitionType = <A>(
   onShown: (shown: Shown) => A,
   onNotShown: (nowShown: NotShown) => A
 ) => (mt: TransitionType) => {
-  switch (mt.tag_) {
+  switch (mt._tag) {
     case "Shown":
       return onShown(mt);
 
@@ -51,12 +51,27 @@ export const matchTransitionType = <A>(
  */
 
 interface Viewed extends tag, StoryStats {
-  tag_: "Viewed";
+  _tag: "Viewed";
 }
 interface NotViewed extends tag, StoryStats {
-  tag_: "NotViewed";
+  _tag: "NotViewed";
 }
 export type Result_StoryStats = Viewed | NotViewed;
+export const match = <A>(
+  onViewed: (f: Viewed) => A,
+  onNotViewed: (nf: NotViewed) => A
+) => (ma: Result_StoryStats) => {
+  switch (ma._tag) {
+    case "Viewed":
+      return onViewed(ma);
+    case "NotViewed":
+      return onNotViewed(ma);
+    default:
+      throw new Error(
+        "Impossible match in WatchStory/OpenedByUrl/index -> match"
+      );
+  }
+};
 /**
  * When opened by an url, instagram asks for permission
  * to see the story with the logged profile.

@@ -1,9 +1,9 @@
 import { pipe } from 'fp-ts/lib/function';
 import { ElementHandle } from 'puppeteer';
 import * as WT from 'WebTeer/index';
-import { click, exists } from 'WebTeer/Utils/ElementHandle';
+import { click, evaluateClick, exists } from 'WebTeer/Utils/ElementHandle';
 
-import { StoryStats, TransitionType } from '../index';
+import { StoryStats } from '../index';
 
 const cycles = (c: StoryStats): number => {
   const leftToView = c.availableStories - c.viewedStories;
@@ -27,25 +27,26 @@ const notChangedViewedCounter = (vc: ViewedCounter): ViewedCounter => ({
   before: vc.now,
 });
 const isChangedViewedCounter = (vc: ViewedCounter): boolean =>
-  vc.now === vc.before;
+  !(vc.now === vc.before);
 
 export const scrollStories: (
-  nextStoryButton: ElementHandle<HTMLButtonElement>
-) => (c: StoryStats) => WT.WebProgram<StoryStats> = (nextStoryButton) => (c) =>
+  buttonNext: ElementHandle<HTMLButtonElement>
+) => (c: StoryStats) => WT.WebProgram<StoryStats> = (buttonNext) => (c) =>
   pipe(
     WT.of<ViewedCounter>(toViewedCounter(c)),
+    WT.chainFirst((vc) => WT.of(console.log(vc))),
     WT.chainN<ViewedCounter>(
-      100,
+      1500,
       cycles(c)
     )((vc) =>
       isChangedViewedCounter(vc)
         ? pipe(
-            nextStoryButton,
+            buttonNext,
             exists,
             WT.chain((stillExists) =>
               stillExists
                 ? pipe(
-                    nextStoryButton,
+                    buttonNext,
                     click,
                     WT.chain(() => WT.of(incViewedCounter(vc)))
                   )

@@ -38,7 +38,22 @@ export type ByElementResult = Liked | NotLiked;
  */
 export const liked: Liked = { _tag: "Liked" };
 export const notLiked: NotLiked = { _tag: "NotLiked" };
-
+/**
+ *
+ */
+export const match = <A>(
+  onLiked: (f: Liked) => A,
+  onNotLiked: (nf: NotLiked) => A
+) => (ma: ByElementResult) => {
+  switch (ma._tag) {
+    case "Liked":
+      return onLiked(ma);
+    case "NotLiked":
+      return onNotLiked(ma);
+    default:
+      throw new Error("Impossible match in Like/ByElement/index -> match");
+  }
+};
 /**
  * m
  */

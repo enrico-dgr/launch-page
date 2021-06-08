@@ -42,6 +42,22 @@ export const notFollowed: NotFollowed = { _tag: "NotFollowed" };
 /**
  *
  */
+export const match = <A>(
+  onFollowed: (f: Followed) => A,
+  onNotFollowed: (nf: NotFollowed) => A
+) => (ma: ByElementResult) => {
+  switch (ma._tag) {
+    case "Followed":
+      return onFollowed(ma);
+    case "NotFollowed":
+      return onNotFollowed(ma);
+    default:
+      throw new Error("Impossible match in Follow/ByElement/index -> match");
+  }
+};
+/**
+ *
+ */
 export const byElement = get<
   ByElementDeps,
   ByElementDeps,

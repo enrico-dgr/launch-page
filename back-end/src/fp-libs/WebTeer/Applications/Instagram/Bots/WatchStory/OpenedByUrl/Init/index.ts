@@ -1,18 +1,13 @@
 import { pipe } from 'fp-ts/lib/function';
 import * as WT from 'WebTeer/index';
 import { isOneElementArray } from 'WebTeer/Utils/ElementHandle';
-import { $x } from 'WebTeer/Utils/WebDeps';
+import { waitFor$x } from 'WebTeer/Utils/WebDeps';
 
 import { Permission_MaxStories, TransitionType } from '../index';
 import { showStories } from './showStories';
 
-/**
- * story button permission
- * `//section/div//button[contains(.,'Visualizza la storia')]`
- */
-
 const $xOne_ButtonNextStory = pipe(
-  $x(`//button[./div[@class='coreSpriteRightChevron']]`),
+  waitFor$x(`//button[./div[@class='coreSpriteRightChevron']]`),
   WT.chain(
     isOneElementArray(
       (els, r) =>
@@ -36,12 +31,12 @@ export const init: (
             $xOne_ButtonNextStory,
             WT.chain((btn) =>
               WT.of<TransitionType>({
-                tag_: "Shown",
+                _tag: "Shown",
                 buttonNext: btn,
                 maxStories: i.maxStories,
               })
             )
           )
-        : WT.of<TransitionType>({ tag_: "NotShown", maxStories: i.maxStories })
+        : WT.of<TransitionType>({ _tag: "NotShown", maxStories: i.maxStories })
     )
   );

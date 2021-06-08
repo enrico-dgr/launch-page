@@ -1,7 +1,7 @@
 import * as Bot from 'WebTeer/Bot';
 import { WebProgram } from 'WebTeer/index';
 
-import { Comment, Follow, Like, Story } from './actions';
+import { Comment, Follow, Like, Story } from './Action';
 import { conclusion } from './Conclusion';
 import { init } from './Init';
 import { main } from './Main';
