@@ -1,5 +1,6 @@
 import { pipe } from 'fp-ts/function';
 import { ElementHandle, Page } from 'puppeteer';
+import { sendMessage } from 'WebTeer/Applications/Telegram/Utils';
 import { MainResult } from 'WebTeer/Bot/main';
 import * as WT from 'WebTeer/index';
 import { click } from 'WebTeer/Utils/ElementHandle';
@@ -9,8 +10,9 @@ import * as F from 'WT-Instagram/Bots/Follow/index';
 import * as L from 'WT-Instagram/Bots/Like/index';
 import * as WS from 'WT-Instagram/Bots/WatchStory/index';
 
+import { BotDeps } from '../..';
 import { Action, Comment, Follow, Like, match as getMatch, Story } from '../../Action';
-import { ActionInfo } from './getInfos';
+import { ActionInfo, ATE, getActionMessage } from './getInfos';
 
 /**
  * to implement
@@ -98,9 +100,31 @@ const triggerAction = (action: Action) => (page: Page) =>
  * @description ends cycle and sets the telegram
  * chat ready for next cycle
  */
-const endCycle: () => WT.WebProgram<MainResult> = () =>
+const prepareNextCycle: (m: BotDeps) => WT.WebProgram<MainResult> = (m) =>
   pipe(
-    WT.of<MainResult>({ end: true })
+    getActionMessage(m),
+    WT.chainN<ATE>(
+      500,
+      3
+    )((a) =>
+      a.el !== undefined
+        ? WT.of(a)
+        : pipe(
+            sendMessage(m.botChatButtons.newAction),
+            WT.chain(WT.delay(500)),
+            WT.chain(() => getActionMessage(m))
+          )
+    ),
+    WT.chain((a) =>
+      a.el !== undefined
+        ? WT.of(undefined)
+        : WT.left(
+            new Error(
+              `No action-message found for next cycle in chat with ${m.botChatName}`
+            )
+          )
+    ),
+    WT.chain(() => WT.of<MainResult>({ end: true }))
   );
 /**
  *
@@ -124,5 +148,5 @@ export const doAction: (actionInfo: ActionInfo) => WT.WebProgram<MainResult> = (
               : click(actionInfo.confirmBtn)
           )
         ),
-    WT.chain(endCycle)
+    WT.chain(() => prepareNextCycle(actionInfo.botDeps))
   );

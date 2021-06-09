@@ -1,7 +1,7 @@
 import { pipe } from 'fp-ts/function';
 import { ElementHandle } from 'puppeteer';
 import * as WT from 'WebTeer/index';
-import { click, isOneElementArray } from 'WebTeer/Utils/ElementHandle';
+import { click, isOneElementArray, type } from 'WebTeer/Utils/ElementHandle';
 import { goto, waitFor$x } from 'WebTeer/Utils/WebDeps';
 import * as Telegram from 'WT-Telegram/index';
 
@@ -23,4 +23,17 @@ export const openDialog: (chatName: string) => WT.WebProgram<void> = (
       )
     ),
     WT.chain((els) => click(els[0]))
+  );
+export const sendMessage = (text: string) =>
+  pipe(
+    waitFor$x(`//div[@class='composer_rich_textarea']`),
+    WT.chain(
+      isOneElementArray(
+        (els, r) => `Found '${els.length}' textarea-input(s) at ${r.page.url()}`
+      )
+    ),
+    WT.chain((els) => WT.of(els[0])),
+    WT.chainFirst(click),
+    WT.chain(WT.delay(700)),
+    WT.chain(type(text + String.fromCharCode(13), { delay: 300 }))
   );

@@ -6,12 +6,13 @@ import { mainDo } from './Do/index';
 
 const main = get({
   checksBeforeDo: () => [WT.of(undefined)],
-  do: () =>
-    WT.of<BotDeps & MainResult>({
-      ...emptyBotDeps,
-      botChatName: "",
-      end: true,
-    }),
+  do: mainDo,
+  // () =>
+  //   WT.of<BotDeps & MainResult>({
+  //     ...emptyBotDeps,
+  //     botChatName: "",
+  //     end: true,
+  //   }),
   checksAfterDo: () => [WT.of(undefined)],
 });
 

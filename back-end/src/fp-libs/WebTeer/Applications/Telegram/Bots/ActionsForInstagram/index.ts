@@ -11,6 +11,7 @@ export interface BotDeps {
   botChatButtons: {
     confirm: string;
     skip: string;
+    newAction: string;
   };
   action: {
     follow: Follow;
@@ -24,7 +25,9 @@ export const emptyBotDeps: BotDeps = {
   botChatButtons: {
     confirm: "",
     skip: "",
+    newAction: "",
   },
+
   action: {
     follow: {
       _tag: "Follow",
@@ -48,7 +51,7 @@ export const emptyBotDeps: BotDeps = {
     },
   },
 };
-export const ActionsForInstagram: (
+export const actionsForInstagram: (
   bd: BotDeps
 ) => WebProgram<undefined> = Bot.get({
   init,

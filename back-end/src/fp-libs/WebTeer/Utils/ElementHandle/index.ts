@@ -130,3 +130,18 @@ export const exists: (
   WT.chain(() => WT.of<boolean>(true)),
   WT.orElse(() => WT.of<boolean>(false))
 );
+/**
+ *
+ */
+export const type: (
+  text: string,
+  options?: { delay: number }
+) => (el: ElementHandle<Element>) => WT.WebProgram<void> = (text, options) => (
+  el
+) =>
+  WT.fromTaskEither(() =>
+    el
+      .type(text, options)
+      .then(() => E.right(undefined))
+      .catch((err) => E.left(WT.anyToError(err)))
+  );

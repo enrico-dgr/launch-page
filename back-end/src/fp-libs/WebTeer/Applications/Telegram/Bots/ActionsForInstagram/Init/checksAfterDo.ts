@@ -12,11 +12,10 @@ const checksAfterDo: (bd: BotDeps) => WT.WebProgram<void>[] = (bd) => [
   pipe(
     waitFor$x(XPathAnyMessage(bd.botChatName)),
     WT.chain(
-      pipe(
+      isNElementArray((n) => n > 0)(
         (els, r) =>
           `Found ${els.length} messages for bot-name: "${bd.botChatName}" \n` +
-          `URL: ${r.page.url()}`,
-        isNElementArray((n) => n > 0)
+          `URL: ${r.page.url()}`
       )
     ),
     WT.chain(() => WT.of(undefined))
