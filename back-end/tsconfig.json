@@ -9,6 +9,7 @@
       "WT-MrInsta/*": ["./src/fp-libs/WebTeer/Applications/MrInsta/*"]
     },
     "strict": true,
+    // "lib": ["es2018", "dom", "esnext"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "./build",
