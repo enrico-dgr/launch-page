@@ -1,6 +1,7 @@
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
 import * as RTE from 'fp-ts/ReaderTaskEither';
+import { concatAll } from 'fp-ts/Semigroup';
 import { ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
 
 import * as WT from '../../index';
@@ -31,12 +32,12 @@ export const evaluateClick: (
 ) => WT.WebProgram<void> = (el) =>
   WT.fromTaskK(() => () => el.evaluate((el: HTMLElement) => el.click()))();
 
-export const getProperty = <T = never, El extends HTMLElement = never>(
-  property: keyof El & string
+export const getProperty = <T = never, El extends Element = never>(
+  property: keyof El
 ) => (el: ElementHandle<Element>): WT.WebProgram<T> =>
   WT.fromTaskEither(() =>
     el
-      .getProperty(property)
+      .getProperty(String(property))
       .then((jsh) => jsh?.jsonValue<T>())
       .then((json) =>
         json === undefined
@@ -145,3 +146,40 @@ export const type: (
       .then(() => E.right(undefined))
       .catch((err) => E.left(WT.anyToError(err)))
   );
+/**
+ * ------------------ checkProperties
+ */
+// type
+export type ElementProps<El extends Element, A> = [keyof El, A][];
+// recursive function
+const checkPropertiesRecur = <El extends Element, A>(
+  expectedProps: ElementProps<El, A>
+) => (el: ElementHandle<El>) => (
+  wrongProps: ElementProps<El, A>
+): WT.WebProgram<ElementProps<El, A>> =>
+  expectedProps.length > 0
+    ? pipe(
+        getProperty<A, El>(expectedProps[0][0])(el),
+        WT.chain((a) =>
+          a === expectedProps[0][1]
+            ? checkPropertiesRecur(expectedProps.slice(1))(el)(wrongProps)
+            : checkPropertiesRecur(expectedProps.slice(1))(el)([
+                ...wrongProps,
+                expectedProps[0],
+              ])
+        )
+      )
+    : WT.of(wrongProps);
+// final program
+/**
+ * Check all properties to be true and return the false ones
+ * @param expectedProps
+ * @returns
+ */
+export const checkProperties = <El extends Element, A>(
+  expectedProps: ElementProps<El, A>
+) => (el: ElementHandle<El>): WT.WebProgram<ElementProps<El, A>> =>
+  checkPropertiesRecur(expectedProps)(el)([]);
+/**
+ *  -----------------------------------------------------
+ */

@@ -19,6 +19,12 @@ export interface WebProgram<A>
  */
 export const of: <A = never>(a: A) => WebProgram<A> = RTE.of;
 /**
+ * @category — Functor
+ */
+export const map: <A, B>(
+  f: (a: A) => B
+) => (fa: WebProgram<A>) => WebProgram<B> = RTE.map;
+/**
  * Composes computations in sequence, using the return value of one computation to determine the next computation.
  *
  * @category Monad
@@ -115,23 +121,19 @@ export const leftAny: <E = never, A = never>(err: E) => WebProgram<A> = (err) =>
  * @category semigroup instance
  */
 
-export const getSemigroupChain: <A>(
-  chain_: typeof chain
-) => S.Semigroup<WebProgram<A>> = (chain_) => ({
-  concat: (x, y) =>
-    pipe(
-      x,
-      chain_(() => y)
-    ),
+export const getSemigroupChain = <A>(
+  chain_: (f: (a: A) => WebProgram<A>) => (ma: WebProgram<A>) => WebProgram<A>
+): S.Semigroup<(a: A) => WebProgram<A>> => ({
+  concat: (x, y) => flow(x, chain_(y)),
 });
 /**
  *
  */
 export const chainArray: <A>(
-  startWith: WebProgram<A>
-) => (as: readonly WebProgram<A>[]) => WebProgram<A> = S.concatAll(
-  getSemigroupChain(chain)
-);
+  startWith: (a: A) => WebProgram<A>
+) => (
+  as: readonly ((a: A) => WebProgram<A>)[]
+) => (a: A) => WebProgram<A> = S.concatAll(getSemigroupChain(chain));
 
 /**
  * @category constructors
@@ -155,6 +157,12 @@ export const ask: () => WebProgram<WebDeps> = RTE.ask;
 export const orElse: <A>(
   onLeft: (e: Error) => WebProgram<A>
 ) => (ma: WebProgram<A>) => WebProgram<A> = RTE.orElse;
+/**
+ * @category combinators
+ */
+export const orElseW: <B>(
+  onLeft: (e: Error) => WebProgram<B>
+) => <A>(ma: WebProgram<A>) => WebProgram<B | A> = RTE.orElseW;
 /**
  *
  * @param millis

@@ -1,6 +1,7 @@
-import * as WT from "../../../index";
-import { pipe } from "fp-ts/lib/function";
-import * as S from "fp-ts/lib/Semigroup";
+import { pipe } from 'fp-ts/lib/function';
+import * as S from 'fp-ts/lib/Semigroup';
+
+import * as WT from '../../../index';
 
 export interface RoutineDeps<ProfileType> {
   readonly preRetrieveChecks: WT.WebProgram<void>[];
@@ -15,7 +16,9 @@ const concatAll = S.concatAll(WT.getSemigroupChain<void>(WT.chain));
  */
 export const routine = <ProfileType>(D: RoutineDeps<ProfileType>) => {
   return pipe(
-    concatAll(WT.of(undefined))(D.preRetrieveChecks),
+    concatAll(() => WT.of(undefined))(
+      D.preRetrieveChecks.map((c) => () => c)
+    )(),
     WT.chainNOrElse<void, void>(
       1000,
       5
