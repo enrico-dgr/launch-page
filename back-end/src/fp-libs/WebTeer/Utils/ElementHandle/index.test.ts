@@ -1,11 +1,15 @@
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
+import * as O from 'fp-ts/Option';
 import * as P from 'puppeteer';
 
+import * as WT from '../../index';
+import * as WD from '../WebDeps';
 import * as _ from './index';
 
 describe("Utils/ElementHandle", () => {
   const timeout = 5000;
+  const googleUrl = "https://google.com";
   let page: P.Page;
   let inputSearch: P.ElementHandle;
   let linkGoogleStore: P.ElementHandle;
@@ -14,7 +18,7 @@ describe("Utils/ElementHandle", () => {
   beforeAll(async () => {
     // page
     page = await global.__BROWSER__.newPage();
-    await page.goto("https://google.com");
+    await page.goto(googleUrl);
     //
     inputSearch =
       (await page.waitForXPath(`//input[@title='Cerca']`)) ??
@@ -42,7 +46,15 @@ describe("Utils/ElementHandle", () => {
   describe("getProperty", () => {
     it("href", async () => {
       await expect(
-        pipe({ page }, _.getProperty<string>("href")(linkGoogleStore))()
+        pipe(
+          _.getProperty<string>("href")(linkGoogleStore),
+          WT.map(
+            O.match(
+              () => "",
+              (a) => a
+            )
+          )
+        )({ page })()
       ).resolves.toStrictEqual(
         E.right<Error, string>(
           "https://store.google.com/IT?utm_source=hp_header&utm_medium=google_ooo&utm_campaign=GS100042&hl=it-IT"
@@ -52,9 +64,14 @@ describe("Utils/ElementHandle", () => {
     it("origin", async () => {
       await expect(
         pipe(
-          { page },
-          _.getProperty<string, HTMLAnchorElement>("origin")(linkGoogleStore)
-        )()
+          _.getProperty<string, HTMLAnchorElement>("origin")(linkGoogleStore),
+          WT.map(
+            O.match(
+              () => "",
+              (a) => a
+            )
+          )
+        )({ page })()
       ).resolves.toStrictEqual(
         E.right<Error, string>("https://store.google.com")
       );
@@ -62,9 +79,14 @@ describe("Utils/ElementHandle", () => {
     it("class", async () => {
       await expect(
         pipe(
-          { page },
-          _.getProperty<string, HTMLElement>("className")(linkGoogleStore)
-        )()
+          _.getProperty<string, HTMLElement>("className")(linkGoogleStore),
+          WT.map(
+            O.match(
+              () => "",
+              (a) => a
+            )
+          )
+        )({ page })()
       ).resolves.toStrictEqual(E.right<Error, string>("MV3Tnb"));
     });
   });
@@ -166,4 +188,94 @@ describe("Utils/ElementHandle", () => {
       });
     });
   });
+
+  /**
+   * checkProperties
+   */
+  describe("checkProperties", () => {
+    it("all good", async () => {
+      await expect(
+        pipe(
+          _.checkProperties<HTMLElement, string>([["innerText", "Google"]])(
+            title[0]
+          )
+        )({ page })()
+      ).resolves.toStrictEqual(E.right([]));
+    });
+    it("properties not corresponding", async () => {
+      await expect(
+        pipe(
+          _.checkProperties<HTMLAnchorElement, string>([
+            ["href", "Google"],
+            ["innerText", "Provola Piccante"],
+          ])(title[0])
+        )({ page })()
+      ).resolves.toStrictEqual(
+        E.right([
+          ["href", "Google"],
+          ["innerText", "Provola Piccante"],
+        ])
+      );
+    });
+  });
+  /**
+   * $x
+   */
+  describe("$x", () => {
+    it("non empty", async () => {
+      await expect(
+        pipe(
+          _.$x(titleXPath)((await page.$x(`//*`))[0]),
+          WT.chain((els) =>
+            pipe(
+              _.getInnerText(els[0]),
+              WT.map(
+                O.match(
+                  () => ({
+                    lenght: els.length,
+                    text: "",
+                  }),
+                  (t) => ({
+                    lenght: els.length,
+                    text: t,
+                  })
+                )
+              ),
+              WT.chain((o) =>
+                pipe(
+                  _.getInnerText(title[0]),
+                  WT.map(
+                    O.match(
+                      () => ({
+                        lenght: title.length,
+                        text: "",
+                      }),
+                      (t) => ({
+                        lenght: title.length,
+                        text: t,
+                      })
+                    )
+                  ),
+                  WT.map((o2) => o2.lenght === o.lenght && o2.text === o.text)
+                )
+              )
+            )
+          )
+        )({ page })()
+      ).resolves.toEqual(E.right(true));
+    });
+    it("empty", async () => {
+      await expect(
+        pipe(
+          { page },
+          _.$x('//*[text()="Random not available xpath"]')(
+            (await page.$x(`//*`))[0]
+          )
+        )()
+      ).resolves.toEqual(E.right([]));
+    });
+  });
+  /**
+   *
+   */
 });

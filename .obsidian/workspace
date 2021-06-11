@@ -9,11 +9,22 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/ClickFollowButton.md",
+            "file": "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/FollowUser/docs/FollowUser.md",
             "mode": "source"
           }
         },
         "group": "4962cfec10c1ab04"
+      },
+      {
+        "id": "723eddc6d5099307",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/ClickFollowButton.md",
+            "mode": "source"
+          }
+        }
       },
       {
         "id": "afd95c913c416175",
@@ -21,7 +32,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/ClickFollowButton.md",
+            "file": "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/FollowUser/docs/FollowUser.md",
             "mode": "preview"
           }
         },
@@ -82,7 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/ClickFollowButton.md",
+                "file": "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/FollowUser/docs/FollowUser.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,15 +113,15 @@
   },
   "active": "737b70e4ce71500d",
   "lastOpenFiles": [
+    "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/FollowUser/docs/FollowUser.md",
     "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/ClickFollowButton.md",
+    "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/Click.png",
     "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/FollowUser/docs/Untitled.md",
     "Untitled.md",
     "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/isValid.png",
     "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/Pasted image 20210610152856.png",
     "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ByElement/docs/ClickFollowButton.md",
     "back-end/src/fp-libs/WebTeer/Applications/docs/Applications.md",
-    "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ByElement/docs/Untitled.md",
-    "back-end/src/fp-libs/WebTeer/docs/WebTeer.md",
-    "back-end/src/fp-libs/docs/WebTeer.md"
+    "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ByElement/docs/Untitled.md"
   ]
 }

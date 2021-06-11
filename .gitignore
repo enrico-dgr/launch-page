@@ -7,7 +7,6 @@ package-lock.json
 **.log
 photos
 srcOld
-docs
 .*.md
 example.ts
 openBrowser.ts

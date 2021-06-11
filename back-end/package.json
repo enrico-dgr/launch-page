@@ -39,6 +39,7 @@
     "fetch": "^1.1.0",
     "fp-ts": "^2.10.4",
     "gravatar": "^1.8.1",
+    "iso-639-1": "^2.1.9",
     "jest-puppeteer": "^5.0.4",
     "jsonwebtoken": "^8.5.1",
     "logging-ts": "^0.3.4",

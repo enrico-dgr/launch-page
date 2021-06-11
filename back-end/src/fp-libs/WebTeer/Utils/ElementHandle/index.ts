@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either';
-import { flow, pipe } from 'fp-ts/lib/function';
+import { flow, pipe, Predicate } from 'fp-ts/lib/function';
+import * as O from 'fp-ts/Option';
 import * as RTE from 'fp-ts/ReaderTaskEither';
-import { concatAll } from 'fp-ts/Semigroup';
 import { ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
 
 import * as WT from '../../index';
@@ -34,20 +34,49 @@ export const evaluateClick: (
 
 export const getProperty = <T = never, El extends Element = never>(
   property: keyof El
-) => (el: ElementHandle<Element>): WT.WebProgram<T> =>
+) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<T>> =>
   WT.fromTaskEither(() =>
     el
       .getProperty(String(property))
       .then((jsh) => jsh?.jsonValue<T>())
       .then((json) =>
         json === undefined
-          ? E.left(new Error(`Property of name '${property}', NOT FOUND`))
-          : E.right<Error, T>(json)
+          ? E.right(O.none)
+          : E.right<Error, O.Option<T>>(O.some(json))
       )
       .catch((err) => E.left(WT.anyToError(err)))
   );
 export const getInnerText = getProperty<string>("innerText");
 export const getHref = getProperty<string, HTMLAnchorElement>("href");
+/**
+ *
+ */
+export const expectedLength: (
+  predicate: Predicate<number>
+) => (
+  errorObject: (els: ElementHandle<Element>[], r: WT.WebDeps) => Object
+) => (
+  els: ElementHandle<Element>[]
+) => WT.WebProgram<ElementHandle<Element>[]> = (
+  predicate: Predicate<number>
+) => (errorObject) => (els) =>
+  pipe(
+    WT.ask(),
+    WT.chain((r) =>
+      pipe(
+        r,
+        WT.fromPredicate(
+          () => predicate(els.length),
+          () => new Error(JSON.stringify(errorObject(els, r)))
+        )
+      )
+    ),
+    WT.chain(() => WT.of(els))
+  );
+/**
+ * @deprecated
+ * use fp-ts/Array instead.
+ */
 export const isNElementArray: (
   howMany: (n: number) => boolean
 ) => (
@@ -70,7 +99,15 @@ export const isNElementArray: (
     ),
     WT.chain(() => WT.of(els))
   );
+/**
+ * @deprecated
+ * use fp-ts/Array instead.
+ */
 export const isOneElementArray = isNElementArray((n) => n === 1);
+/**
+ * @deprecated
+ * use fp-ts/Array instead.
+ */
 export const isZeroElementArray = isNElementArray((n) => n === 0);
 export const evaluate = <T extends EvaluateFn<any>>(
   pageFunction: string | T,
@@ -88,6 +125,8 @@ export const evaluate = <T extends EvaluateFn<any>>(
  * - If *false*, you don't want the text to be in the innerText.
  * @returns - right(undefined) if the *has* condition has been respected.
  * - left(errorMessage) otherwise.
+ * @deprecated
+ * use `checkProperties` instead
  */
 export const innerTextMatcher = (has: boolean) => (
   text: string,
@@ -101,7 +140,11 @@ export const innerTextMatcher = (has: boolean) => (
         WT.ask(),
         WT.chain((r) =>
           WT.fromPredicate(
-            () => (innerText.search(text) > -1 ? has : !has),
+            () =>
+              O.match<string, boolean>(
+                () => false,
+                (a) => (a.search(text) > -1 ? has : !has)
+              )(innerText),
             () => new Error(errorMessage(this_el, r))
           )(undefined)
         )
@@ -121,18 +164,24 @@ export const $x = (XPath: string) => (
       .then((els) => (els !== undefined ? E.right(els) : E.right([])))
       .catch((err) => E.left(WT.anyToError(err)))
   );
+
 /**
- *
+ * @deprecated
  */
 export const exists: (
   el: ElementHandle<Element>
 ) => WT.WebProgram<boolean> = flow(
   getInnerText,
-  WT.chain(() => WT.of<boolean>(true)),
+  WT.chain(
+    O.match(
+      () => WT.of(false),
+      () => WT.of<boolean>(true)
+    )
+  ),
   WT.orElse(() => WT.of<boolean>(false))
 );
 /**
- *
+ * @deprecated
  */
 export const type: (
   text: string,
@@ -151,6 +200,7 @@ export const type: (
  */
 // type
 export type ElementProps<El extends Element, A> = [keyof El, A][];
+
 // recursive function
 const checkPropertiesRecur = <El extends Element, A>(
   expectedProps: ElementProps<El, A>
@@ -161,20 +211,28 @@ const checkPropertiesRecur = <El extends Element, A>(
     ? pipe(
         getProperty<A, El>(expectedProps[0][0])(el),
         WT.chain((a) =>
-          a === expectedProps[0][1]
-            ? checkPropertiesRecur(expectedProps.slice(1))(el)(wrongProps)
-            : checkPropertiesRecur(expectedProps.slice(1))(el)([
+          O.match(
+            () =>
+              checkPropertiesRecur(expectedProps.slice(1))(el)([
                 ...wrongProps,
                 expectedProps[0],
-              ])
+              ]),
+            (val) =>
+              val === expectedProps[0][1]
+                ? checkPropertiesRecur(expectedProps.slice(1))(el)(wrongProps)
+                : checkPropertiesRecur(expectedProps.slice(1))(el)([
+                    ...wrongProps,
+                    expectedProps[0],
+                  ])
+          )(a)
         )
       )
     : WT.of(wrongProps);
 // final program
 /**
- * Check all properties to be true and return the false ones
+ * Check all properties to match with `expectedProps`
  * @param expectedProps
- * @returns
+ * @returns unmatched `expectedProps`
  */
 export const checkProperties = <El extends Element, A>(
   expectedProps: ElementProps<El, A>

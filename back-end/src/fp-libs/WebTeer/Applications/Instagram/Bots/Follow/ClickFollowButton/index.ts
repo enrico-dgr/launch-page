@@ -1,21 +1,25 @@
 import { pipe } from 'fp-ts/lib/function';
 import { ElementHandle } from 'puppeteer';
 import * as WT from 'WebTeer/index';
+import { LanguageSettingsKeys, languageSettingsSelector } from 'WebTeer/options';
 import { checkProperties, click, ElementProps } from 'WebTeer/Utils/ElementHandle';
+import {
+    languageSettings as languageSettingsInstagram, Setting as SettingInstagram
+} from 'WT-Instagram/LanguageSettings';
 
 /**
  * Input
  */
 type ButtonProps = ElementProps<HTMLButtonElement, string>;
-type ExpectedStringProperties = {
-  preFollow: ButtonProps;
-  postFollow: ButtonProps;
+type Settings = {
+  buttonPreFollowProps: ButtonProps;
+  buttonPostFollowProps: ButtonProps;
 };
 export interface Options {}
 /**
  * Output
  */
-interface tag {
+export interface tag {
   _tag: string;
 }
 export interface Followed extends tag {
@@ -33,23 +37,23 @@ interface NotClicked extends tag, WrongProps {
 interface InvalidButton extends tag, WrongProps {
   _tag: "InvalidButton";
 }
-type Reason = AlreadyFollowed | InvalidButton | NotClicked;
-export interface NotFollowed extends tag {
+export type Reason = AlreadyFollowed | InvalidButton | NotClicked;
+export interface NotFollowed<R extends tag> extends tag {
   _tag: "NotFollowed";
-  reason: Reason;
+  reason: R;
 }
-export type ClickFollowButtonOutput = Followed | NotFollowed;
+export type ClickFollowButtonOutput = Followed | NotFollowed<Reason>;
 /**
  * Output utils
  */
 const followed: Followed = { _tag: "Followed" };
-const notFollowed = (reason: Reason): NotFollowed => ({
+const notFollowed = (reason: Reason): NotFollowed<Reason> => ({
   _tag: "NotFollowed",
   reason,
 });
-const invalidButton = (wrongProps: ButtonProps): NotFollowed =>
+const invalidButton = (wrongProps: ButtonProps): NotFollowed<Reason> =>
   notFollowed({ _tag: "InvalidButton", wrongProps });
-const notClicked = (wrongProps: ButtonProps): NotFollowed =>
+const notClicked = (wrongProps: ButtonProps): NotFollowed<Reason> =>
   notFollowed({ _tag: "NotClicked", wrongProps });
 const alreadyFollowed = notFollowed({ _tag: "AlreadyFollowed" });
 /**
@@ -58,16 +62,19 @@ const alreadyFollowed = notFollowed({ _tag: "AlreadyFollowed" });
 
 interface ClickFollowButtonBodyInput {
   button: ElementHandle<HTMLButtonElement>;
-  expectedStringProperties: ExpectedStringProperties;
+  settings: Settings;
   options: Options;
 }
 const clickFollowButtonBody: (
   I: ClickFollowButtonBodyInput
 ) => WT.WebProgram<ClickFollowButtonOutput> = (I) => {
   const isValidButton = () =>
-    checkProperties(I.expectedStringProperties.preFollow)(I.button);
+    checkProperties(I.settings.buttonPreFollowProps)(I.button);
   const isFollowed = () =>
-    checkProperties(I.expectedStringProperties.postFollow)(I.button);
+    checkProperties(I.settings.buttonPostFollowProps)(I.button);
+  /**
+   *
+   */
   return pipe(
     isValidButton(),
     WT.chain((wrongPropsVB) =>
@@ -100,27 +107,22 @@ const clickFollowButtonBody: (
 /**
  * Program call
  */
-enum Languages {
-  it = "it",
-}
-export type LanguageSettingKeys = keyof typeof Languages;
-export const languageSettings: {
-  [key in LanguageSettingKeys]: ExpectedStringProperties;
-} = {
-  it: {
-    preFollow: [["innerText", "Segui"]],
-    postFollow: [["innerText", ""]],
-  },
-};
-
 export interface ClickFollowButtonInput {
   button: ElementHandle<HTMLButtonElement>;
-  language: LanguageSettingKeys;
+  language: LanguageSettingsKeys;
   options: Options;
 }
+
+const languageSettings = languageSettingsSelector<Settings, SettingInstagram>(
+  (sets) => ({
+    buttonPreFollowProps: sets.buttonFollow.expectedProps.preFollow,
+    buttonPostFollowProps: sets.buttonFollow.expectedProps.postFollow,
+  })
+)(languageSettingsInstagram);
+//
 export const clickFollowButton = (I: ClickFollowButtonInput) =>
   clickFollowButtonBody({
     button: I.button,
-    expectedStringProperties: languageSettings[I.language],
+    settings: languageSettings(I.language),
     options: I.options,
   });
