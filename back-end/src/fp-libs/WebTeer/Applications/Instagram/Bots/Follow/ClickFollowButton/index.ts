@@ -1,8 +1,12 @@
+import * as A from 'fp-ts/Array';
 import { pipe } from 'fp-ts/lib/function';
+import * as O from 'fp-ts/Option';
 import { ElementHandle } from 'puppeteer';
 import * as WT from 'WebTeer/index';
 import { LanguageSettingsKeys, languageSettingsSelector } from 'WebTeer/options';
-import { checkProperties, click, ElementProps } from 'WebTeer/Utils/ElementHandle';
+import {
+    checkPropertiesFromSets, click, ElementProps, matchOneSetOfProperties
+} from 'WebTeer/Utils/ElementHandle';
 import {
     languageSettings as languageSettingsInstagram, Setting as SettingInstagram
 } from 'WT-Instagram/LanguageSettings';
@@ -12,8 +16,8 @@ import {
  */
 type ButtonProps = ElementProps<HTMLButtonElement, string>;
 type Settings = {
-  buttonPreFollowProps: ButtonProps;
-  buttonPostFollowProps: ButtonProps;
+  buttonPreFollowProps: ButtonProps[];
+  buttonPostFollowProps: ButtonProps[];
 };
 export interface Options {}
 /**
@@ -68,10 +72,41 @@ interface ClickFollowButtonBodyInput {
 const clickFollowButtonBody: (
   I: ClickFollowButtonBodyInput
 ) => WT.WebProgram<ClickFollowButtonOutput> = (I) => {
-  const isValidButton = () =>
-    checkProperties(I.settings.buttonPreFollowProps)(I.button);
-  const isFollowed = () =>
-    checkProperties(I.settings.buttonPostFollowProps)(I.button);
+  const isValidButton = (): WT.WebProgram<
+    ElementProps<HTMLButtonElement, string>
+  > =>
+    pipe(
+      matchOneSetOfProperties<HTMLButtonElement, string>(
+        I.settings.buttonPreFollowProps
+      )(I.button),
+      WT.map(A.flatten)
+    );
+
+  //
+  const isFollowed_Recur = (
+    n: number
+  ): WT.WebProgram<ElementProps<HTMLButtonElement, string>> =>
+    pipe(
+      matchOneSetOfProperties<HTMLButtonElement, string>(
+        I.settings.buttonPostFollowProps
+      )(I.button),
+      WT.map(A.flatten),
+      WT.chain<
+        ElementProps<HTMLButtonElement, string>,
+        ElementProps<HTMLButtonElement, string>
+      >((wrongProps) =>
+        wrongProps.length > 0 && n > 0
+          ? pipe(
+              undefined,
+              WT.delay(1000),
+              WT.chain(() => isFollowed_Recur(n - 1))
+            )
+          : WT.of(wrongProps)
+      )
+    );
+  const isFollowed: () => WT.WebProgram<
+    ElementProps<HTMLButtonElement, string>
+  > = () => isFollowed_Recur(5);
   /**
    *
    */

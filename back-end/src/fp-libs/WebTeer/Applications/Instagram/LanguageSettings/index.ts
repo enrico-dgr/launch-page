@@ -8,14 +8,17 @@ export const languageSettings: LanguageSettings<Setting> = {
   it: {
     buttonFollow: {
       expectedProps: {
-        preFollow: [["innerText", "Segui"]],
-        postFollow: [["innerText", ""]],
+        preFollow: [
+          [["innerText", "Segui"]],
+          [["innerText", "Segui anche tu"]],
+        ],
+        postFollow: [[["innerText", ""]]],
       },
     },
     profilePage: {
       elements: {
         privateProfile: {
-          XPath: `//*[contains(.,'private')]`,
+          XPath: `//*[contains(text(),'Questo account è privato')]`,
         },
         buttonFollow: {
           XPath: `//header//*/button[contains(text(),'Segui')]`,

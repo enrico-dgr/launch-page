@@ -43,7 +43,9 @@ export type FollowUserOutput = (Followed | NotFollowed<Reason>) & {
 const followUserBody = (
   I: FollowUserBodyInput
 ): WT.WebProgram<FollowUserOutput> => {
+  //
   const isOnPage = pipe(WT.asks((r) => r.page.url() === I.profileUrl.href));
+  //
   const isPrivate_Recur = (n: number): WT.WebProgram<boolean> =>
     pipe(
       $x(I.settings.privateProfileXPath),
@@ -54,6 +56,7 @@ const followUserBody = (
       )
     );
   const isPrivate = () => isPrivate_Recur(3);
+  //
   const getButtonFollow = pipe(
     $x(I.settings.buttonFollowXPath),
     WT.chain(

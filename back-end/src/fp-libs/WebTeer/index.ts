@@ -1,5 +1,6 @@
 import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
+import * as IO from 'fp-ts/IO';
 import { flow, pipe, Predicate } from 'fp-ts/lib/function';
 import * as RT from 'fp-ts/ReaderTask';
 import * as RTE from 'fp-ts/ReaderTaskEither';
@@ -86,6 +87,7 @@ export const matchW: <B, A, C>(
 export const fromTaskK: <A extends readonly unknown[], B>(
   f: (...a: A) => T.Task<B>
 ) => (...a: A) => WebProgram<B> = RTE.fromTaskK;
+export const fromIO: <A>(fa: IO.IO<A>) => WebProgram<A> = RTE.fromIO;
 /**
  * @category constructors
  */

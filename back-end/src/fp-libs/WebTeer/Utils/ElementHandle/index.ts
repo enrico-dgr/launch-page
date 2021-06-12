@@ -1,3 +1,4 @@
+import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import { flow, pipe, Predicate } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
@@ -195,14 +196,13 @@ export const type: (
       .then(() => E.right(undefined))
       .catch((err) => E.left(WT.anyToError(err)))
   );
+
 /**
- * ------------------ checkProperties
+ *
  */
-// type
 export type ElementProps<El extends Element, A> = [keyof El, A][];
 
-// recursive function
-const checkPropertiesRecur = <El extends Element, A>(
+const checkProperties_Recur = <El extends Element, A>(
   expectedProps: ElementProps<El, A>
 ) => (el: ElementHandle<El>) => (
   wrongProps: ElementProps<El, A>
@@ -213,14 +213,14 @@ const checkPropertiesRecur = <El extends Element, A>(
         WT.chain((a) =>
           O.match(
             () =>
-              checkPropertiesRecur(expectedProps.slice(1))(el)([
+              checkProperties_Recur(expectedProps.slice(1))(el)([
                 ...wrongProps,
                 expectedProps[0],
               ]),
             (val) =>
               val === expectedProps[0][1]
-                ? checkPropertiesRecur(expectedProps.slice(1))(el)(wrongProps)
-                : checkPropertiesRecur(expectedProps.slice(1))(el)([
+                ? checkProperties_Recur(expectedProps.slice(1))(el)(wrongProps)
+                : checkProperties_Recur(expectedProps.slice(1))(el)([
                     ...wrongProps,
                     expectedProps[0],
                   ])
@@ -228,7 +228,7 @@ const checkPropertiesRecur = <El extends Element, A>(
         )
       )
     : WT.of(wrongProps);
-// final program
+
 /**
  * Check all properties to match with `expectedProps`
  * @param expectedProps
@@ -237,7 +237,75 @@ const checkPropertiesRecur = <El extends Element, A>(
 export const checkProperties = <El extends Element, A>(
   expectedProps: ElementProps<El, A>
 ) => (el: ElementHandle<El>): WT.WebProgram<ElementProps<El, A>> =>
-  checkPropertiesRecur(expectedProps)(el)([]);
+  checkProperties_Recur(expectedProps)(el)([]);
+/**
+ *
+ */
+const checkPropertiesFromSets_Recur = <El extends Element, A>(
+  setsOfExpectedProps: ElementProps<El, A>[]
+) => (el: ElementHandle<El>) => (
+  setsOfWrongProps: ElementProps<El, A>[]
+): WT.WebProgram<ElementProps<El, A>[]> =>
+  setsOfExpectedProps.length > 0
+    ? pipe(
+        checkProperties(setsOfExpectedProps[0])(el),
+        WT.chain((wrongProps) =>
+          checkPropertiesFromSets_Recur(setsOfExpectedProps.slice(1))(el)([
+            ...setsOfWrongProps,
+            wrongProps,
+          ])
+        )
+      )
+    : WT.of(setsOfWrongProps);
+export const checkPropertiesFromSets = <El extends Element, A>(
+  setsOfExpectedProps: ElementProps<El, A>[]
+) => (el: ElementHandle<El>): WT.WebProgram<ElementProps<El, A>[]> =>
+  checkPropertiesFromSets_Recur(setsOfExpectedProps)(el)([]);
+/**
+ * @returns
+ * - array of empty array if one set has a good match
+ * - array of wrong ElementProps<El,A> in the corresponding
+ * order of the input
+ * e.g.
+ * @example
+ * // ↓-- bad result
+ * pipe(
+ *  matchOneSetOfProperties([[["innerText","some wrong text"]]]),
+ *  WT.map(
+ * // first set of props ----↓  ↓---- first prop
+ *    wrongSets => wrongSets[0][0]
+ *  ),
+ *  WT.map(
+ *    console.log
+ *  ) // output -> ['innerText','some wrong text']
+ * );
+ * // ↓-- good result
+ * pipe(
+ *  matchOneSetOfProperties([[["innerText","some good text"]]]),
+ *  WT.map(
+ *    wrongSets => wrongSets
+ *  ),
+ *  WT.map(
+ *    console.log
+ *  ) // output -> [[]]
+ * );
+ *
+ */
+export const matchOneSetOfProperties = <El extends Element, A>(
+  setsOfExpectedProps: ElementProps<El, A>[]
+) => (el: ElementHandle<El>): WT.WebProgram<ElementProps<El, A>[]> =>
+  pipe(
+    checkPropertiesFromSets<El, A>(setsOfExpectedProps)(el),
+    WT.map((setsOfWrongProps) =>
+      pipe(
+        A.findFirst(A.isEmpty)(setsOfWrongProps),
+        O.match(
+          () => setsOfWrongProps,
+          (a_) => [[]]
+        )
+      )
+    )
+  );
 /**
  *  -----------------------------------------------------
  */

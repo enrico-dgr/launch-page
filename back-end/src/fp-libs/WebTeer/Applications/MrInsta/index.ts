@@ -1,7 +1,8 @@
 import { flow, pipe } from 'fp-ts/lib/function';
+import * as O from 'fp-ts/Option';
 import { Page } from 'puppeteer';
 
-import * as WebTeer from '../../index';
+import * as WT from '../../index';
 import * as ElementUtils from '../../Utils/ElementHandle';
 import * as WebDepsUtils from '../../Utils/WebDeps';
 import * as Instagram from '../Instagram';
@@ -26,7 +27,7 @@ export const initFreeFollower = flow(getBaseUrl, (url: string) =>
     goToGrowthPlansPage: WebDepsUtils.goto(url),
     activatePlan: pipe(
       WebDepsUtils.waitFor$x(plansPage.freeFollower),
-      WebTeer.chain(
+      WT.chain(
         ElementUtils.isOneElementArray(
           (els, r) =>
             `Found "${
@@ -35,7 +36,7 @@ export const initFreeFollower = flow(getBaseUrl, (url: string) =>
             `Expected page: ${url}`
         )
       ),
-      WebTeer.chain((els) => ElementUtils.evaluateClick(els[0]))
+      WT.chain((els) => ElementUtils.evaluateClick(els[0]))
     ),
   })
 );
@@ -45,72 +46,75 @@ export const initFreeFollower = flow(getBaseUrl, (url: string) =>
 export const routineFreeFollower = routine<Page>({
   retrieveProfile: pipe(
     WebDepsUtils.waitFor$x(freeFollower.followProfileButton),
-    WebTeer.chain(
+    WT.chain(
       ElementUtils.isOneElementArray(
         (els, r) => `Found "${els.length}" profile-links at ${r.page.url()}`
       )
     ),
-    WebTeer.chain((els) => pipe(els[0], ElementUtils.getHref)),
-    WebTeer.chain(WebDepsUtils.openNewPageToUrl)
+    WT.chain((els) => pipe(els[0], ElementUtils.getHref)),
+    WT.chain(
+      O.match(() => WT.leftAny(`No profile-link href in MrInsta/index`), WT.of)
+    ),
+    WT.chain(WebDepsUtils.openNewPageToUrl)
   ),
   follow: (p) =>
     pipe(
-      WebTeer.ask(),
-      WebTeer.chainTaskEitherK((r) =>
+      WT.ask(),
+      WT.chainTaskEitherK((r) =>
         pipe({ ...r, page: p }, Instagram.Follow.followOnProfilePage)
       )
     ),
   confirm: pipe(
     WebDepsUtils.closeOtherPages,
-    WebTeer.chain(() => WebDepsUtils.waitFor$x(freeFollower.confirmButton)),
-    WebTeer.chain(
+    WT.chain(() => WebDepsUtils.waitFor$x(freeFollower.confirmButton)),
+    WT.chain(
       ElementUtils.isOneElementArray(
         (els, r) => `Found "${els.length}" confirm-buttons at ${r.page.url()}`
       )
     ),
-    WebTeer.chain((els) => ElementUtils.evaluateClick(els[0]))
+    WT.chain((els) => ElementUtils.evaluateClick(els[0]))
   ),
   preRetrieveChecks: [
     pipe(
-      WebTeer.of(undefined),
-      WebTeer.chainNOrElse<void, void>(
+      WT.of(undefined),
+      WT.chainNOrElse<void, void>(
         1000,
         18
       )(() =>
         pipe(
           WebDepsUtils.$x(`//*[contains(.,'Processing')]`),
-          WebTeer.chain(
+          WT.chain(
             ElementUtils.isZeroElementArray(
               (els, r) =>
                 `Found "${els.length}" processing-text at ${r.page.url()}`
             )
           ),
-          WebTeer.chain(() => WebTeer.of(undefined))
+          WT.chain(() => WT.of(undefined))
         )
       )
     ),
-    WebTeer.delay<void>(2000)(undefined),
+    WT.delay<void>(2000)(undefined),
   ],
   /**
    *
    */
   skip: pipe(
     WebDepsUtils.closeOtherPages,
-    WebTeer.chainFirst(WebTeer.delay(1000)),
-    WebTeer.chain(() => WebDepsUtils.bringToFront),
-    WebTeer.chainNOrElse<void, void>(
+    WT.chainFirst(WT.delay(1000)),
+    WT.chain(() => WebDepsUtils.bringToFront),
+    WT.chainNOrElse<void, void>(
       1000,
       5
     )(() =>
       pipe(
         WebDepsUtils.$x(`//*//a[contains(.,'Skip')]`),
-        WebTeer.chain(
+        WT.chain(
           ElementUtils.isOneElementArray(
             (els, r) => `Found "${els.length}" skip-button at ${r.page.url()}`
           )
         ),
-        WebTeer.chain((els) => ElementUtils.evaluateClick(els[0])),
-        WebTeer.chain(() => WebTeer.of(undefined))
+        WT.chain((els) => ElementUtils.evaluateClick(els[0])),
+        WT.chain(() => WT.of(undefined))
       )
     )
   ),
@@ -125,21 +129,21 @@ export const freeFollowerPlan = (socialPlatform: SocialPlatform) =>
     init: initFreeFollower(socialPlatform),
     routine: routineFreeFollower,
     end: pipe(
-      WebTeer.of(undefined),
-      WebTeer.chainNOrElse<undefined, void>(
+      WT.of(undefined),
+      WT.chainNOrElse<undefined, void>(
         1000,
         60
       )(() =>
         pipe(
           WebDepsUtils.$x(`//button[text()='Validate']`),
-          WebTeer.chain(
+          WT.chain(
             ElementUtils.isOneElementArray(
               (els, r) =>
                 `Found "${els.length}" validate-button at ${r.page.url()}`
             )
           ),
-          WebTeer.chain((els) => ElementUtils.evaluateClick(els[0])),
-          WebTeer.chain(() => WebTeer.of(undefined))
+          WT.chain((els) => ElementUtils.evaluateClick(els[0])),
+          WT.chain(() => WT.of(undefined))
         )
       )
     ),
