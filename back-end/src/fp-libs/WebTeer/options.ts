@@ -9,6 +9,6 @@ export const languageSettingsSelector: <SettingsSelected, Settings>(
   selector: (s: Settings) => SettingsSelected
 ) => (
   ls: LanguageSettings<Settings>
-) => (lang: LanguageSettingsKeys) => SettingsSelected = (selector) => (ls) => (
-  lang
-) => selector(ls[lang]);
+) => (lang: LanguageSettingsKeys) => SettingsSelected = (selector) => (
+  languageSettings
+) => (lang) => selector(languageSettings[lang]);

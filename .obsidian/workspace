@@ -16,17 +16,6 @@
         "group": "4962cfec10c1ab04"
       },
       {
-        "id": "723eddc6d5099307",
-        "type": "leaf",
-        "state": {
-          "type": "markdown",
-          "state": {
-            "file": "back-end/src/fp-libs/WebTeer/Applications/Instagram/Bots/Follow/ClickFollowButton/docs/ClickFollowButton.md",
-            "mode": "source"
-          }
-        }
-      },
-      {
         "id": "afd95c913c416175",
         "type": "leaf",
         "state": {
@@ -76,8 +65,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "6c663aa20cda29fd",

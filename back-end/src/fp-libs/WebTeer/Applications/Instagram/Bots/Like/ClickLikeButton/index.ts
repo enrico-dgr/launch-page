@@ -13,11 +13,11 @@ import {
  */
 type ButtonProps = ElementProps<HTMLButtonElement, string>;
 type Settings = {
-  buttonPreFollowProps: ButtonProps[];
-  buttonPostFollowProps: ButtonProps[];
+  buttonPreLikeProps: ButtonProps[];
+  buttonPostLikeProps: ButtonProps[];
 };
 export interface Options {}
-interface ClickFollowButtonBodyInput {
+interface ClickLikeButtonBodyInput {
   button: ElementHandle<HTMLButtonElement>;
   settings: Settings;
   options: Options;
@@ -28,11 +28,11 @@ interface ClickFollowButtonBodyInput {
 export interface tag {
   _tag: string;
 }
-export interface Followed extends tag {
-  _tag: "Followed";
+export interface Likeed extends tag {
+  _tag: "Likeed";
 }
-interface AlreadyFollowed extends tag {
-  _tag: "AlreadyFollowed";
+interface AlreadyLikeed extends tag {
+  _tag: "AlreadyLikeed";
 }
 interface WrongProps {
   wrongProps: ButtonProps;
@@ -43,45 +43,45 @@ interface NotClicked extends tag, WrongProps {
 interface InvalidButton extends tag, WrongProps {
   _tag: "InvalidButton";
 }
-export type Reason = AlreadyFollowed | InvalidButton | NotClicked;
-export interface NotFollowed<R extends tag> extends tag {
-  _tag: "NotFollowed";
+export type Reason = AlreadyLikeed | InvalidButton | NotClicked;
+export interface NotLikeed<R extends tag> extends tag {
+  _tag: "NotLikeed";
   reason: R;
 }
-export type ClickFollowButtonOutput = Followed | NotFollowed<Reason>;
+export type ClickLikeButtonOutput = Likeed | NotLikeed<Reason>;
 /**
  * Output utils
  */
-const followed: Followed = { _tag: "Followed" };
-const notFollowed = (reason: Reason): NotFollowed<Reason> => ({
-  _tag: "NotFollowed",
+const followed: Likeed = { _tag: "Likeed" };
+const notLikeed = (reason: Reason): NotLikeed<Reason> => ({
+  _tag: "NotLikeed",
   reason,
 });
-const invalidButton = (wrongProps: ButtonProps): NotFollowed<Reason> =>
-  notFollowed({ _tag: "InvalidButton", wrongProps });
-const notClicked = (wrongProps: ButtonProps): NotFollowed<Reason> =>
-  notFollowed({ _tag: "NotClicked", wrongProps });
-const alreadyFollowed = notFollowed({ _tag: "AlreadyFollowed" });
+const invalidButton = (wrongProps: ButtonProps): NotLikeed<Reason> =>
+  notLikeed({ _tag: "InvalidButton", wrongProps });
+const notClicked = (wrongProps: ButtonProps): NotLikeed<Reason> =>
+  notLikeed({ _tag: "NotClicked", wrongProps });
+const alreadyLikeed = notLikeed({ _tag: "AlreadyLikeed" });
 /**
  * Program body
  */
 
-const clickFollowButtonBody: (
-  I: ClickFollowButtonBodyInput
-) => WT.WebProgram<ClickFollowButtonOutput> = (I) => {
+const clickLikeButtonBody: (
+  I: ClickLikeButtonBodyInput
+) => WT.WebProgram<ClickLikeButtonOutput> = (I) => {
   const isValidButton = (): WT.WebProgram<ButtonProps> =>
     pipe(
       matchOneSetOfProperties<HTMLButtonElement, string>(
-        I.settings.buttonPreFollowProps
+        I.settings.buttonPreLikeProps
       )(I.button),
       WT.map(A.flatten)
     );
 
   //
-  const isFollowed_Recur = (n: number): WT.WebProgram<ButtonProps> =>
+  const isLikeed_Recur = (n: number): WT.WebProgram<ButtonProps> =>
     pipe(
       matchOneSetOfProperties<HTMLButtonElement, string>(
-        I.settings.buttonPostFollowProps
+        I.settings.buttonPostLikeProps
       )(I.button),
       WT.map(A.flatten),
       WT.chain<
@@ -92,13 +92,12 @@ const clickFollowButtonBody: (
           ? pipe(
               undefined,
               WT.delay(1000),
-              WT.chain(() => isFollowed_Recur(n - 1))
+              WT.chain(() => isLikeed_Recur(n - 1))
             )
           : WT.of(wrongProps)
       )
     );
-  const isFollowed: () => WT.WebProgram<ButtonProps> = () =>
-    isFollowed_Recur(5);
+  const isLikeed: () => WT.WebProgram<ButtonProps> = () => isLikeed_Recur(5);
   /**
    *
    */
@@ -111,19 +110,19 @@ const clickFollowButtonBody: (
             WT.map(() => followed)
           )
         : pipe(
-            isFollowed(),
-            WT.map<ButtonProps, ClickFollowButtonOutput>((wrongPropsF) =>
+            isLikeed(),
+            WT.map<ButtonProps, ClickLikeButtonOutput>((wrongPropsF) =>
               wrongPropsF.length < 1
-                ? alreadyFollowed
+                ? alreadyLikeed
                 : invalidButton(wrongPropsVB)
             )
           )
     ),
     WT.chain((f) =>
-      f._tag === "Followed"
+      f._tag === "Likeed"
         ? pipe(
-            isFollowed(),
-            WT.map<ButtonProps, ClickFollowButtonOutput>((wrongPropsFPost) =>
+            isLikeed(),
+            WT.map<ButtonProps, ClickLikeButtonOutput>((wrongPropsFPost) =>
               wrongPropsFPost.length < 1 ? f : notClicked(wrongPropsFPost)
             )
           )
@@ -134,7 +133,7 @@ const clickFollowButtonBody: (
 /**
  * Program call
  */
-export interface ClickFollowButtonInput {
+export interface ClickLikeButtonInput {
   button: ElementHandle<HTMLButtonElement>;
   language: LanguageSettingsKeys;
   options: Options;
@@ -142,13 +141,13 @@ export interface ClickFollowButtonInput {
 
 const languageSettings = languageSettingsSelector<Settings, SettingInstagram>(
   (sets) => ({
-    buttonPreFollowProps: sets.buttonFollow.expectedProps.preFollow,
-    buttonPostFollowProps: sets.buttonFollow.expectedProps.postFollow,
+    buttonPreLikeProps: sets.buttonLike.expectedProps.preLike,
+    buttonPostLikeProps: sets.buttonLike.expectedProps.postLike,
   })
 )(languageSettingsInstagram);
 //
-export const clickFollowButton = (I: ClickFollowButtonInput) =>
-  clickFollowButtonBody({
+export const clickLikeButton = (I: ClickLikeButtonInput) =>
+  clickLikeButtonBody({
     button: I.button,
     settings: languageSettings(I.language),
     options: I.options,

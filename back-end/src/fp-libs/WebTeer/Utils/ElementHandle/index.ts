@@ -27,12 +27,16 @@ export const oldClick: RTE.ReaderTaskEither<
 export const click: (el: ElementHandle<Element>) => WT.WebProgram<void> = (
   el
 ) => WT.fromTaskK(() => () => el.click())();
-
+/**
+ * runs `click` on page's console
+ */
 export const evaluateClick: (
   el: ElementHandle<Element>
 ) => WT.WebProgram<void> = (el) =>
   WT.fromTaskK(() => () => el.evaluate((el: HTMLElement) => el.click()))();
-
+/**
+ * runs `el.getProperty()`
+ */
 export const getProperty = <T = never, El extends Element = never>(
   property: keyof El
 ) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<T>> =>
@@ -46,6 +50,46 @@ export const getProperty = <T = never, El extends Element = never>(
           : E.right<Error, O.Option<T>>(O.some(json))
       )
       .catch((err) => E.left(WT.anyToError(err)))
+  );
+
+export type QualifiedAttributeName = "aria-label";
+export const isQualifiedAttributeName = (
+  name: any
+): name is QualifiedAttributeName => {
+  switch (name) {
+    case "aria-label":
+      return true;
+
+    default:
+      return false;
+  }
+};
+/**
+ * get attributes such as *aria-label*
+ */
+export const getAttribute = <El extends Element = never>(
+  qualifiedAttributeName: QualifiedAttributeName
+) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<string>> =>
+  WT.fromTaskEither(() =>
+    el
+      .evaluate((el: El) => el.getAttribute(qualifiedAttributeName))
+      .then((value) =>
+        value === null
+          ? E.right(O.none)
+          : E.right<Error, O.Option<string>>(O.some(value))
+      )
+      .catch((err) => E.left(WT.anyToError(err)))
+  );
+/**
+ *
+ */
+export const getPropertyOrAttribute = <T = never, El extends Element = never>(
+  property: keyof El | QualifiedAttributeName
+) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<T | string>> =>
+  pipe(
+    isQualifiedAttributeName(property)
+      ? getAttribute(property)(el)
+      : getProperty(property)(el)
   );
 export const getInnerText = getProperty<string>("innerText");
 export const getHref = getProperty<string, HTMLAnchorElement>("href");
@@ -200,7 +244,10 @@ export const type: (
 /**
  *
  */
-export type ElementProps<El extends Element, A> = [keyof El, A][];
+export type ElementProps<El extends Element, A> = [
+  keyof El | QualifiedAttributeName,
+  A | string
+][];
 
 const checkProperties_Recur = <El extends Element, A>(
   expectedProps: ElementProps<El, A>
@@ -209,8 +256,10 @@ const checkProperties_Recur = <El extends Element, A>(
 ): WT.WebProgram<ElementProps<El, A>> =>
   expectedProps.length > 0
     ? pipe(
-        getProperty<A, El>(expectedProps[0][0])(el),
-        WT.chain((a) =>
+        isQualifiedAttributeName(expectedProps[0][0])
+          ? getAttribute<El>(expectedProps[0][0])(el)
+          : getProperty<A, El>(expectedProps[0][0])(el),
+        WT.chain<O.Option<A | string>, ElementProps<El, A>>((a) =>
           O.match(
             () =>
               checkProperties_Recur(expectedProps.slice(1))(el)([

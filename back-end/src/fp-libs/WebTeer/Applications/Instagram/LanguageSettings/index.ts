@@ -15,6 +15,17 @@ export const languageSettings: LanguageSettings<Setting> = {
         postFollow: [[["innerText", ""]]],
       },
     },
+    buttonLike: {
+      svg: {
+        expectedProps: {
+          preLike: [[["aria-label", "Mi piace"]]],
+          postLike: [[["aria-label", "Non mi piace più"]]],
+        },
+      },
+    },
+    notAvailablePage: {
+      XPath: `//*[contains(.,'Spiacenti, questa pagina non è disponibile')]`,
+    },
     profilePage: {
       elements: {
         privateProfile: {
@@ -22,6 +33,16 @@ export const languageSettings: LanguageSettings<Setting> = {
         },
         buttonFollow: {
           XPath: `//header//*/button[contains(text(),'Segui')]`,
+        },
+      },
+    },
+    igPostPage: {
+      elements: {
+        buttonLike: {
+          XPath: `//section/span/button[./div/span/*[name()='svg' and @aria-label='Mi piace']]`,
+        },
+        buttonUnlike: {
+          XPath: `//section/span/button[./div/span/*[name()='svg' and @aria-label='Non mi piace più']]`,
         },
       },
     },

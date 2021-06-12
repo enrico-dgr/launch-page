@@ -3,15 +3,14 @@ import { pipe } from 'fp-ts/lib/function';
 import * as WT from 'WebTeer/index';
 import { LanguageSettingsKeys, languageSettingsSelector } from 'WebTeer/options';
 import { expectedLength } from 'WebTeer/Utils/ElementHandle';
-import { $x } from 'WebTeer/Utils/WebDeps';
+import { $x, goto } from 'WebTeer/Utils/WebDeps';
 import {
     languageSettings as languageSettingsInstagram, Setting as SettingInstagram
 } from 'WT-Instagram/LanguageSettings';
-import { goto, PageState_Instagram } from 'WT-Instagram/Utils';
 
 import {
     clickFollowButton, Followed, NotFollowed, Options as OptionsCFBO, Reason as ReasonCFBO, tag
-} from '../ClickFollowButton';
+} from '../ClickLikeButton';
 
 interface Options extends OptionsCFBO {
   /**
@@ -33,12 +32,9 @@ export interface FollowUserBodyInput {
 interface CannotFollowPrivate extends tag {
   _tag: "CannotFollowPrivate";
 }
-interface PageState extends tag {
-  _tag: PageState_Instagram;
-}
-export type Reason = ReasonCFBO | CannotFollowPrivate | PageState;
+export type Reason = ReasonCFBO | CannotFollowPrivate;
 
-export type FollowUser_Output = (Followed | NotFollowed<Reason>) & {
+export type FollowUserOutput = (Followed | NotFollowed<Reason>) & {
   isPrivate: boolean;
 };
 /**
@@ -46,14 +42,10 @@ export type FollowUser_Output = (Followed | NotFollowed<Reason>) & {
  */
 const followUserBody = (
   I: FollowUserBodyInput
-): WT.WebProgram<FollowUser_Output> => {
-  /**
-   *
-   */
+): WT.WebProgram<FollowUserOutput> => {
+  //
   const isOnPage = pipe(WT.asks((r) => r.page.url() === I.profileUrl.href));
-  /**
-   *
-   */
+  //
   const isPrivate_Recur = (n: number): WT.WebProgram<boolean> =>
     pipe(
       $x(I.settings.privateProfileXPath),
@@ -64,9 +56,7 @@ const followUserBody = (
       )
     );
   const isPrivate = () => isPrivate_Recur(3);
-  /**
-   *
-   */
+  //
   const getButtonFollow = pipe(
     $x(I.settings.buttonFollowXPath),
     WT.chain(
@@ -78,16 +68,15 @@ const followUserBody = (
     ),
     WT.map((els) => els[0])
   );
-  /**
-   *
-   */
-  const onAvailablePage = pipe(
-    undefined,
-    WT.delay(1000),
+
+  return pipe(
+    isOnPage,
+    WT.chain((b) => (b ? WT.of(undefined) : goto(I.profileUrl.href))),
+    WT.chain(WT.delay(1000)),
     WT.chain(isPrivate),
     WT.chain((isPrvt) =>
       isPrvt === true && I.options.allowPrivate === false
-        ? WT.of<FollowUser_Output>({
+        ? WT.of<FollowUserOutput>({
             _tag: "NotFollowed",
             reason: {
               _tag: "CannotFollowPrivate",
@@ -104,34 +93,12 @@ const followUserBody = (
               })
             ),
             WT.chain((o) =>
-              WT.of<FollowUser_Output>({
+              WT.of<FollowUserOutput>({
                 ...o,
                 isPrivate: isPrvt,
               })
             )
           )
-    )
-  );
-  /**
-   * Body
-   */
-  return pipe(
-    isOnPage,
-    WT.chain((b) =>
-      b
-        ? WT.of<PageState_Instagram>("AvailablePage")
-        : goto(I.language)(I.profileUrl.href)
-    ),
-    WT.chain<PageState_Instagram, FollowUser_Output>((res) =>
-      res === "NotAvailablePage"
-        ? WT.of<FollowUser_Output>({
-            _tag: "NotFollowed",
-            reason: {
-              _tag: "NotAvailablePage",
-            },
-            isPrivate: false,
-          })
-        : onAvailablePage
     )
   );
 };
