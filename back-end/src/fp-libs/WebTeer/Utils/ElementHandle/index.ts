@@ -360,5 +360,69 @@ export const matchOneSetOfProperties = <El extends Element, A>(
     )
   );
 /**
- *  -----------------------------------------------------
+ *
  */
+type XPathResult = "Found" | "NotFound";
+const tellIfRelativeXPathIsValid = (xpath: string) => (
+  el: ElementHandle<Element>
+) =>
+  pipe(
+    $x(xpath)(el),
+    WT.map(A.isEmpty),
+    WT.map((b) =>
+      b ? O.some<XPathResult>("NotFound") : O.some<XPathResult>("Found")
+    )
+  );
+export type HTMLElementProperties<El extends Element, A> = (
+  | [keyof El | QualifiedAttributeName, A | string]
+  | [string, XPathResult]
+)[];
+const matchOnFirstProp = <El extends Element, A>(
+  expectedProps: HTMLElementProperties<El, A>
+) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<A | string>> => {
+  if (isQualifiedAttributeName(expectedProps[0][0])) {
+    return getAttribute<El>(expectedProps[0][0])(el);
+  } else if (typeof expectedProps[0][0] === "string") {
+    return tellIfRelativeXPathIsValid(expectedProps[0][0])(el);
+  } else {
+    return getProperty<A, El>(expectedProps[0][0])(el);
+  }
+};
+const recursivelyCheckHTMLProperties = <El extends Element, A>(
+  expectedProps: HTMLElementProperties<El, A>
+) => (el: ElementHandle<El>) => (
+  wrongProps: HTMLElementProperties<El, A>
+): WT.WebProgram<HTMLElementProperties<El, A>> =>
+  expectedProps.length > 0
+    ? pipe(
+        matchOnFirstProp<El, A>(expectedProps)(el),
+        WT.chain<O.Option<A | string>, HTMLElementProperties<El, A>>(
+          O.match(
+            () =>
+              recursivelyCheckHTMLProperties(expectedProps.slice(1))(el)([
+                ...wrongProps,
+                expectedProps[0],
+              ]),
+            (val) =>
+              val === expectedProps[0][1]
+                ? recursivelyCheckHTMLProperties(expectedProps.slice(1))(el)(
+                    wrongProps
+                  )
+                : recursivelyCheckHTMLProperties(expectedProps.slice(1))(el)([
+                    ...wrongProps,
+                    expectedProps[0],
+                  ])
+          )
+        )
+      )
+    : WT.of(wrongProps);
+
+/**
+ * Check all properties to match with `expectedProps`
+ * @param expectedProps
+ * @returns unmatched `expectedProps`
+ */
+export const checkHTMLProperties = <El extends Element, A>(
+  expectedProps: HTMLElementProperties<El, A>
+) => (el: ElementHandle<El>): WT.WebProgram<HTMLElementProperties<El, A>> =>
+  recursivelyCheckHTMLProperties(expectedProps)(el)([]);
