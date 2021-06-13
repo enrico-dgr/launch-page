@@ -1,44 +1,48 @@
 import * as A from 'fp-ts/Array';
 import { flow, pipe } from 'fp-ts/function';
 import * as WT from 'WebTeer/index';
-import { LanguageSettings, LanguageSettingsKeys, languageSettingsSelector } from 'WebTeer/options';
+import {
+    getPropertiesFromSettingsAndLanguage, Languages, SettingsByLanguage
+} from 'WebTeer/settingsByLanguage';
 import { $x, goto as gotoWD } from 'WebTeer/Utils/WebDeps';
 
-import { languageSettings, Setting } from '../LanguageSettings';
+import { Settings, settingsByLanguage } from '../SettingsByLanguage';
 
-export type PageState_Instagram = "AvailablePage" | "NotAvailablePage";
+export type StateOfInstagramPage = "AvailablePage" | "NotAvailablePage";
 
-const gotoBody = (notAvailablePageXPath: string) => (n: number) => (
-  url: string
-): WT.WebProgram<PageState_Instagram> =>
+const tryNTimesGotoInstagramPage = (notAvailablePageXPath: string) => (
+  n: number
+) => (): WT.WebProgram<StateOfInstagramPage> =>
   n > 0
     ? pipe(
-        gotoWD(url),
-        WT.chain(() =>
-          pipe(
-            $x(notAvailablePageXPath),
-            WT.map(A.isEmpty),
-            WT.chain((b) =>
-              b === true
-                ? pipe(
-                    undefined,
-                    WT.delay(500),
-                    WT.chain(() => gotoBody(notAvailablePageXPath)(n - 1)(url))
-                  )
-                : WT.of<PageState_Instagram>("NotAvailablePage")
-            )
-          )
+        $x(notAvailablePageXPath),
+        WT.map(A.isEmpty),
+        WT.chain((b) =>
+          b === true
+            ? pipe(
+                undefined,
+                WT.delay(500),
+                WT.chain(() =>
+                  tryNTimesGotoInstagramPage(notAvailablePageXPath)(n - 1)()
+                )
+              )
+            : WT.of<StateOfInstagramPage>("NotAvailablePage")
         )
       )
-    : WT.of<PageState_Instagram>("AvailablePage");
+    : WT.of<StateOfInstagramPage>("AvailablePage");
 /**
  *
  */
-export const goto: (
-  lang: LanguageSettingsKeys
-) => (url: string) => WT.WebProgram<PageState_Instagram> = (lang) =>
-  gotoBody(
-    languageSettingsSelector<string, Setting>(
-      (sets) => sets.notAvailablePage.XPath
-    )(languageSettings)(lang)
-  )(3);
+export const gotoInstagramPage: (
+  lang: Languages
+) => (url: string) => WT.WebProgram<StateOfInstagramPage> = (lang) => (url) =>
+  pipe(
+    gotoWD(url),
+    WT.chain(
+      tryNTimesGotoInstagramPage(
+        getPropertiesFromSettingsAndLanguage<string, Settings>(
+          (sets) => sets.notAvailablePage.XPath
+        )(settingsByLanguage)(lang)
+      )(3)
+    )
+  );

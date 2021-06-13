@@ -122,7 +122,6 @@ export const leftAny: <E = never, A = never>(err: E) => WebProgram<A> = (err) =>
 /**
  * @category semigroup instance
  */
-
 export const getSemigroupChain = <A>(
   chain_: (f: (a: A) => WebProgram<A>) => (ma: WebProgram<A>) => WebProgram<A>
 ): S.Semigroup<(a: A) => WebProgram<A>> => ({
@@ -175,8 +174,7 @@ export const delay: <A>(millis: number) => (first: A) => WebProgram<A> = (
 ) => fromTaskK((a) => T.delay(millis)(T.of(a)));
 /**
  *
- * @todo The following functions could be more abstract.
- * Consider change them before adding new similar.
+ * @todo remove dependencies from these functions
  * --------------------------- Start ---------------------------
  */
 /**
@@ -187,6 +185,7 @@ export const delay: <A>(millis: number) => (first: A) => WebProgram<A> = (
  * *NOTE* the first attempt will run immediately
  * @param attempts
  * @returns
+ * @deprecated better create recursive function for the purpose
  */
 const nOrElse: <A, B>(
   millis: number,
@@ -216,6 +215,7 @@ const nOrElse: <A, B>(
  * *NOTE* the first attempt will run immediately
  * @param attempts
  * @returns
+ * @deprecated better create recursive function for the purpose
  */
 export const chainNOrElse: <A, B>(
   millis: number,
@@ -238,6 +238,7 @@ export const chainNOrElse: <A, B>(
  * *NOTE* the first attempt will run immediately
  * @param attempts
  * @returns the result of the last cycle (*right* or *left*)
+ * @deprecated better create recursive function for the purpose
  */
 const dummyRepeat: <A>(
   millis: number,
@@ -268,6 +269,7 @@ const dummyRepeat: <A>(
  * *NOTE* the first attempt will run immediately
  * @param attempts
  * @returns the result of the last cycle (*right* or *left*)
+ * @deprecated better create recursive function for the purpose
  */
 export const chainN: <A>(
   millis: number,

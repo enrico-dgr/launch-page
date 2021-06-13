@@ -1,6 +1,6 @@
 import { ElementProps } from 'WebTeer/Utils/ElementHandle';
 
-export interface Setting {
+export interface Settings {
   buttonFollow: {
     expectedProps: {
       preFollow: ElementProps<HTMLButtonElement, string>[];
@@ -10,9 +10,21 @@ export interface Setting {
   buttonLike: {
     svg: {
       expectedProps: {
-        preLike: ElementProps<HTMLElement, string>[];
-        postLike: ElementProps<HTMLButtonElement, string>[];
+        preLike: ElementProps<HTMLOrSVGImageElement, string>[];
+        postLike: ElementProps<HTMLOrSVGImageElement, string>[];
       };
+      /**
+       * XPath relative to buttonLike
+       */
+      XPath: string;
+      /**
+       * XPath relative to buttonLike
+       */
+      XPathPreLike: string;
+      /**
+       * XPath relative to buttonLike
+       */
+      XPathPostLike: string;
     };
   };
   notAvailablePage: {
@@ -24,6 +36,9 @@ export interface Setting {
         XPath: string;
       };
       buttonFollow: {
+        XPath: string;
+      };
+      buttonAlreadyFollow: {
         XPath: string;
       };
     };

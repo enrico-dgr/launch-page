@@ -1,10 +1,10 @@
-import { LanguageSettings } from 'WebTeer/options';
+import { SettingsByLanguage } from 'WebTeer/settingsByLanguage';
 
-import { Setting } from './setting';
+import { Settings } from './settings';
 
-export { Setting } from "./setting";
+export { Settings } from "./settings";
 
-export const languageSettings: LanguageSettings<Setting> = {
+export const settingsByLanguage: SettingsByLanguage<Settings> = {
   it: {
     buttonFollow: {
       expectedProps: {
@@ -21,6 +21,9 @@ export const languageSettings: LanguageSettings<Setting> = {
           preLike: [[["aria-label", "Mi piace"]]],
           postLike: [[["aria-label", "Non mi piace più"]]],
         },
+        XPath: `./div/span/*[name()='svg']`,
+        XPathPreLike: `./div/span/*[name()='svg' and @aria-label='Mi piace']`,
+        XPathPostLike: `./div/span/*[name()='svg' and @aria-label='Non mi piace più']`,
       },
     },
     notAvailablePage: {
@@ -33,6 +36,9 @@ export const languageSettings: LanguageSettings<Setting> = {
         },
         buttonFollow: {
           XPath: `//header//*/button[contains(text(),'Segui')]`,
+        },
+        buttonAlreadyFollow: {
+          XPath: `//button[./div/span[@aria-label='Segui già']]`,
         },
       },
     },

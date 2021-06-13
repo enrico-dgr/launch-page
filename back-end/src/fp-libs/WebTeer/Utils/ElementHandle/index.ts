@@ -72,7 +72,11 @@ export const getAttribute = <El extends Element = never>(
 ) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<string>> =>
   WT.fromTaskEither(() =>
     el
-      .evaluate((el: El) => el.getAttribute(qualifiedAttributeName))
+      .evaluate(
+        (el: El, qualifiedAttributeName) =>
+          el.getAttribute(qualifiedAttributeName),
+        qualifiedAttributeName
+      )
       .then((value) =>
         value === null
           ? E.right(O.none)
