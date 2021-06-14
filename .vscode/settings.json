@@ -1,6 +1,7 @@
 {
     "typescript.tsdk": "./front-end/node_modules/typescript/lib",
     "cSpell.words": [
+        "combinators",
         "socialgift",
         "teleteer"
     ]

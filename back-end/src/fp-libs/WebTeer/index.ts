@@ -9,6 +9,8 @@ import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
 import { Page } from 'puppeteer';
 
+import { createErrorFromErrorInfos, ErrorInfos, stackErrorInfos } from './errorInfos';
+
 export interface WebDeps {
   page: Page;
 }
@@ -108,6 +110,7 @@ export const right: <A = never>(a: A) => WebProgram<A> = RTE.right;
 export const left: <A = never>(e: Error) => WebProgram<A> = RTE.left;
 /**
  * @category constructors
+ *
  */
 export const anyToError: <E>(err: E) => Error = (err) =>
   err instanceof Error ? err : new Error(JSON.stringify(err));
@@ -164,6 +167,20 @@ export const orElse: <A>(
 export const orElseW: <B>(
   onLeft: (e: Error) => WebProgram<B>
 ) => <A>(ma: WebProgram<A>) => WebProgram<B | A> = RTE.orElseW;
+/**
+ * @category constructors
+ */
+export const leftFromErrorInfos = <A = never>(
+  errorInfos: ErrorInfos,
+  pathToFile: string
+): WebProgram<A> => left(createErrorFromErrorInfos(errorInfos, pathToFile));
+/**
+ * @category combinators
+ */
+export const orElseStackErrorInfos = <A>(errorInfos: ErrorInfos) => (
+  ma: WebProgram<A>
+): WebProgram<A> =>
+  orElse<A>((e: Error) => left(stackErrorInfos(errorInfos)(e)))(ma);
 /**
  *
  * @param millis
