@@ -6,20 +6,22 @@ import {
 } from 'WebTeer/Applications/Instagram/SettingsByLanguage';
 import * as WT from 'WebTeer/index';
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
-import { click, ElementProps, matchOneSetOfProperties } from 'WebTeer/Utils/ElementHandle';
+import {
+    click, HTMLElementProperties, matchOneSetOfHTMLProperties
+} from 'WebTeer/Utils/ElementHandle';
 
 /**
  * @category Input of Body
  * @subcategory Subtype
  */
-type ButtonProps = ElementProps<HTMLButtonElement, string>;
+type PropertiesOfButton = HTMLElementProperties<HTMLButtonElement, string>;
 /**
  * @category Input of Body
  * @subcategory Subtype
  */
 type Settings = {
-  buttonPreFollowProps: ButtonProps[];
-  buttonPostFollowProps: ButtonProps[];
+  buttonPreFollowProps: PropertiesOfButton[];
+  buttonPostFollowProps: PropertiesOfButton[];
 };
 /**
  * @category Input of Body
@@ -71,7 +73,7 @@ interface AlreadyFollowed extends tag {
  * @subcategory Subtype
  */
 interface WrongProps {
-  wrongProps: ButtonProps;
+  wrongProps: PropertiesOfButton;
 }
 /**
  * @category Output
@@ -121,14 +123,16 @@ const notFollowed = (reason: Reason): NotFollowed => ({
  * @category Output
  * @subcategory Util
  */
-const returnInvalidButtonAsOutput = (wrongProps: ButtonProps): NotFollowed =>
-  notFollowed({ _tag: "InvalidButton", wrongProps });
+const returnInvalidButtonAsOutput = (
+  wrongProps: PropertiesOfButton
+): NotFollowed => notFollowed({ _tag: "InvalidButton", wrongProps });
 /**
  * @category Output
  * @subcategory Util
  */
-const returnNotClickedAsOutput = (wrongProps: ButtonProps): NotFollowed =>
-  notFollowed({ _tag: "NotClicked", wrongProps });
+const returnNotClickedAsOutput = (
+  wrongProps: PropertiesOfButton
+): NotFollowed => notFollowed({ _tag: "NotClicked", wrongProps });
 /**
  * @category Output
  * @subcategory Util
@@ -145,9 +149,9 @@ const bodyOfClickButtonFollow: (I: InputOfBody) => WT.WebProgram<Output> = (
    * @category Body
    * @subcategory Abstraction
    */
-  const checkPropertiesOfButton = (): WT.WebProgram<ButtonProps> =>
+  const checkPropertiesOfButton = (): WT.WebProgram<PropertiesOfButton> =>
     pipe(
-      matchOneSetOfProperties<HTMLButtonElement, string>(
+      matchOneSetOfHTMLProperties<HTMLButtonElement, string>(
         I.settings.buttonPreFollowProps
       )(I.button),
       WT.map(A.flatten)
@@ -159,15 +163,15 @@ const bodyOfClickButtonFollow: (I: InputOfBody) => WT.WebProgram<Output> = (
    */
   const recursivelyCheckPropertiesOfClickedButton = (
     n: number
-  ): WT.WebProgram<ButtonProps> =>
+  ): WT.WebProgram<PropertiesOfButton> =>
     pipe(
-      matchOneSetOfProperties<HTMLButtonElement, string>(
+      matchOneSetOfHTMLProperties<HTMLButtonElement, string>(
         I.settings.buttonPostFollowProps
       )(I.button),
       WT.map(A.flatten),
       WT.chain<
-        ElementProps<HTMLButtonElement, string>,
-        ElementProps<HTMLButtonElement, string>
+        HTMLElementProperties<HTMLButtonElement, string>,
+        HTMLElementProperties<HTMLButtonElement, string>
       >((wrongProps) =>
         wrongProps.length > 0 && n > 0
           ? pipe(
@@ -182,7 +186,7 @@ const bodyOfClickButtonFollow: (I: InputOfBody) => WT.WebProgram<Output> = (
    * @category Body
    * @subcategory Abstraction
    */
-  const checkPropertiesOfClickedButton: () => WT.WebProgram<ButtonProps> = () =>
+  const checkPropertiesOfClickedButton: () => WT.WebProgram<PropertiesOfButton> = () =>
     recursivelyCheckPropertiesOfClickedButton(5);
   /**
    * @category Body
@@ -198,7 +202,7 @@ const bodyOfClickButtonFollow: (I: InputOfBody) => WT.WebProgram<Output> = (
           )
         : pipe(
             checkPropertiesOfClickedButton(),
-            WT.map<ButtonProps, Output>((wrongPropsCBF) =>
+            WT.map<PropertiesOfButton, Output>((wrongPropsCBF) =>
               wrongPropsCBF.length < 1
                 ? returnAlreadyFollowedAsOutput()
                 : returnInvalidButtonAsOutput(wrongPropsBF)
@@ -209,7 +213,7 @@ const bodyOfClickButtonFollow: (I: InputOfBody) => WT.WebProgram<Output> = (
       f._tag === "Followed"
         ? pipe(
             checkPropertiesOfClickedButton(),
-            WT.map<ButtonProps, Output>((wrongPropsCBF) =>
+            WT.map<PropertiesOfButton, Output>((wrongPropsCBF) =>
               wrongPropsCBF.length < 1
                 ? f
                 : returnNotClickedAsOutput(wrongPropsCBF)

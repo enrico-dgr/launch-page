@@ -7,23 +7,21 @@ import {
 import * as WT from 'WebTeer/index';
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
 import {
-    $x, click, ElementProps, expectedLength, matchOneSetOfProperties
+    $x, click, expectedLength, HTMLElementProperties, matchOneSetOfHTMLProperties
 } from 'WebTeer/Utils/ElementHandle';
 
 /**
  * @category Input of Body
  * @subcategory Subtype
  */
-type PropertiesOfSvgInButton = ElementProps<HTMLOrSVGImageElement, string>;
+type PropertiesOfButton = HTMLElementProperties<HTMLButtonElement, string>;
 /**
  * @category Input of Body
  * @subcategory Subtype
  */
 type Settings = {
-  propertiesPreLikeOfSvg: PropertiesOfSvgInButton[];
-  propertiesPostLikeOfSvg: PropertiesOfSvgInButton[];
-  relativeXPathOfSvgLike: string;
-  relativeXPathOfSvgUnlike: string;
+  propsPreLike: PropertiesOfButton[];
+  propsPostLike: PropertiesOfButton[];
 };
 /**
  * @category Input of Body
@@ -33,10 +31,8 @@ const languageSettings = getPropertiesFromSettingsAndLanguage<
   Settings,
   SettingsInstagram
 >((sets) => ({
-  propertiesPreLikeOfSvg: sets.buttonLike.svg.expectedProps.preLike,
-  propertiesPostLikeOfSvg: sets.buttonLike.svg.expectedProps.postLike,
-  relativeXPathOfSvgLike: sets.buttonLike.svg.XPathPreLike,
-  relativeXPathOfSvgUnlike: sets.buttonLike.svg.XPathPostLike,
+  propsPreLike: [[[{ xpath: sets.buttonLike.svg.XPathPreLike }, "Found"]]],
+  propsPostLike: [[[{ xpath: sets.buttonLike.svg.XPathPostLike }, "Found"]]],
 }))(settingsByLanguage);
 /**
  * @category Input of Body
@@ -77,20 +73,20 @@ interface AlreadyLiked extends tag {
  * @subcategory Subtype
  */
 interface WrongProps {
-  wrongProps: PropertiesOfSvgInButton;
+  wrongProps: PropertiesOfButton;
 }
 /**
  * @category Output
  * @subcategory Subtype
  */
-interface NotClicked extends tag {
+interface NotClicked extends tag, WrongProps {
   _tag: "NotClicked";
 }
 /**
  * @category Output
  * @subcategory Subtype
  */
-interface InvalidButton extends tag {
+interface InvalidButton extends tag, WrongProps {
   _tag: "InvalidButton";
 }
 /**
@@ -127,14 +123,15 @@ const notLiked = (reason: Reason): NotLiked => ({
  * @category Output
  * @subcategory Util
  */
-const returnInvalidButtonAsOutput = (): NotLiked =>
-  notLiked({ _tag: "InvalidButton" });
+const returnInvalidButtonAsOutput = (
+  wrongProps: PropertiesOfButton
+): NotLiked => notLiked({ _tag: "InvalidButton", wrongProps });
 /**
  * @category Output
  * @subcategory Util
  */
-const returnNotClickedAsOutput = (): NotLiked =>
-  notLiked({ _tag: "NotClicked" });
+const returnNotClickedAsOutput = (wrongProps: PropertiesOfButton): NotLiked =>
+  notLiked({ _tag: "NotClicked", wrongProps });
 /**
  * @category Output
  * @subcategory Util
@@ -155,48 +152,68 @@ const getBodyOfClickButtonLike: (I: InputOfBody) => WT.WebProgram<Output> = (
    * @category Body
    * @subcategory Abstraction
    */
-  const isThereSvg = (XPath: string): WT.WebProgram<boolean> =>
+  const checkPropertiesOfButton = (): WT.WebProgram<PropertiesOfButton> =>
     pipe(
-      $x(XPath)(I.button),
-      WT.chain(expectedLength((n) => n === 1)((els, r) => ({}))),
-      WT.map(() => true),
-      WT.orElse<boolean>(() => WT.of(false))
+      matchOneSetOfHTMLProperties<HTMLButtonElement, string>(
+        I.settings.propsPreLike
+      )(I.button),
+      WT.map(A.flatten)
+    );
+  /**
+   * @category Body
+   * @subcategory Abstraction
+   * @subcategory Body
+   */
+  const recursivelyCheckPropertiesOfClickedButton = (
+    n: number
+  ): WT.WebProgram<PropertiesOfButton> =>
+    pipe(
+      matchOneSetOfHTMLProperties<HTMLButtonElement, string>(
+        I.settings.propsPostLike
+      )(I.button),
+      WT.map(A.flatten),
+      WT.chain<PropertiesOfButton, PropertiesOfButton>((wrongProps) =>
+        wrongProps.length > 0 && n > 0
+          ? pipe(
+              undefined,
+              WT.delay(1000),
+              WT.chain(() => recursivelyCheckPropertiesOfClickedButton(n - 1))
+            )
+          : WT.of(wrongProps)
+      )
     );
   /**
    * @category Body
    * @subcategory Abstraction
    */
-  const isThereSvgLike = () => isThereSvg(I.settings.relativeXPathOfSvgLike);
-  /**
-   * @category Body
-   * @subcategory Abstraction
-   */
-  const isThereSvgUnlike = () =>
-    isThereSvg(I.settings.relativeXPathOfSvgUnlike);
+  const checkPropertiesOfClickedButton: () => WT.WebProgram<PropertiesOfButton> = () =>
+    recursivelyCheckPropertiesOfClickedButton(5);
   /**
    * @category Body
    * @subcategory Core
    */
   return pipe(
-    isThereSvgLike(),
-    WT.chain((thereIs) =>
-      thereIs
+    checkPropertiesOfButton(),
+    WT.chain((wrongPropsBF) =>
+      wrongPropsBF.length < 1
         ? like()
         : pipe(
-            isThereSvgUnlike(),
-            WT.map<boolean, Output>((thereIs) =>
-              thereIs
+            checkPropertiesOfClickedButton(),
+            WT.map<PropertiesOfButton, Output>((wrongPropsCBF) =>
+              wrongPropsCBF.length < 1
                 ? returnAlreadyLikedAsOutput()
-                : returnInvalidButtonAsOutput()
+                : returnInvalidButtonAsOutput(wrongPropsBF)
             )
           )
     ),
     WT.chain((f) =>
       f._tag === "Liked"
         ? pipe(
-            isThereSvgUnlike(),
-            WT.map<boolean, Output>((thereIs) =>
-              thereIs ? f : returnNotClickedAsOutput()
+            checkPropertiesOfClickedButton(),
+            WT.map<PropertiesOfButton, Output>((wrongPropsCBF) =>
+              wrongPropsCBF.length < 1
+                ? f
+                : returnNotClickedAsOutput(wrongPropsCBF)
             )
           )
         : WT.of(f)

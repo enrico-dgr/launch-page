@@ -51,6 +51,8 @@ export const getProperty = <T = never, El extends Element = never>(
       )
       .catch((err) => E.left(WT.anyToError(err)))
   );
+// const isKeyOfEl = <El extends Element>(key:any):key is keyof El=>
+// ;
 
 export type QualifiedAttributeName = "aria-label";
 export const isQualifiedAttributeName = (
@@ -360,34 +362,61 @@ export const matchOneSetOfProperties = <El extends Element, A>(
     )
   );
 /**
- *
+ * @category type
  */
 type XPathResult = "Found" | "NotFound";
-const tellIfRelativeXPathIsValid = (xpath: string) => (
+/**
+ * @category type
+ */
+type RelativeXPath = {
+  xpath: string;
+};
+/**
+ * @category user type guard
+ */
+const isRelativePath = (relativeXPath: any): relativeXPath is RelativeXPath => {
+  const { xpath } = relativeXPath;
+  if (typeof xpath === "string" && xpath.match(/^\.\//) !== null) {
+    return true;
+  } else return false;
+};
+/**
+ * @category Util
+ */
+const tellIfRelativeXPathExists = (relativeXPath: RelativeXPath) => (
   el: ElementHandle<Element>
 ) =>
   pipe(
-    $x(xpath)(el),
+    $x(relativeXPath.xpath)(el),
     WT.map(A.isEmpty),
     WT.map((b) =>
       b ? O.some<XPathResult>("NotFound") : O.some<XPathResult>("Found")
     )
   );
+/**
+ * @category type
+ */
 export type HTMLElementProperties<El extends Element, A> = (
   | [keyof El | QualifiedAttributeName, A | string]
-  | [string, XPathResult]
+  | [RelativeXPath, XPathResult]
 )[];
+/**
+ * @category Util
+ */
 const matchOnFirstProp = <El extends Element, A>(
   expectedProps: HTMLElementProperties<El, A>
 ) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<A | string>> => {
   if (isQualifiedAttributeName(expectedProps[0][0])) {
     return getAttribute<El>(expectedProps[0][0])(el);
-  } else if (typeof expectedProps[0][0] === "string") {
-    return tellIfRelativeXPathIsValid(expectedProps[0][0])(el);
+  } else if (isRelativePath(expectedProps[0][0])) {
+    return tellIfRelativeXPathExists(expectedProps[0][0])(el);
   } else {
     return getProperty<A, El>(expectedProps[0][0])(el);
   }
 };
+/**
+ * @category Body
+ */
 const recursivelyCheckHTMLProperties = <El extends Element, A>(
   expectedProps: HTMLElementProperties<El, A>
 ) => (el: ElementHandle<El>) => (
@@ -421,8 +450,90 @@ const recursivelyCheckHTMLProperties = <El extends Element, A>(
  * Check all properties to match with `expectedProps`
  * @param expectedProps
  * @returns unmatched `expectedProps`
+ * @category Util
  */
 export const checkHTMLProperties = <El extends Element, A>(
   expectedProps: HTMLElementProperties<El, A>
 ) => (el: ElementHandle<El>): WT.WebProgram<HTMLElementProperties<El, A>> =>
   recursivelyCheckHTMLProperties(expectedProps)(el)([]);
+/**
+ * @category Body
+ */
+const recursivelyCheckHTMLPropertiesFromSets = <El extends Element, A>(
+  setsOfExpectedProps: HTMLElementProperties<El, A>[]
+) => (el: ElementHandle<El>) => (
+  setsOfWrongProps: HTMLElementProperties<El, A>[]
+): WT.WebProgram<HTMLElementProperties<El, A>[]> =>
+  setsOfExpectedProps.length > 0
+    ? pipe(
+        checkHTMLProperties(setsOfExpectedProps[0])(el),
+        WT.chain((wrongProps) =>
+          recursivelyCheckHTMLPropertiesFromSets(setsOfExpectedProps.slice(1))(
+            el
+          )([...setsOfWrongProps, wrongProps])
+        )
+      )
+    : WT.of(setsOfWrongProps);
+/**
+ * @category Util
+ */
+export const checkHTMLPropertiesFromSets = <El extends Element, A>(
+  setsOfExpectedProps: HTMLElementProperties<El, A>[]
+) => (el: ElementHandle<El>): WT.WebProgram<HTMLElementProperties<El, A>[]> =>
+  recursivelyCheckHTMLPropertiesFromSets(setsOfExpectedProps)(el)([]);
+/**
+ * @returns
+ * - array of empty array if one set has a good match
+ * - array of wrong HTMLElementProperties<El,A> in the corresponding
+ * order of the input
+ * e.g.
+ * @example
+ * // ↓-- bad result
+ * pipe(
+ *  matchOneSetOfProperties([[["innerText","some wrong text"]]]),
+ *  WT.map(
+ * // first set of props ----↓  ↓---- first prop
+ *    wrongSets => wrongSets[0][0]
+ *  ),
+ *  WT.map(
+ *    console.log
+ *  ) // output -> ['innerText','some wrong text']
+ * );
+ * // ↓-- bad result
+ * pipe(
+ *  matchOneSetOfProperties([[['...','...'],["./someWrongRelativeXPath","Found"]]]),
+ *  WT.map(
+ * // first set of props ----↓  ↓---- second prop
+ *    wrongSets => wrongSets[0][1]
+ *  ),
+ *  WT.map(
+ *    console.log
+ *  ) // output -> ["./someWrongRelativeXPath","Found"]
+ * );
+ * // ↓-- good result
+ * pipe(
+ *  matchOneSetOfProperties([[["innerText","some good text"]]]),
+ *  WT.map(
+ *    wrongSets => wrongSets
+ *  ),
+ *  WT.map(
+ *    console.log
+ *  ) // output -> [[]]
+ * );
+ * @category Util
+ */
+export const matchOneSetOfHTMLProperties = <El extends Element, A>(
+  setsOfExpectedProps: HTMLElementProperties<El, A>[]
+) => (el: ElementHandle<El>): WT.WebProgram<HTMLElementProperties<El, A>[]> =>
+  pipe(
+    checkHTMLPropertiesFromSets<El, A>(setsOfExpectedProps)(el),
+    WT.map((setsOfWrongProps) =>
+      pipe(
+        A.findFirst(A.isEmpty)(setsOfWrongProps),
+        O.match(
+          () => setsOfWrongProps,
+          (a_) => [[]]
+        )
+      )
+    )
+  );
