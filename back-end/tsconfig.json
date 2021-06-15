@@ -3,10 +3,10 @@
     "module": "commonjs",
     "baseUrl": ".",
     "paths": {
-      "WebTeer/*": ["./src/fp-libs/WebTeer/*"],
-      "WT-Telegram/*": ["./src/fp-libs/WebTeer/Applications/Telegram/*"],
-      "WT-Instagram/*": ["./src/fp-libs/WebTeer/Applications/Instagram/*"],
-      "WT-MrInsta/*": ["./src/fp-libs/WebTeer/Applications/MrInsta/*"]
+      "WebTeer/*": ["src/*"],
+      "WT-Telegram/*": ["src/Applications/Telegram/*"],
+      "WT-Instagram/*": ["src/Applications/Instagram/*"],
+      "WT-MrInsta/*": ["src/Applications/MrInsta/*"]
     },
     "strict": true,
     // "lib": ["es2018", "dom", "esnext"],
