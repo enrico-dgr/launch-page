@@ -1,4 +1,4 @@
-import { SettingsByLanguage } from 'src/WebTeer/settingsByLanguage';
+import { SettingsByLanguage } from 'src/settingsByLanguage';
 
 import { Settings } from './settings';
 
@@ -49,6 +49,25 @@ export const settingsByLanguage: SettingsByLanguage<Settings> = {
         },
         buttonUnlike: {
           XPath: `//section/span/button[./div/span/*[name()='svg' and @aria-label='Non mi piace più']]`,
+        },
+      },
+    },
+    pageOfStory: {
+      elements: {
+        barsOfStories: {
+          XPath: `//div[@class='_7zQEa']`,
+        },
+        barsOfLoadingForStories: {
+          XPath: `//div[@class='XcATa ' and @style='width: 100%;']`,
+        },
+        buttonForPermission: {
+          XPath: `//section/div//button[contains(.,'Visualizza la storia')]`,
+        },
+        buttonToScrollStory: {
+          expectedProps: [
+            [{ xpath: `./div[@class='coreSpriteRightChevron']` }, "Found"],
+          ],
+          XPath: `//button[./div[@class='coreSpriteRightChevron']]`,
         },
       },
     },

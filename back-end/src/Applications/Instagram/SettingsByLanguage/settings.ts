@@ -1,4 +1,4 @@
-import { ElementProps } from 'src/WebTeer/Utils/ElementHandle';
+import { ElementProps, HTMLElementProperties } from 'src/elementHandle';
 
 export interface Settings {
   buttonFollow: {
@@ -49,6 +49,23 @@ export interface Settings {
         XPath: string;
       };
       buttonUnlike: {
+        XPath: string;
+      };
+    };
+  };
+  pageOfStory: {
+    elements: {
+      barsOfStories: {
+        XPath: string;
+      };
+      barsOfLoadingForStories: {
+        XPath: string;
+      };
+      buttonForPermission: {
+        XPath: string;
+      };
+      buttonToScrollStory: {
+        expectedProps: HTMLElementProperties<HTMLButtonElement, string>;
         XPath: string;
       };
     };

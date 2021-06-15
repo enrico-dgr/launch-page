@@ -2,9 +2,9 @@ import { flow, pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import { Page } from 'puppeteer';
 
+import * as WebDepsUtils from '../../dependencies';
+import * as ElementUtils from '../../elementHandle';
 import * as WT from '../../index';
-import * as ElementUtils from '../../Utils/ElementHandle';
-import * as WebDepsUtils from '../../Utils/WebDeps';
 import * as Instagram from '../Instagram';
 import { init } from './Init';
 import { plan } from './Plan';

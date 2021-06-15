@@ -1,2 +1,2 @@
-export * as ClickButtonFollow from "./ClickButtonFollow";
-export * as FollowUser from "./FollowUser";
+export * as ClickButtonFollow from "./clickButtonFollow";
+export * as FollowUser from "./followUser";

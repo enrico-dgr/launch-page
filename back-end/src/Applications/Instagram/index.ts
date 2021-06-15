@@ -1,1 +1,1 @@
-export * as Follow from "./FollowFunctions";
+export * as Follow from "./deprecated";

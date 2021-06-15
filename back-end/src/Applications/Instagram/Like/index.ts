@@ -1,2 +1,2 @@
-export * as ClickButtonLike from "./ClickButtonLike";
-export * as LikeToPost from "./LikeToPost";
+export * as ClickButtonLike from "./clickButtonLike";
+export * as LikeToPost from "./likeToPost";
