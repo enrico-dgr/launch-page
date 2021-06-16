@@ -1,9 +1,9 @@
 import { pipe } from 'fp-ts/function';
 import { ElementHandle } from 'puppeteer';
+import * as Telegram from 'src/Applications/Telegram/index';
+import { goto, waitFor$x } from 'src/dependencies';
+import { click, isOneElementArray, type } from 'src/elementHandle';
 import * as WT from 'src/index';
-import * as Telegram from 'src/WebTeer/Applications/Telegram/index';
-import { click, isOneElementArray, type } from 'src/WebTeer/Utils/ElementHandle';
-import { goto, waitFor$x } from 'src/WebTeer/Utils/WebDeps';
 
 const HOME_HREF = Telegram.Urls.base.home.href;
 

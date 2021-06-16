@@ -1,2 +1,2 @@
-export * as ByElement from "./ByElement";
-export * as OpenedByUrl from "./OpenedByUrl";
+export * as ScrollStories from "./scrollStories";
+export * as WatchStoryAtUrl from "./watchStoryAtUrl";

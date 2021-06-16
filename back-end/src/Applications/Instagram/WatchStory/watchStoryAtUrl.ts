@@ -2,16 +2,52 @@ import { pipe } from 'fp-ts/lib/function';
 import { $x, waitFor$x } from 'src/dependencies';
 import { click, expectedLength } from 'src/elementHandle';
 import * as WT from 'src/index';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
+import {
+    Settings as SettingsOfInstagram, settingsByLanguage
+} from 'WT-Instagram/SettingsByLanguage';
+
+import { goto } from '../goto';
+import { Options, Output as OutputOfScrollStories, scrollStories, tag } from './scrollStories';
 
 interface Settings {
   xpathOfButtonPermission: string;
   xpathOfButtonNext: string;
 }
+/**
+ * @category Input of Body
+ */
 interface InputOfBody {
+  storyUrl: URL;
   settings: Settings;
+  options: Options;
+  language: Languages;
 }
-
+/**
+ * @category type-classes
+ * @subcategory Output
+ */
+interface NotAvailablePage extends tag {
+  _tag: "NotAvailablePage";
+}
+/**
+ * @category Output
+ */
+type Output = NotAvailablePage | OutputOfScrollStories;
+/**
+ * @category Body
+ */
 const bodyOfWatchStoryAtUrl = (I: InputOfBody) => {
+  /**
+   * @description
+   * Tries to click on permission-button.
+   * Recur+$x is used instead of waitFor$x,
+   * but maybe is to change. @todo <--
+   * @returns
+   * - *true* on verified clicked
+   * - *false* otherwise
+   * @category Abstraction
+   */
   const showStories = (
     delay: number,
     attempts: number
@@ -36,8 +72,12 @@ const bodyOfWatchStoryAtUrl = (I: InputOfBody) => {
           )
         )
       : WT.of(false);
-
-  const checkIfButtonIsGone = () =>
+  /**
+   * @description
+   * Verify if permission-button disappeared.
+   * @category Abstraction
+   */
+  const checkIfButtonPermissionIsGone = () =>
     pipe(
       $x(I.settings.xpathOfButtonPermission),
       WT.chain(
@@ -48,27 +88,84 @@ const bodyOfWatchStoryAtUrl = (I: InputOfBody) => {
       WT.map(() => true),
       WT.orElse(() => WT.of<boolean>(false))
     );
+  /**
+   * @returns the button to scroll stories
+   * from left to right.
+   * @category Abstraction
+   */
+  const returnButtonNext = () =>
+    pipe(
+      $x(I.settings.xpathOfButtonNext),
+      WT.chain(
+        expectedLength((n) => n === 1)(
+          (els, r) => `${els.length} scrollRight-button in story`
+        )
+      ),
+      WT.map((btns) => btns[0])
+    );
+  /**
+   * @category Core
+   */
   return pipe(
-    showStories(500, 10),
-    WT.chain((b) => (b ? checkIfButtonIsGone() : WT.of(b))),
-    WT.chain((b) =>
-      b
-        ? pipe(
-            $x(I.settings.xpathOfButtonNext),
-            WT.chain(
-              expectedLength((n) => n === 1)(
-                (els, r) => `${els.length} scrollRight-button in story`
-              )
+    goto(I.language)(I.storyUrl.href),
+    WT.chain((a) =>
+      a !== "AvailablePage"
+        ? WT.of<Output>({ _tag: "NotAvailablePage" })
+        : pipe(
+            showStories(500, 10),
+            WT.chain((permissionIsGiven) =>
+              permissionIsGiven ? checkIfButtonPermissionIsGone() : WT.of(false)
             ),
-            WT.chain((btn) =>
-              WT.of<TransitionType>({
-                _tag: "Shown",
-                buttonNext: btn,
-                maxStories: i.maxStories,
-              })
+            WT.chain((storiesAreShown) =>
+              storiesAreShown === false
+                ? WT.of<Output>({ _tag: "NoAvailableStories" })
+                : pipe(
+                    returnButtonNext(),
+                    WT.chain((buttonNext) =>
+                      scrollStories({
+                        language: I.language,
+                        options: I.options,
+                        buttonNext,
+                      })
+                    )
+                  )
             )
           )
-        : WT.of<TransitionType>({ _tag: "NotShown", maxStories: i.maxStories })
     )
   );
 };
+/**
+ * @category type-classes
+ */
+interface Input {
+  storyUrl: URL;
+  language: Languages;
+  options: Options;
+}
+/**
+ * @category constructors
+ */
+const getSettings: (
+  lang: Languages
+) => Settings = getPropertiesFromSettingsAndLanguage<
+  Settings,
+  SettingsOfInstagram
+>((sets) => ({
+  xpathOfButtonNext: sets.pageOfStory.elements.buttonToScrollStory.XPath,
+  xpathOfButtonPermission: sets.pageOfStory.elements.buttonForPermission.XPath,
+}))(settingsByLanguage);
+/**
+ * @description Given a Url of a story-collection,
+ * watch a given number (or all, if not specified)
+ * of stories in that collection.
+ * It assumes that, loading a new page of story,
+ * instagram will ask for permission of profile and
+ * will not switch to a new story-collection at
+ * the end of the current one.
+ * @category program
+ */
+export const watchStoryAtUrl = (I: Input): WT.WebProgram<Output> =>
+  bodyOfWatchStoryAtUrl({
+    ...I,
+    settings: getSettings(I.language),
+  });

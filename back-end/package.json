@@ -7,7 +7,7 @@
     "start": "ts-node -r tsconfig-paths/register build/index.js",
     "start:ts": "ts-node -r tsconfig-paths/register src/index.ts",
     "nodemon": "nodemon",
-    "debug": "ts-node -r tsconfig-paths/register src/debug/debug.ts",
+    "debug": "ts-node -r tsconfig-paths/register src/localCode/debug/debug.ts",
     "eg": "ts-node -r tsconfig-paths/register src/example.ts",
     "ob": "ts-node -r tsconfig-paths/register build/openBrowser.js",
     "ob:ts": "ts-node -r tsconfig-paths/register src/openBrowser.ts",
