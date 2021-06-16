@@ -6,10 +6,7 @@ export type ErrorInfos = {
 /**
  * @category constructors
  */
-export const createErrorFromErrorInfos = (
-  errorInfos: ErrorInfos,
-  pathToFile: string
-): Error => ({
+export const createErrorFromErrorInfos = (errorInfos: ErrorInfos): Error => ({
   message: JSON.stringify([
     {
       message: errorInfos.message,
@@ -18,7 +15,7 @@ export const createErrorFromErrorInfos = (
     } as ErrorInfos,
   ]),
   name: "Error",
-  stack: "(" + pathToFile + ")",
+  stack: "(" + errorInfos.filePath + ")",
 });
 /**
  * @category combinators

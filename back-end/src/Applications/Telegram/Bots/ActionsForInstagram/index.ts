@@ -1,5 +1,5 @@
+import * as Bot from 'src/deprecated';
 import { WebProgram } from 'src/index';
-import * as Bot from 'src/WebTeer/Bot';
 
 import { Comment, Follow, Like, Story } from './Action';
 import { conclusion } from './Conclusion';

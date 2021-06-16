@@ -171,9 +171,8 @@ export const orElseW: <B>(
  * @category constructors
  */
 export const leftFromErrorInfos = <A = never>(
-  errorInfos: ErrorInfos,
-  pathToFile: string
-): WebProgram<A> => left(createErrorFromErrorInfos(errorInfos, pathToFile));
+  errorInfos: ErrorInfos
+): WebProgram<A> => left(createErrorFromErrorInfos(errorInfos));
 /**
  * @category combinators
  */

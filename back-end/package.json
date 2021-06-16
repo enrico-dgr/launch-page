@@ -10,7 +10,7 @@
     "debug": "ts-node -r tsconfig-paths/register src/localCode/debug/debug.ts",
     "eg": "ts-node -r tsconfig-paths/register src/example.ts",
     "ob": "ts-node -r tsconfig-paths/register build/openBrowser.js",
-    "ob:ts": "ts-node -r tsconfig-paths/register src/openBrowser.ts",
+    "ob:ts": "ts-node -r tsconfig-paths/register src/localCode/openBrowser.ts",
     "build": "tsc -b",
     "prod": "node build copy/index.js",
     "test": "jest"
