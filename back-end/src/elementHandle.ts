@@ -203,6 +203,7 @@ export const innerTextMatcher = (has: boolean) => (
     ),
     WT.chain(() => WT.of(this_el))
   );
+
 /**
  *
  */
@@ -232,7 +233,7 @@ export const exists: (
   WT.orElse(() => WT.of<boolean>(false))
 );
 /**
- * @deprecated
+ *
  */
 export const type: (
   text: string,
@@ -368,7 +369,7 @@ type XPathResult = "Found" | "NotFound";
 /**
  * @category type
  */
-type RelativeXPath = {
+export type RelativeXPath = {
   xpath: string;
 };
 /**

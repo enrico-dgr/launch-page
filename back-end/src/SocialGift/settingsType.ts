@@ -1,10 +1,10 @@
-import { HTMLElementProperties } from 'WebTeer/elementHandle';
+import { HTMLElementProperties, RelativeXPath } from 'WebTeer/elementHandle';
 
 import { TypeOfActions } from './index';
 
 export interface Settings {
+  chatUrl: URL;
   message: {
-    returnXPath: (interlocutor: string, mustContainText?: string) => string;
     elements: {
       link: { relativeXPath: string };
       buttonConfirm: { relativeXPath: string };

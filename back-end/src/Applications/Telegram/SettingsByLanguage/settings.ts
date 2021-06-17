@@ -1,5 +1,3 @@
-import { ElementProps, HTMLElementProperties } from 'src/elementHandle';
-
 export interface Settings {
   urls: {
     base: URL;

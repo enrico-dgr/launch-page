@@ -1,3 +1,5 @@
+import { format } from 'prettier';
+
 export type ErrorInfos = {
   filePath: string;
   nameOfFunction: string;
@@ -55,3 +57,8 @@ export const stackErrorInfos = (errorInfos: ErrorInfos) => (
     };
   }
 };
+/**
+ * @category util
+ */
+export const errorInfosToString = (e: Error) =>
+  format(e.message, { parser: "json" }) + "\n Source path:" + e.stack ?? "";

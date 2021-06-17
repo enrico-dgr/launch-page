@@ -1,14 +1,13 @@
+import { log } from 'fp-ts/Console';
 import { pipe } from 'fp-ts/function';
 import { Reader } from 'fp-ts/lib/Reader';
 import * as O from 'fp-ts/Option';
 import * as S from 'fp-ts/Semigroup';
 import path from 'path';
-import { ElementHandle } from 'puppeteer';
+import { ElementHandle, Page } from 'puppeteer';
 import * as WT from 'src/index';
-import { waitFor$x } from 'WebTeer/dependencies';
-import {
-    $x, checkHTMLProperties, click, getHref, HTMLElementProperties
-} from 'WebTeer/elementHandle';
+import { goto, openNewPage, otherPages, waitFor$x } from 'WebTeer/dependencies';
+import { $x, click, getHref, getInnerText, HTMLElementProperties } from 'WebTeer/elementHandle';
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
 import { FollowUser, LikeToPost, WatchStoryAtUrl } from 'WT-Instagram/index';
 import {
@@ -49,6 +48,7 @@ type Options = {
  * @category type-classes
  */
 interface Settings {
+  chatUrl: URL;
   message: {
     xpath: string;
     link: {
@@ -60,7 +60,7 @@ interface Settings {
     buttonSkip: {
       relativeXPath: string;
     };
-    expectedTextOfMessagesWithAction: {
+    expectedContainedTextOfMessagesWithAction: {
       [k in TypeOfActions]: HTMLElementProperties<HTMLElement, string>;
     };
   };
@@ -100,24 +100,24 @@ const bodyOfActuator: BodyOfActuator = (D) => {
   // --------------------------
   // Find message of Action
   // --------------------------
-  type ActionAndWronprops = {
+  type ActionAndFound = {
     action: TypeOfActions;
-    wrongProps: HTMLElementProperties<HTMLElement, string>;
+    found: boolean;
   };
-  const defaultActionAndWrongprops: ActionAndWronprops = {
+  const defaultActionAndWrongprops: ActionAndFound = {
     action: "Comment",
-    wrongProps: [["innerText", ""]],
+    found: false,
   };
   /**
    * @category semigroup-instance
    */
   const semigroupChainMatchedAction: S.Semigroup<
-    WT.WebProgram<ActionAndWronprops>
+    WT.WebProgram<ActionAndFound>
   > = {
     concat: (x, y) =>
       pipe(
         x,
-        WT.chain((a) => (a.wrongProps.length < 1 ? WT.of(a) : y))
+        WT.chain((a) => (a.found ? WT.of(a) : y))
       ),
   };
   const concatAll = S.concatAll(semigroupChainMatchedAction)(
@@ -126,64 +126,82 @@ const bodyOfActuator: BodyOfActuator = (D) => {
   /**
    *
    */
-  interface FoundMessage extends ActionAndWronprops {
+  interface FoundMessage {
     _tag: "FoundMessage";
     el: ElementHandle<Element>;
+    action: TypeOfActions;
   }
   interface NotFoundMessage {
     _tag: "NotFoundMessage";
   }
-  type OutputOfFindLast = FoundMessage | NotFoundMessage;
-  const findLastWithAMatch = (
+  type LastMessageWithAction = FoundMessage | NotFoundMessage;
+  const findLastMessageWithAction = (
     els: ElementHandle<Element>[]
-  ): WT.WebProgram<OutputOfFindLast> =>
+  ): WT.WebProgram<LastMessageWithAction> =>
     els.length < 1
       ? WT.of({ _tag: "NotFoundMessage" })
       : pipe(
           Object.entries(
-            D.settings.message.expectedTextOfMessagesWithAction
+            D.settings.message.expectedContainedTextOfMessagesWithAction
           ).map(
             // Object.entries doesn't let you specify keys,
             // ending up with string keys.
-            (
-              actionAndProps: [
-                string,
-                HTMLElementProperties<HTMLElement, string>
-              ]
-            ) =>
+            (actionAndProps) =>
               pipe(
                 els[els.length - 1],
-                checkHTMLProperties(actionAndProps[1]),
-                WT.map((wrongProps) => ({
+                getInnerText,
+                WT.chain(
+                  O.match(
+                    () => WT.left(new Error("No innerText in msg")),
+                    (text) => WT.of(text.search(actionAndProps[1][0][1]) > -1)
+                  )
+                ),
+                WT.map((found) => ({
                   // To avoid typescript complaints -> `as TypeOfActions`
                   action: actionAndProps[0] as TypeOfActions,
-                  wrongProps,
+                  found,
                 }))
               )
           ),
           concatAll,
-          WT.chain(({ action, wrongProps }) =>
-            wrongProps.length < 1
+          WT.chainFirst<ActionAndFound, void>((loggingToDebug) =>
+            WT.fromIO(log(JSON.stringify(loggingToDebug)))
+          ),
+          WT.chain(({ action, found }) =>
+            found
               ? WT.of({
                   _tag: "FoundMessage",
-                  action,
-                  wrongProps,
                   el: els[els.length - 1],
+                  action,
                 })
-              : findLastWithAMatch(els.slice(0, els.length - 1))
+              : findLastMessageWithAction(els.slice(0, els.length - 1))
           )
         );
 
   // --------------------------
   // Action
   // --------------------------
-  const runAction = (action: TypeOfActions) => (el: ElementHandle<Element>) => {
+  const runAction = (action: TypeOfActions) => (
+    messageWithAction: ElementHandle<Element>
+  ) => {
     // --------------------------
     // Get Infos for Action
     // --------------------------
-    const getActionHref: () => WT.WebProgram<string> = () =>
+    const getActionHref: (n: number) => WT.WebProgram<string> = (
+      attempts: number = 4
+    ) =>
       pipe(
-        $x(D.settings.message.link.relativeXPath)(el),
+        $x(D.settings.message.link.relativeXPath)(messageWithAction),
+        // --- DEBUG
+        WT.chainFirst(() =>
+          pipe(
+            getInnerText(messageWithAction),
+            WT.chain((loggingToDebug) =>
+              WT.fromIO(log(JSON.stringify(loggingToDebug)))
+            )
+          )
+        ),
+        // ---
         WT.chain((els) =>
           els.length === 1
             ? WT.of(els[0])
@@ -201,7 +219,12 @@ const bodyOfActuator: BodyOfActuator = (D) => {
           message: `In message with bot ${D.nameOfBot}`,
           nameOfFunction: "getActionHref",
           filePath: ABSOLUTE_PATH,
-        })
+        }),
+        WT.orElse((e) =>
+          attempts > 0
+            ? pipe(attempts - 1, WT.delay(1000), WT.chain(getActionHref))
+            : WT.left(e)
+        )
       );
     // --------------------------
     // Actions Implementation
@@ -275,7 +298,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     // --------------------------
     const skip: () => WT.WebProgram<void> = () =>
       pipe(
-        $x(D.settings.message.buttonSkip.relativeXPath)(el),
+        $x(D.settings.message.buttonSkip.relativeXPath)(messageWithAction),
         WT.chain((els) =>
           els.length === 1
             ? WT.of(els[0])
@@ -288,13 +311,13 @@ const bodyOfActuator: BodyOfActuator = (D) => {
         WT.chain(click),
         WT.orElseStackErrorInfos({
           message: `In message with bot ${D.nameOfBot}`,
-          nameOfFunction: "getSkipButton",
+          nameOfFunction: "skip",
           filePath: ABSOLUTE_PATH,
         })
       );
     const confirm: () => WT.WebProgram<void> = () =>
       pipe(
-        $x(D.settings.message.buttonConfirm.relativeXPath)(el),
+        $x(D.settings.message.buttonConfirm.relativeXPath)(messageWithAction),
         WT.chain((els) =>
           els.length === 1
             ? WT.of(els[0])
@@ -307,7 +330,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
         WT.chain(click),
         WT.orElseStackErrorInfos({
           message: `In message with bot ${D.nameOfBot}`,
-          nameOfFunction: "getConfirmButton",
+          nameOfFunction: "confirm",
           filePath: ABSOLUTE_PATH,
         })
       );
@@ -315,7 +338,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     // Core of RunAction
     // --------------------------
     return pipe(
-      getActionHref(),
+      getActionHref(5),
       WT.map((href) => new URL(href)),
       WT.chain((url) =>
         D.options.skip[action]
@@ -324,7 +347,20 @@ const bodyOfActuator: BodyOfActuator = (D) => {
                 message: `${action} skipped because of option's skip === true`,
               })
             )
-          : implementations[action](url)
+          : pipe(
+              otherPages,
+              WT.chain((pages) =>
+                pages.length > 0 ? WT.of(pages[0]) : openNewPage
+              ),
+              WT.chain<Page, OutcomeOfAction>((page) =>
+                pipe(
+                  WT.ask(),
+                  WT.chainTaskEitherK((r) =>
+                    implementations[action](url)({ ...r, page })
+                  )
+                )
+              )
+            )
       ),
       WT.chainFirst((a) => (a.outcome === "Confirm" ? confirm() : skip()))
     );
@@ -369,30 +405,38 @@ const bodyOfActuator: BodyOfActuator = (D) => {
   ): WT.WebProgram<StateOfCycle> =>
     soc._tag === "End"
       ? WT.of(soc)
-      : soc.consecutiveNewActions > 5 || soc.consecutiveSkips > 5
+      : soc.consecutiveNewActions > 2 || soc.consecutiveSkips > 4
       ? WT.of(updateState({ ...soc, _tag: "End" }))
       : pipe(
           waitFor$x(D.settings.message.xpath),
-          WT.chain(findLastWithAMatch),
-          WT.chain((messageOfAction) =>
-            messageOfAction._tag === "NotFoundMessage"
+          WT.chain(findLastMessageWithAction),
+          WT.chain((messageWithAction) =>
+            messageWithAction._tag === "NotFoundMessage"
               ? pipe(
                   sendMessage(D.language)(D.settings.buttonNewAction.text),
                   WT.map<void, ResultOfCycle>(() => "NewAction")
                 )
               : pipe(
-                  runAction(messageOfAction.action)(messageOfAction.el),
-                  // here I could print/log infos.
+                  runAction(messageWithAction.action)(messageWithAction.el),
+                  // here I print/log result of action.
+                  WT.chainFirst((loggingToDebug) =>
+                    WT.fromIO(log(JSON.stringify(loggingToDebug)))
+                  ),
                   WT.map((actionResult) => actionResult.outcome)
                 )
           ),
           WT.map<ResultOfCycle, StateOfCycle>((_tag) =>
             updateState({ ...soc, _tag })
           ),
+          WT.chainFirst((loggingToDebug) =>
+            WT.fromIO(log(JSON.stringify(loggingToDebug)))
+          ),
+          WT.chain(WT.delay(2000)),
           WT.chain(cycle)
         );
   return pipe(
-    openDialog(D.language)(D.nameOfBot),
+    goto(D.settings.chatUrl.href),
+    WT.chain(WT.delay(2000)),
     WT.chain(() => cycle())
   );
 };
@@ -415,6 +459,7 @@ export const actuator = (I: Input) => {
   return bodyOfActuator({
     ...I,
     settings: {
+      chatUrl: getPropsByBotChoice((sets) => sets.chatUrl),
       buttonNewAction: {
         text: getPropsByBotChoice<string>(
           (sets) => sets.dialog.elements.buttonNewAction.text
@@ -439,7 +484,7 @@ export const actuator = (I: Input) => {
             (sets) => sets.message.elements.buttonSkip.relativeXPath
           ),
         },
-        expectedTextOfMessagesWithAction: getPropsByBotChoice(
+        expectedContainedTextOfMessagesWithAction: getPropsByBotChoice(
           (sets) => sets.message.expectedTextsForActions
         ),
       },
