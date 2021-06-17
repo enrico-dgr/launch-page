@@ -14,7 +14,7 @@ export const settingsByLanguage: SettingsByLanguage<Settings> = {
         `//a[@class='im_dialog' and contains(., '${interlocutor}')]`,
     },
     message: {
-      returnXPath: (interlocutor: string, mustContainText?: string) =>
+      returnXPath: (interlocutor: string, mustContainText: string) =>
         `//div[@class='im_content_message_wrap im_message_in'` +
         ` and contains(., '${interlocutor}')` +
         ` and contains(.,'${mustContainText}')]`,

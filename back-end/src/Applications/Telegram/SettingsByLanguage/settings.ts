@@ -8,7 +8,7 @@ export interface Settings {
     returnXPath: (interlocutor: string) => string;
   };
   message: {
-    returnXPath: (interlocutor: string, mustContainText?: string) => string;
+    returnXPath: (interlocutor: string, mustContainText: string) => string;
   };
   dialog: {
     elements: {

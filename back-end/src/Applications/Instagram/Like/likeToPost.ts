@@ -37,7 +37,7 @@ const settingsByLanguage = getPropertiesFromSettingsAndLanguage<
  * @category Input of Body
  */
 export interface InputOfBody {
-  profileUrl: URL;
+  urlOfPost: URL;
   settings: Settings;
   language: Languages;
   options: Options;
@@ -94,7 +94,7 @@ const bodyOfLikeToPost = (I: InputOfBody): WT.WebProgram<Output> => {
    * @subcategory Abstraction
    */
   const isOnPage = () =>
-    pipe(WT.asks((r) => r.page.url() === I.profileUrl.href));
+    pipe(WT.asks((r) => r.page.url() === I.urlOfPost.href));
   /**
    * @category Body
    * @subcategory Abstraction
@@ -151,7 +151,7 @@ const bodyOfLikeToPost = (I: InputOfBody): WT.WebProgram<Output> => {
     WT.chain((itIs) =>
       itIs
         ? WT.of<StateOfInstagramPage>("AvailablePage")
-        : goto(I.language)(I.profileUrl.href)
+        : goto(I.language)(I.urlOfPost.href)
     ),
     WT.chain<StateOfInstagramPage, Output>((res) =>
       res === "NotAvailablePage"
@@ -164,7 +164,7 @@ const bodyOfLikeToPost = (I: InputOfBody): WT.WebProgram<Output> => {
  * @category Input
  */
 export interface Input {
-  profileUrl: URL;
+  urlOfPost: URL;
   language: Languages;
   options: Options;
 }
