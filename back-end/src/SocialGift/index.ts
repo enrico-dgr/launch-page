@@ -11,10 +11,10 @@ import { $x, click, getHref, getInnerText, HTMLElementProperties } from 'WebTeer
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
 import { FollowUser, LikeToPost, WatchStoryAtUrl } from 'WT-Instagram/index';
 import {
-    openDialog, sendMessage, Settings as SettingsOfTelegram,
-    settingsByLanguage as settingsOfTelegramByLanguage
+    sendMessage, Settings as SettingsOfTelegram, settingsByLanguage as settingsOfTelegramByLanguage
 } from 'WT-Telegram/index';
 
+import { newConfirmedReport } from './logs/jsonDB';
 import { Settings as SettingsOfBots, settingsByBotChoice } from './settings';
 import { Bots, getPropertiesFromSettingsAndBotChoice } from './settingsByBotChoice';
 
@@ -164,9 +164,6 @@ const bodyOfActuator: BodyOfActuator = (D) => {
               )
           ),
           concatAll,
-          WT.chainFirst<ActionAndFound, void>((loggingToDebug) =>
-            WT.fromIO(log(JSON.stringify(loggingToDebug)))
-          ),
           WT.chain(({ action, found }) =>
             found
               ? WT.of({
@@ -325,8 +322,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     // --------------------------
     return pipe(
       getActionHref(),
-      WT.map((href) => new URL(href)),
-      WT.chain((url) =>
+      WT.chain((href) =>
         D.options.skip[action]
           ? WT.of(
               returnSkip({
@@ -344,10 +340,21 @@ const bodyOfActuator: BodyOfActuator = (D) => {
                   WT.chainTaskEitherK((r) =>
                     pipe(
                       bringToFront,
-                      WT.chain(() => implementations[action](url))
+                      WT.chain(() => implementations[action](new URL(href)))
                     )({ ...r, page })
                   )
                 )
+              ),
+              WT.chainFirst((a) =>
+                a.outcome === "Confirm"
+                  ? WT.fromIO(
+                      newConfirmedReport({
+                        action,
+                        href,
+                        info: a.info,
+                      })
+                    )
+                  : WT.of(undefined)
               )
             )
       ),
