@@ -147,26 +147,25 @@ const bodyOfValidator: BodyOfActuator = (D) => {
         ),
     };
 
-    const coreOfRunAction =
-      action === "WatchStory"
-        ? WT.of(returnSkip({}))
-        : pipe(
-            implementations[action](new URL(href)),
-            WT.chainFirst((outcomeOfAction) =>
-              outcomeOfAction.outcome === "Confirm"
-                ? pipe(
-                    WT.fromIO(
-                      newBadReport({
-                        action,
-                        href,
-                        info: outcomeOfAction.info,
-                      })
-                    ),
-                    WT.chain(() => WT.fromIO(removeOldestConfirmedReport()))
-                  )
-                : WT.fromIO(removeOldestConfirmedReport())
+    const coreOfRunAction = pipe(
+      implementations[action](new URL(href)),
+      WT.chainFirst((outcomeOfAction) =>
+        outcomeOfAction.outcome === "Confirm"
+          ? pipe(
+              action === "WatchStory"
+                ? WT.of(undefined)
+                : WT.fromIO(
+                    newBadReport({
+                      action,
+                      href,
+                      info: outcomeOfAction.info,
+                    })
+                  ),
+              WT.chain(() => WT.fromIO(removeOldestConfirmedReport()))
             )
-          );
+          : WT.fromIO(removeOldestConfirmedReport())
+      )
+    );
     return coreOfRunAction;
   };
 

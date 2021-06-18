@@ -17,8 +17,8 @@ const PATH_OF_BAD_JSON = path.resolve(__dirname, "./bad.json");
 /**
  * @name parseToFormattedJSON
  */
-const parseToFormattedJSON = (object: {}) =>
-  format(JSON.stringify(object), { parser: "json-stringify" });
+const parseToFormattedJSON = (reportJSON: ReportJSON) =>
+  format(JSON.stringify(reportJSON), { parser: "json-stringify" });
 /**
  *
  */
@@ -46,6 +46,7 @@ export type Report = {
  *
  */
 export interface ReportJSON {
+  counter: number;
   reports: Report[];
 }
 
@@ -81,6 +82,7 @@ export const newConfirmedReport = (newReport: Report) =>
         PATH_OF_CONFIRMED_JSON,
         parseToFormattedJSON({
           ...data,
+          counter: data.counter + 1,
           reports: [...(data.reports ?? []), newReport],
         })
       )
@@ -98,6 +100,7 @@ export const newBadReport = (newReport: Report) =>
         PATH_OF_BAD_JSON,
         parseToFormattedJSON({
           ...data,
+          counter: data.counter + 1,
           reports: [...(data.reports ?? []), newReport],
         })
       )
