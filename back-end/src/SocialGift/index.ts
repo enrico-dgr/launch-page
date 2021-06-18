@@ -6,7 +6,7 @@ import * as S from 'fp-ts/Semigroup';
 import path from 'path';
 import { ElementHandle, Page } from 'puppeteer';
 import * as WT from 'src/index';
-import { goto, openNewPage, otherPages, waitFor$x } from 'WebTeer/dependencies';
+import { bringToFront, goto, openNewPage, otherPages, waitFor$x } from 'WebTeer/dependencies';
 import { $x, click, getHref, getInnerText, HTMLElementProperties } from 'WebTeer/elementHandle';
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
 import { FollowUser, LikeToPost, WatchStoryAtUrl } from 'WT-Instagram/index';
@@ -187,21 +187,9 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     // --------------------------
     // Get Infos for Action
     // --------------------------
-    const getActionHref: (n: number) => WT.WebProgram<string> = (
-      attempts: number = 4
-    ) =>
+    const getActionHref: () => WT.WebProgram<string> = () =>
       pipe(
         $x(D.settings.message.link.relativeXPath)(messageWithAction),
-        // --- DEBUG
-        WT.chainFirst(() =>
-          pipe(
-            getInnerText(messageWithAction),
-            WT.chain((loggingToDebug) =>
-              WT.fromIO(log(JSON.stringify(loggingToDebug)))
-            )
-          )
-        ),
-        // ---
         WT.chain((els) =>
           els.length === 1
             ? WT.of(els[0])
@@ -220,10 +208,8 @@ const bodyOfActuator: BodyOfActuator = (D) => {
           nameOfFunction: "getActionHref",
           filePath: ABSOLUTE_PATH,
         }),
-        WT.orElse((e) =>
-          attempts > 0
-            ? pipe(attempts - 1, WT.delay(1000), WT.chain(getActionHref))
-            : WT.left(e)
+        WT.chainFirst((loggingToDebug) =>
+          WT.fromIO(log("Href: " + JSON.stringify(loggingToDebug)))
         )
       );
     // --------------------------
@@ -338,7 +324,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     // Core of RunAction
     // --------------------------
     return pipe(
-      getActionHref(5),
+      getActionHref(),
       WT.map((href) => new URL(href)),
       WT.chain((url) =>
         D.options.skip[action]
@@ -356,12 +342,17 @@ const bodyOfActuator: BodyOfActuator = (D) => {
                 pipe(
                   WT.ask(),
                   WT.chainTaskEitherK((r) =>
-                    implementations[action](url)({ ...r, page })
+                    pipe(
+                      bringToFront,
+                      WT.chain(() => implementations[action](url))
+                    )({ ...r, page })
                   )
                 )
               )
             )
       ),
+      WT.chainFirst(WT.delay(1000)),
+      WT.chainFirst(() => bringToFront),
       WT.chainFirst((a) => (a.outcome === "Confirm" ? confirm() : skip()))
     );
   };
@@ -429,9 +420,9 @@ const bodyOfActuator: BodyOfActuator = (D) => {
             updateState({ ...soc, _tag })
           ),
           WT.chainFirst((loggingToDebug) =>
-            WT.fromIO(log(JSON.stringify(loggingToDebug)))
+            WT.fromIO(log("Cycle ending" + JSON.stringify(loggingToDebug)))
           ),
-          WT.chain(WT.delay(2000)),
+          WT.chain(WT.delay(4000)),
           WT.chain(cycle)
         );
   return pipe(

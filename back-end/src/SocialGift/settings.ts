@@ -9,18 +9,18 @@ export const settingsByBotChoice: SettingsByBotChoice<Settings> = {
     message: {
       elements: {
         link: {
-          relativeXPath: `./div[@class='im_message_text']//a[contains(@href,'http')]`,
+          relativeXPath: `.//div[@class='im_message_text']//a[contains(@href,'http')]`,
         },
         buttonConfirm: {
-          relativeXPath: `./button[contains(text(),'CONFERMA')]`,
+          relativeXPath: `.//button[contains(text(),'CONFERMA')]`,
         },
         buttonSkip: {
-          relativeXPath: `./button[contains(text(),'SALTA')]`,
+          relativeXPath: `.//button[contains(text(),'SALTA')]`,
         },
       },
       expectedTextsForActions: {
         Follow: [["innerText", "Segui il Profilo"]],
-        Like: [["innerText", "Lascia un LIKE"]],
+        Like: [["innerText", "Like al Post"]],
         WatchStory: [["innerText", "Visualizza Stories"]],
         Comment: [["innerText", "Comment"]],
         Extra: [["innerText", "EXTRA"]],

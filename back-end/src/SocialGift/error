@@ -1,0 +1,27 @@
+
+{"action":"WatchStory","found":true}
+{"_tag":"Some","value":"[21:49:36]\nSocialgift\n:\n:fire: Partecipa alla Campagna :fire:\n\nECCO COSA DEVI FARE: 👁 Visualizza Stories\nCLICCA QUI: https://www.instagram.com/stories/sarychic/2597339989090058316\n\n:warning: Ricordati di eseguire le operazioni con @waverener12\n\n:moneybag:  Riceverai: €0.00100 per il tuo buono\n\n:eyes: Quando apri la storia Clicca su Visualizza la storia e guarda le prime 3 Stories ( se presenti ) contando la prima che ti verrà mostrata.\n\n:arrow_right: Completando questa campagna riceverai punti per la Gara Mensile e quella Giornaliera\n:arrow_right: SALTA :arrow_right:\n:white_check_mark: CONFERMA :white_check_mark:"}
+{"_tag":"Some","value":"[21:49:36]\nSocialgift\n:\n:fire: Partecipa alla Campagna :fire:\n\nECCO COSA DEVI FARE: 👁 Visualizza Stories\nCLICCA QUI: https://www.instagram.com/stories/sarychic/2597339989090058316\n\n:warning: Ricordati di eseguire le operazioni con @waverener12\n\n:moneybag:  Riceverai: €0.00100 per il tuo buono\n\n:eyes: Quando apri la storia Clicca su Visualizza la storia e guarda le prime 3 Stories ( se presenti ) contando la prima che ti verrà mostrata.\n\n:arrow_right: Completando questa campagna riceverai punti per la Gara Mensile e quella Giornaliera\n:arrow_right: SALTA :arrow_right:\n:white_check_mark: CONFERMA :white_check_mark:"}
+{"_tag":"Some","value":"[21:49:36]\nSocialgift\n:\n:fire: Partecipa alla Campagna :fire:\n\nECCO COSA DEVI FARE: 👁 Visualizza Stories\nCLICCA QUI: https://www.instagram.com/stories/sarychic/2597339989090058316\n\n:warning: Ricordati di eseguire le operazioni con @waverener12\n\n:moneybag:  Riceverai: €0.00100 per il tuo buono\n\n:eyes: Quando apri la storia Clicca su Visualizza la storia e guarda le prime 3 Stories ( se presenti ) contando la prima che ti verrà mostrata.\n\n:arrow_right: Completando questa campagna riceverai punti per la Gara Mensile e quella Giornaliera\n:arrow_right: SALTA :arrow_right:\n:white_check_mark: CONFERMA :white_check_mark:"}
+{"_tag":"Some","value":"[21:49:36]\nSocialgift\n:\n:fire: Partecipa alla Campagna :fire:\n\nECCO COSA DEVI FARE: 👁 Visualizza Stories\nCLICCA QUI: https://www.instagram.com/stories/sarychic/2597339989090058316\n\n:warning: Ricordati di eseguire le operazioni con @waverener12\n\n:moneybag:  Riceverai: €0.00100 per il tuo buono\n\n:eyes: Quando apri la storia Clicca su Visualizza la storia e guarda le prime 3 Stories ( se presenti ) contando la prima che ti verrà mostrata.\n\n:arrow_right: Completando questa campagna riceverai punti per la Gara Mensile e quella Giornaliera\n:arrow_right: SALTA :arrow_right:\n:white_check_mark: CONFERMA :white_check_mark:"}
+{"_tag":"Some","value":"[21:49:36]\nSocialgift\n:\n:fire: Partecipa alla Campagna :fire:\n\nECCO COSA DEVI FARE: 👁 Visualizza Stories\nCLICCA QUI: https://www.instagram.com/stories/sarychic/2597339989090058316\n\n:warning: Ricordati di eseguire le operazioni con @waverener12\n\n:moneybag:  Riceverai: €0.00100 per il tuo buono\n\n:eyes: Quando apri la storia Clicca su Visualizza la storia e guarda le prime 3 Stories ( se presenti ) contando la prima che ti verrà mostrata.\n\n:arrow_right: Completando questa campagna riceverai punti per la Gara Mensile e quella Giornaliera\n:arrow_right: SALTA :arrow_right:\n:white_check_mark: CONFERMA :white_check_mark:"}
+{"_tag":"Some","value":"[21:49:36]\nSocialgift\n:\n:fire: Partecipa alla Campagna :fire:\n\nECCO COSA DEVI FARE: 👁 Visualizza Stories\nCLICCA QUI: https://www.instagram.com/stories/sarychic/2597339989090058316\n\n:warning: Ricordati di eseguire le operazioni con @waverener12\n\n:moneybag:  Riceverai: €0.00100 per il tuo buono\n\n:eyes: Quando apri la storia Clicca su Visualizza la storia e guarda le prime 3 Stories ( se presenti ) contando la prima che ti verrà mostrata.\n\n:arrow_right: Completando questa campagna riceverai punti per la Gara Mensile e quella Giornaliera\n:arrow_right: SALTA :arrow_right:\n:white_check_mark: CONFERMA :white_check_mark:"}
+--------- --------- --------- ---------
+Program run with error.
+--------- Message:
+            [
+  {
+    "message": "In message with bot Socialgift",
+    "nameOfFunction": "getActionHref",
+    "filePath": "/Users/enricodigrazia/Desktop/desktopContent/projects/bots/tg-ig/back-end/src/SocialGift/index.ts"
+  },
+  { "messageNotFromJSON": "Found 0 HTMLAnchorElement(s) containing 'http'." }
+]
+
+ Source path:Error: Found 0 HTMLAnchorElement(s) containing 'http'.
+    at /Users/enricodigrazia/Desktop/desktopContent/projects/bots/tg-ig/back-end/src/SocialGift/index.ts:209:17
+    at /Users/enricodigrazia/Desktop/desktopContent/projects/bots/tg-ig/back-end/node_modules/fp-ts/lib/EitherT.js:52:116
+    at /Users/enricodigrazia/Desktop/desktopContent/projects/bots/tg-ig/back-end/node_modules/fp-ts/lib/ReaderT.js:18:116
+    at /Users/enricodigrazia/Desktop/desktopContent/projects/bots/tg-ig/back-end/node_modules/fp-ts/lib/Task.js:118:44
+    at processTicksAndRejections (internal/process/task_queues.js:93:5)
+--------- --------- --------- ---------
