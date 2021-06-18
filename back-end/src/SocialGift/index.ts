@@ -14,7 +14,7 @@ import {
     sendMessage, Settings as SettingsOfTelegram, settingsByLanguage as settingsOfTelegramByLanguage
 } from 'WT-Telegram/index';
 
-import { newConfirmedReport } from './logs/jsonDB';
+import { newConfirmedReport, newSkipReport, Report } from './logs/jsonDB';
 import { Settings as SettingsOfBots, settingsByBotChoice } from './settings';
 import { Bots, getPropertiesFromSettingsAndBotChoice } from './settingsByBotChoice';
 
@@ -180,7 +180,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
   // --------------------------
   const runAction = (action: TypeOfActions) => (
     messageWithAction: ElementHandle<Element>
-  ) => {
+  ): WT.WebProgram<ResultOfCycle> => {
     // --------------------------
     // Get Infos for Action
     // --------------------------
@@ -204,10 +204,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
           message: `In message with bot ${D.nameOfBot}`,
           nameOfFunction: "getActionHref",
           filePath: ABSOLUTE_PATH,
-        }),
-        WT.chainFirst((loggingToDebug) =>
-          WT.fromIO(log("Href: " + JSON.stringify(loggingToDebug)))
-        )
+        })
       );
     // --------------------------
     // Actions Implementation
@@ -279,7 +276,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     // --------------------------
     // Skip, Confirm
     // --------------------------
-    const skip: () => WT.WebProgram<void> = () =>
+    const skip: (report: Report) => WT.WebProgram<ResultOfCycle> = (report) =>
       pipe(
         $x(D.settings.message.buttonSkip.relativeXPath)(messageWithAction),
         WT.chain((els) =>
@@ -292,13 +289,17 @@ const bodyOfActuator: BodyOfActuator = (D) => {
               )
         ),
         WT.chain(click),
+        WT.chain(() => WT.fromIO(newSkipReport(report))),
+        WT.map<void, ResultOfCycle>(() => "Skip"),
         WT.orElseStackErrorInfos({
           message: `In message with bot ${D.nameOfBot}`,
           nameOfFunction: "skip",
           filePath: ABSOLUTE_PATH,
         })
       );
-    const confirm: () => WT.WebProgram<void> = () =>
+    const confirm: (report: Report) => WT.WebProgram<ResultOfCycle> = (
+      report
+    ) =>
       pipe(
         $x(D.settings.message.buttonConfirm.relativeXPath)(messageWithAction),
         WT.chain((els) =>
@@ -311,6 +312,8 @@ const bodyOfActuator: BodyOfActuator = (D) => {
               )
         ),
         WT.chain(click),
+        WT.chainFirst(() => WT.fromIO(newConfirmedReport(report))),
+        WT.map<void, ResultOfCycle>(() => "Confirm"),
         WT.orElseStackErrorInfos({
           message: `In message with bot ${D.nameOfBot}`,
           nameOfFunction: "confirm",
@@ -324,10 +327,13 @@ const bodyOfActuator: BodyOfActuator = (D) => {
       getActionHref(),
       WT.chain((href) =>
         D.options.skip[action]
-          ? WT.of(
-              returnSkip({
-                message: `${action} skipped because of option's skip === true`,
-              })
+          ? pipe(
+              WT.of(
+                returnSkip({
+                  message: `${action} skipped because of option's skip === true`,
+                })
+              ),
+              WT.map((outcomeOfAction) => ({ ...outcomeOfAction, href }))
             )
           : pipe(
               otherPages,
@@ -345,22 +351,24 @@ const bodyOfActuator: BodyOfActuator = (D) => {
                   )
                 )
               ),
-              WT.chainFirst((a) =>
-                a.outcome === "Confirm"
-                  ? WT.fromIO(
-                      newConfirmedReport({
-                        action,
-                        href,
-                        info: a.info,
-                      })
-                    )
-                  : WT.of(undefined)
-              )
+              WT.map((outcomeOfAction) => ({ ...outcomeOfAction, href }))
             )
       ),
       WT.chainFirst(WT.delay(1000)),
       WT.chainFirst(() => bringToFront),
-      WT.chainFirst((a) => (a.outcome === "Confirm" ? confirm() : skip()))
+      WT.chain(({ outcome, info, href }) =>
+        outcome === "Confirm"
+          ? confirm({
+              action,
+              href,
+              info,
+            })
+          : skip({
+              action,
+              href,
+              info,
+            })
+      )
     );
   };
 
@@ -414,22 +422,12 @@ const bodyOfActuator: BodyOfActuator = (D) => {
                   sendMessage(D.language)(D.settings.buttonNewAction.text),
                   WT.map<void, ResultOfCycle>(() => "NewAction")
                 )
-              : pipe(
-                  runAction(messageWithAction.action)(messageWithAction.el),
-                  // here I print/log result of action.
-                  WT.chainFirst((loggingToDebug) =>
-                    WT.fromIO(log(JSON.stringify(loggingToDebug)))
-                  ),
-                  WT.map((actionResult) => actionResult.outcome)
-                )
+              : pipe(runAction(messageWithAction.action)(messageWithAction.el))
           ),
           WT.map<ResultOfCycle, StateOfCycle>((_tag) =>
             updateState({ ...soc, _tag })
           ),
-          WT.chainFirst((loggingToDebug) =>
-            WT.fromIO(log("Cycle ending" + JSON.stringify(loggingToDebug)))
-          ),
-          WT.chain(WT.delay(4000)),
+          WT.chain(WT.delay(7000)),
           WT.chain(cycle)
         );
   return pipe(

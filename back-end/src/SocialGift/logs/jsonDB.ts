@@ -3,14 +3,19 @@ import { pipe } from 'fp-ts/lib/function';
 import fs from 'fs';
 import path from 'path';
 import { format } from 'prettier';
+import { user } from 'src/localCode/nodeUtils';
 
 import { TypeOfActions } from '../';
 
 // ------------------------------------------
 //  Constants
 // ------------------------------------------
-const PATH_OF_CONFIRMED_JSON = path.resolve(__dirname, "./confirmed.json");
-const PATH_OF_BAD_JSON = path.resolve(__dirname, "./bad.json");
+const PATH_OF_CONFIRMED_JSON = path.resolve(
+  __dirname,
+  `./${user}/confirmed.json`
+);
+const PATH_OF_BAD_JSON = path.resolve(__dirname, `./${user}/bad.json`);
+const PATH_OF_SKIP_JSON = path.resolve(__dirname, `./${user}/skip.json`);
 // ------------------------------------------
 //  Utils
 // ------------------------------------------
@@ -19,16 +24,25 @@ const PATH_OF_BAD_JSON = path.resolve(__dirname, "./bad.json");
  */
 const parseToFormattedJSON = (reportJSON: ReportJSON) =>
   format(JSON.stringify(reportJSON), { parser: "json-stringify" });
+
 /**
  *
  */
 const confirmedJSON = () =>
   JSON.parse(fs.readFileSync(PATH_OF_CONFIRMED_JSON, "utf8")) as ReportJSON;
+
 /**
  *
  */
 const badJSON = () =>
   JSON.parse(fs.readFileSync(PATH_OF_BAD_JSON, "utf8")) as ReportJSON;
+
+/**
+ *
+ */
+const skipJSON = () =>
+  JSON.parse(fs.readFileSync(PATH_OF_BAD_JSON, "utf8")) as ReportJSON;
+
 // ------------------------------------------
 //  Exports
 // ------------------------------------------
@@ -98,6 +112,23 @@ export const newBadReport = (newReport: Report) =>
     IO.chain<ReportJSON, void>((data) => () =>
       fs.writeFileSync(
         PATH_OF_BAD_JSON,
+        parseToFormattedJSON({
+          ...data,
+          counter: data.counter + 1,
+          reports: [...(data.reports ?? []), newReport],
+        })
+      )
+    )
+  );
+/**
+ *
+ */
+export const newSkipReport = (newReport: Report) =>
+  pipe(
+    skipJSON,
+    IO.chain<ReportJSON, void>((data) => () =>
+      fs.writeFileSync(
+        PATH_OF_SKIP_JSON,
         parseToFormattedJSON({
           ...data,
           counter: data.counter + 1,
