@@ -1,3 +1,6 @@
+/**
+ * @since 1.0.0
+ */
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
 import { Browser, ElementHandle, Page } from 'puppeteer';
@@ -8,6 +11,7 @@ import * as WT from './';
  * @param xPath
  * @returns Array or empty array.
  * @description Runs `page.waitForXPath` and then `page.$x`
+ * @since 1.0.0
  */
 export const waitFor$x = (xPath: string) => (
   page: Page
@@ -22,6 +26,9 @@ export const waitFor$x = (xPath: string) => (
     ),
     WT.chain(() => $x(xPath)(page))
   );
+/**
+ * @since 1.0.0
+ */
 export const $x = (XPath: string) => (
   page: Page
 ): WT.WebProgram<ElementHandle<Element>[]> =>
@@ -40,6 +47,7 @@ export const $x = (XPath: string) => (
  * @param selector
  * @returns Array or empty array.
  * @description Runs `page.waitForSelector` and then `page.$$`
+ * @since 1.0.0
  */
 export const waitFor$$ = (selector: string) => (
   page: Page
@@ -54,6 +62,9 @@ export const waitFor$$ = (selector: string) => (
     ),
     WT.chain(() => $$(selector)(page))
   );
+/**
+ * @since 1.0.0
+ */
 export const $$ = (selector: string) => (
   page: Page
 ): WT.WebProgram<ElementHandle<Element>[]> =>
@@ -64,7 +75,7 @@ export const $$ = (selector: string) => (
       .catch((err) => E.left(WT.anyToError(err)))
   );
 /**
- *
+ * @since 1.0.0
  */
 export const goto = (url: string) => (page: Page): WT.WebProgram<void> =>
   WT.fromTaskEither(() =>
@@ -74,12 +85,13 @@ export const goto = (url: string) => (page: Page): WT.WebProgram<void> =>
       .catch((err) => E.left(WT.anyToError(err)))
   );
 /**
- *
+ * @since 1.0.0
  */
 export const browser = (page: Page): WT.WebProgram<Browser> =>
   WT.of(page.browser());
 /**
  * @returns the new page
+ * @since 1.0.0
  */
 export const openNewPage: (page: Page) => WT.WebProgram<Page> = flow(
   browser,
@@ -89,6 +101,7 @@ export const openNewPage: (page: Page) => WT.WebProgram<Page> = flow(
  *
  * @param url
  * @returns the new Page
+ * @since 1.0.0
  */
 export const openNewPageToUrl: (
   url: string
@@ -103,8 +116,14 @@ export const openNewPageToUrl: (
       )
     )
   );
+/**
+ * @since 1.0.0
+ */
 export const close: (page: Page) => WT.WebProgram<void> = (page) =>
   WT.fromTaskK(() => () => page.close())();
+/**
+ * @since 1.0.0
+ */
 export const otherPages: (page: Page) => WT.WebProgram<Page[]> = (page: Page) =>
   pipe(
     page,
@@ -130,6 +149,7 @@ export const otherPages: (page: Page) => WT.WebProgram<Page[]> = (page: Page) =>
   );
 /**
  * @todo refactoring using *otherPages* abstraction
+ * @since 1.0.0
  */
 export const closeOtherPages: (page: Page) => WT.WebProgram<Page> = (
   page: Page
@@ -160,5 +180,8 @@ export const closeOtherPages: (page: Page) => WT.WebProgram<Page> = (
       }
     })
   );
+/**
+ * @since 1.0.0
+ */
 export const bringToFront = (page: Page): WT.WebProgram<void> =>
   WT.fromTaskK(() => () => page.bringToFront())();

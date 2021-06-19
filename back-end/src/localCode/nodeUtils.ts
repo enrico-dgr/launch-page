@@ -4,5 +4,5 @@ export const headless = () => {
   const first = process.argv[2] ?? "true";
   return first === "false" ? false : true;
 };
-export const user = myProfiles.newmener2;
+export const user = myProfiles.waverener12;
 export const userDataDir = `./userDataDirs/folders/${user}`;

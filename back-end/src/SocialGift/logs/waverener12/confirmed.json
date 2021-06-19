@@ -1,5 +1,5 @@
 {
-  "counter": 2,
+  "counter": 5,
   "reports": [
     {
       "action": "Like",
@@ -11,6 +11,30 @@
     {
       "action": "Follow",
       "href": "https://instagram.com/officialkarmab",
+      "info": {
+        "_tag": "Followed",
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/ideatende",
+      "info": {
+        "_tag": "Followed",
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/ibizagalaevents_",
+      "info": {
+        "_tag": "Followed",
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/villabrasini_beautyclinic",
       "info": {
         "_tag": "Followed",
         "isPrivate": false

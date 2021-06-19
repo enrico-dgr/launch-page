@@ -12,6 +12,38 @@ import { routine } from './Routine';
 import { UrlsMI, UrlsTM } from './Urls';
 import { freeFollower, plansPage } from './XPaths';
 
+const nOrElse: <A, B>(
+  millis: number,
+  attempts: number
+) => (awp: (a: A) => WT.WebProgram<B>) => (a: A) => WT.WebProgram<B> = <A, B>(
+  millis: number,
+  attempts: number
+) => (awp: (a: A) => WT.WebProgram<B>) => (a: A) =>
+  pipe(
+    a,
+    awp,
+    WT.orElse((e) =>
+      attempts > 1
+        ? pipe(
+            undefined,
+            WT.delay(millis),
+            WT.chain(() => nOrElse<A, B>(millis, attempts - 1)(awp)(a))
+          )
+        : WT.left(e)
+    )
+  );
+
+export const chainNOrElse: <A, B>(
+  millis: number,
+  attempts: number
+) => (
+  awp: (a: A) => WT.WebProgram<B>
+) => (wp: WT.WebProgram<A>) => WT.WebProgram<B> = <A, B>(
+  millis: number,
+  attempts: number
+) => (awp: (a: A) => WT.WebProgram<B>) => (wp: WT.WebProgram<A>) =>
+  pipe(wp, WT.chain(nOrElse<A, B>(millis, attempts)(awp)));
+
 type SocialPlatform = "MrInsta" | "TurboMedia";
 const getBaseUrl = (socialPlatform: SocialPlatform): string => {
   switch (socialPlatform) {
@@ -43,7 +75,7 @@ export const initFreeFollower = flow(getBaseUrl, (url: string) =>
 /**
  *
  */
-export const routineFreeFollower = routine<Page>({
+export const routineFreeFollower = routine<string>({
   retrieveProfile: pipe(
     WebDepsUtils.waitFor$x(freeFollower.followProfileButton),
     WT.chain(
@@ -54,15 +86,28 @@ export const routineFreeFollower = routine<Page>({
     WT.chain((els) => pipe(els[0], ElementUtils.getHref)),
     WT.chain(
       O.match(() => WT.leftAny(`No profile-link href in MrInsta/index`), WT.of)
-    ),
-    WT.chain(WebDepsUtils.openNewPageToUrl)
+    )
   ),
-  follow: (p) =>
+  follow: (href) =>
     pipe(
       WT.ask(),
-      WT.chainTaskEitherK((r) =>
-        pipe({ ...r, page: p }, Instagram.Follow.followOnProfilePage)
-      )
+      WT.chain((r) =>
+        pipe(
+          WebDepsUtils.openNewPage,
+          WT.map((page) => ({ r, page }))
+        )
+      ),
+      WT.chainTaskEitherK(({ r, page }) =>
+        pipe(
+          { ...r, page: page },
+          Instagram.FollowUser.followUser({
+            language: "it",
+            profileUrl: new URL(href),
+            options: { allowPrivate: false },
+          })
+        )
+      ),
+      WT.chain(() => WT.of(undefined))
     ),
   confirm: pipe(
     WebDepsUtils.closeOtherPages,
@@ -77,7 +122,7 @@ export const routineFreeFollower = routine<Page>({
   preRetrieveChecks: [
     pipe(
       WT.of(undefined),
-      WT.chainNOrElse<void, void>(
+      chainNOrElse<void, void>(
         1000,
         18
       )(() =>
@@ -102,7 +147,7 @@ export const routineFreeFollower = routine<Page>({
     WebDepsUtils.closeOtherPages,
     WT.chainFirst(WT.delay(1000)),
     WT.chain(() => WebDepsUtils.bringToFront),
-    WT.chainNOrElse<void, void>(
+    chainNOrElse<void, void>(
       1000,
       5
     )(() =>
@@ -130,7 +175,7 @@ export const freeFollowerPlan = (socialPlatform: SocialPlatform) =>
     routine: routineFreeFollower,
     end: pipe(
       WT.of(undefined),
-      WT.chainNOrElse<undefined, void>(
+      chainNOrElse<undefined, void>(
         1000,
         60
       )(() =>

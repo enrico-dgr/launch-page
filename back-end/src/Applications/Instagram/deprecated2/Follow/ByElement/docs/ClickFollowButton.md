@@ -1,3 +1,0 @@
-# ClickFollowButton
-
-[[ClickFollowButton.png]]

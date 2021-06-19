@@ -1,0 +1,10 @@
+{
+  "srcDir": "src",
+  "outDir": "docs",
+  "exclude": [
+    "src/localCode/**",
+    "src/deprecated/**",
+    "src/Applications/**",
+    "src/SocialGift/**"
+  ]
+}

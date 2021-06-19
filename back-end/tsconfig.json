@@ -24,6 +24,11 @@
     "**/node_modules/*",
     "./build",
     "./node_modules/@types/mongoose/**",
-    "./srcOld"
+    "./srcOld",
+    "**/MrInsta/*",
+    "**/MrInsta/**",
+    "*/MrInsta/**",
+    "**/MrInsta/index.ts",
+    "docs"
   ]
 }

@@ -2,6 +2,7 @@ import { pipe } from 'fp-ts/lib/function';
 import * as S from 'fp-ts/lib/Semigroup';
 
 import * as WT from '../../../index';
+import { chainNOrElse } from '../index';
 
 export interface RoutineDeps<ProfileType> {
   readonly preRetrieveChecks: WT.WebProgram<void>[];
@@ -19,7 +20,7 @@ export const routine = <ProfileType>(D: RoutineDeps<ProfileType>) => {
     concatAll(() => WT.of(undefined))(
       D.preRetrieveChecks.map((c) => () => c)
     )(),
-    WT.chainNOrElse<void, void>(
+    chainNOrElse<void, void>(
       1000,
       5
     )(() =>

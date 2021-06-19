@@ -1,4 +1,6 @@
-import * as A from 'fp-ts/Array';
+/**
+ * @since 1.0.0
+ */
 import * as E from 'fp-ts/Either';
 import * as IO from 'fp-ts/IO';
 import { flow, pipe, Predicate } from 'fp-ts/lib/function';
@@ -11,36 +13,41 @@ import { Page } from 'puppeteer';
 
 import { createErrorFromErrorInfos, ErrorInfos, stackErrorInfos } from './errorInfos';
 
+/**
+ * @category Dependencies
+ * @since 1.0.0
+ */
 export interface WebDeps {
   page: Page;
 }
-
+/**
+ * @category model
+ * @since 1.0.0
+ */
 export interface WebProgram<A>
   extends RTE.ReaderTaskEither<WebDeps, Error, A> {}
 /**
  * @category Pointed
+ * @since 1.0.0
  */
 export const of: <A = never>(a: A) => WebProgram<A> = RTE.of;
 /**
  * @category — Functor
+ * @since 1.0.0
  */
 export const map: <A, B>(
   f: (a: A) => B
 ) => (fa: WebProgram<A>) => WebProgram<B> = RTE.map;
 /**
- * Composes computations in sequence, using the return value of one computation to determine the next computation.
- *
  * @category Monad
+ * @since 1.0.0
  */
 export const chain: <A, B>(
   f: (a: A) => WebProgram<B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chain;
 /**
- * Composes computations in sequence,
- * using the return value of one computation to determine the next computation.
- * The final value will be
- *
- * @category Monad
+ * @category combinators
+ * @since 1.0.0
  */
 export const chainAdd: <A, B>(
   f: (a: A) => WebProgram<B>
@@ -53,24 +60,28 @@ export const chainAdd: <A, B>(
   );
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const chainTaskK: <A, B>(
   f: (a: A) => T.Task<B>
 ) => (first: WebProgram<A>) => WebProgram<B> = RTE.chainTaskK;
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const chainTaskEitherK: <A, B>(
   f: (a: A) => TE.TaskEither<Error, B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chainTaskEitherK;
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const chainFirst: <A, B>(
   f: (a: A) => WebProgram<B>
 ) => (ma: WebProgram<A>) => WebProgram<A> = RTE.chainFirst;
 /**
  * @category destructors
+ * @since 1.0.0
  */
 export const match: <B, A>(
   onLeft: (e: Error) => B,
@@ -78,6 +89,7 @@ export const match: <B, A>(
 ) => (ma: WebProgram<A>) => RT.ReaderTask<WebDeps, B> = RTE.match;
 /**
  * @category destructors
+ * @since 1.0.0
  */
 export const matchW: <B, A, C>(
   onLeft: (e: Error) => B,
@@ -85,45 +97,55 @@ export const matchW: <B, A, C>(
 ) => (ma: WebProgram<A>) => RT.ReaderTask<WebDeps, B | C> = RTE.matchW;
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const fromTaskK: <A extends readonly unknown[], B>(
   f: (...a: A) => T.Task<B>
 ) => (...a: A) => WebProgram<B> = RTE.fromTaskK;
+/**
+ * @since 1.0.0
+ */
 export const fromIO: <A>(fa: IO.IO<A>) => WebProgram<A> = RTE.fromIO;
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const fromTaskEither: <A>(ma: TE.TaskEither<Error, A>) => WebProgram<A> =
   RTE.fromTaskEither;
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const fromEither: <A>(e: E.Either<Error, A>) => WebProgram<A> =
   RTE.fromEither;
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const right: <A = never>(a: A) => WebProgram<A> = RTE.right;
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const left: <A = never>(e: Error) => WebProgram<A> = RTE.left;
 /**
  * @category constructors
- *
+ * @since 1.0.0
  */
 export const anyToError: <E>(err: E) => Error = (err) =>
   err instanceof Error ? err : new Error(JSON.stringify(err));
 /**
  * Derivable from `anyToError`
  * @category constructors
+ * @since 1.0.0
  */
 export const leftAny: <E = never, A = never>(err: E) => WebProgram<A> = (err) =>
   fromEither(
     err instanceof Error ? E.left(err) : E.left(new Error(JSON.stringify(err)))
   );
 /**
- * @category semigroup instance
+ * @category instances
+ * @since 1.0.0
  */
 export const getSemigroupChain = <A>(
   chain_: (f: (a: A) => WebProgram<A>) => (ma: WebProgram<A>) => WebProgram<A>
@@ -131,9 +153,9 @@ export const getSemigroupChain = <A>(
   concat: (x, y) => flow(x, chain_(y)),
 });
 /**
- *
+ * @since 1.0.0
  */
-export const chainArray: <A>(
+export const chainConcatAll: <A>(
   startWith: (a: A) => WebProgram<A>
 ) => (
   as: readonly ((a: A) => WebProgram<A>)[]
@@ -141,6 +163,7 @@ export const chainArray: <A>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const fromPredicate: <A>(
   predicate: Predicate<A>,
@@ -148,155 +171,48 @@ export const fromPredicate: <A>(
 ) => (a: A) => WebProgram<A> = RTE.fromPredicate;
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const asks: <A = never>(f: (r: WebDeps) => A) => WebProgram<A> =
   RTE.asks;
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const ask: () => WebProgram<WebDeps> = RTE.ask;
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const orElse: <A>(
   onLeft: (e: Error) => WebProgram<A>
 ) => (ma: WebProgram<A>) => WebProgram<A> = RTE.orElse;
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const orElseW: <B>(
   onLeft: (e: Error) => WebProgram<B>
 ) => <A>(ma: WebProgram<A>) => WebProgram<B | A> = RTE.orElseW;
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const leftFromErrorInfos = <A = never>(
   errorInfos: ErrorInfos
 ): WebProgram<A> => left(createErrorFromErrorInfos(errorInfos));
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const orElseStackErrorInfos = <A>(errorInfos: ErrorInfos) => (
   ma: WebProgram<A>
 ): WebProgram<A> =>
   orElse<A>((e: Error) => left(stackErrorInfos(errorInfos)(e)))(ma);
 /**
- *
- * @param millis
- * @returns
+ * @category combinators
+ * @since 1.0.0
  */
 export const delay: <A>(millis: number) => (first: A) => WebProgram<A> = (
   millis
 ) => fromTaskK((a) => T.delay(millis)(T.of(a)));
-/**
- *
- * @todo remove dependencies from these functions
- * --------------------------- Start ---------------------------
- */
-/**
- * function to be run a maximum of *N* times and stops when result is *right*
- * or after the max attempts reached, exiting with *left* value.
- * @param millis delay between attempts
- *
- * *NOTE* the first attempt will run immediately
- * @param attempts
- * @returns
- * @deprecated better create recursive function for the purpose
- */
-const nOrElse: <A, B>(
-  millis: number,
-  attempts: number
-) => (awp: (a: A) => WebProgram<B>) => (a: A) => WebProgram<B> = <A, B>(
-  millis: number,
-  attempts: number
-) => (awp: (a: A) => WebProgram<B>) => (a: A) =>
-  pipe(
-    a,
-    awp,
-    orElse((e) =>
-      attempts > 1
-        ? pipe(
-            undefined,
-            delay(millis),
-            chain(() => nOrElse<A, B>(millis, attempts - 1)(awp)(a))
-          )
-        : left(e)
-    )
-  );
-/**
- * chain a function to be run a maximum of *N* times and stops when result is *right*
- * or after the max attempts reached, exiting with *left* value.
- * @param millis delay between attempts
- *
- * *NOTE* the first attempt will run immediately
- * @param attempts
- * @returns
- * @deprecated better create recursive function for the purpose
- */
-export const chainNOrElse: <A, B>(
-  millis: number,
-  attempts: number
-) => (awp: (a: A) => WebProgram<B>) => (wp: WebProgram<A>) => WebProgram<B> = <
-  A,
-  B
->(
-  millis: number,
-  attempts: number
-) => (awp: (a: A) => WebProgram<B>) => (wp: WebProgram<A>) =>
-  pipe(wp, chain(nOrElse<A, B>(millis, attempts)(awp)));
-/**
- * function to be run a maximum of *N* times and stops when result is *left*
- * or after the max attempts reached, exiting with *right* value.
- *
- * The result of each cycle will be passed as argument to the next.
- * @param millis delay between attempts
- *
- * *NOTE* the first attempt will run immediately
- * @param attempts
- * @returns the result of the last cycle (*right* or *left*)
- * @deprecated better create recursive function for the purpose
- */
-const dummyRepeat: <A>(
-  millis: number,
-  numberOfTimes: number
-) => (awp: (a: A) => WebProgram<A>) => (a: A) => WebProgram<A> = <A>(
-  millis: number,
-  numberOfTimes: number
-) => (awp: (a: A) => WebProgram<A>) =>
-  flow(
-    awp,
-    chain((a) =>
-      numberOfTimes > 1
-        ? pipe(
-            undefined,
-            delay(millis),
-            chain(() => dummyRepeat<A>(millis, numberOfTimes - 1)(awp)(a))
-          )
-        : right(a)
-    )
-  );
-/**
- * chain a function to be run a maximum of *N* times and stops when result is *left*
- * or after the max attempts reached, exiting with *right* value.
- *
- * The result of each cycle will be passed as argument to the next.
- * @param millis delay between attempts
- *
- * *NOTE* the first attempt will run immediately
- * @param attempts
- * @returns the result of the last cycle (*right* or *left*)
- * @deprecated better create recursive function for the purpose
- */
-export const chainN: <A>(
-  millis: number,
-  numberOfTimes: number
-) => (awp: (a: A) => WebProgram<A>) => (wp: WebProgram<A>) => WebProgram<A> = <
-  A
->(
-  millis: number,
-  numberOfTimes: number
-) => (awp: (a: A) => WebProgram<A>) => (wp: WebProgram<A>) =>
-  pipe(wp, chain(dummyRepeat<A>(millis, numberOfTimes)(awp)));
-/**
- * --------------------------- End ---------------------------
- */

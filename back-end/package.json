@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
+  "homepage": "https://gitlab.com/enrico-dgr/webteer",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register build/index.js",
     "start:ts": "ts-node -r tsconfig-paths/register src/index.ts",
@@ -15,7 +16,8 @@
     "local:ob": "ts-node -r tsconfig-paths/register src/localCode/openBrowser.ts",
     "build": "tsc -b",
     "prod": "node build copy/index.js",
-    "test": "jest"
+    "test": "jest",
+    "docs": "docs-ts"
   },
   "author": "enrico-dgr",
   "license": "MIT",
