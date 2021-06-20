@@ -3,7 +3,7 @@ import P from 'puppeteer';
 import { validator } from 'WebTeer/SocialGift/validator';
 
 import { myProfiles } from './myProfiles';
-import * as NU from './nodeUtils';
+import * as NU from './nodeVariablesForPuppeteer';
 import { runAndLog } from './runAndLog';
 
 /**
@@ -11,8 +11,8 @@ import { runAndLog } from './runAndLog';
  */
 (async () => {
   const browser = await P.launch({
-    headless: NU.headless(),
-    userDataDir: NU.userDataDir,
+    headless: JSON.parse(NU.options("--headless")()),
+    userDataDir: `src/../userDataDirs/folders/${NU.variables("--user")()}`,
     args: ["--lang=it"],
     defaultViewport: { width: 1050, height: 568 },
   });

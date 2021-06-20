@@ -1,5 +1,3 @@
-import fs from 'fs';
-
-const data = require("confirmed.json");
+const data = JSON.parse('"cosimo":"luca"');
 
 console.log(data);

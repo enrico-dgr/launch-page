@@ -1,4 +1,22 @@
 {
-  "counter": 0,
-  "reports": []
+  "counter": 1,
+  "reports": [
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/ildragoscommettitore",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotClicked",
+          "wrongProps": [
+            [
+              "innerText",
+              ""
+            ]
+          ]
+        },
+        "isPrivate": false
+      }
+    }
+  ]
 }

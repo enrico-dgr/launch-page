@@ -3,13 +3,14 @@ import { pipe } from 'fp-ts/lib/function';
 import fs from 'fs';
 import path from 'path';
 import { format } from 'prettier';
-import { user } from 'src/localCode/nodeUtils';
+import { variables } from 'WebTeer/localCode/nodeVariablesForPuppeteer';
 
 import { TypeOfActions } from '../';
 
 // ------------------------------------------
 //  Constants
 // ------------------------------------------
+const user = variables("--user")();
 const PATH_OF_CONFIRMED_JSON = path.resolve(
   __dirname,
   `./${user}/confirmed.json`
@@ -41,7 +42,7 @@ const badJSON = () =>
  *
  */
 const skipJSON = () =>
-  JSON.parse(fs.readFileSync(PATH_OF_BAD_JSON, "utf8")) as ReportJSON;
+  JSON.parse(fs.readFileSync(PATH_OF_SKIP_JSON, "utf8")) as ReportJSON;
 
 // ------------------------------------------
 //  Exports

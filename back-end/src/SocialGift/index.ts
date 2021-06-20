@@ -427,7 +427,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
           WT.map<ResultOfCycle, StateOfCycle>((_tag) =>
             updateState({ ...soc, _tag })
           ),
-          WT.chain(WT.delay(7000)),
+          WT.chain(WT.delay(3 * 60 * 1000)),
           WT.chain(cycle)
         );
   return pipe(
