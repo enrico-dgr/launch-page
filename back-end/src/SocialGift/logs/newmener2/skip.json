@@ -1,5 +1,5 @@
 {
-  "counter": 9,
+  "counter": 14,
   "reports": [
     {
       "action": "Follow",
@@ -20,51 +20,7 @@
     },
     {
       "action": "Follow",
-      "href": "https://instagram.com/black_got_talent",
-      "info": {
-        "_tag": "NotFollowed",
-        "reason": {
-          "_tag": "NotAvailablePage"
-        },
-        "isPrivate": false
-      }
-    },
-    {
-      "action": "Follow",
-      "href": "https://instagram.com/ceramica_luciano_amicuzi",
-      "info": {
-        "_tag": "NotFollowed",
-        "reason": {
-          "_tag": "NotAvailablePage"
-        },
-        "isPrivate": false
-      }
-    },
-    {
-      "action": "Follow",
-      "href": "https://instagram.com/guadagnarescommettendo",
-      "info": {
-        "_tag": "NotFollowed",
-        "reason": {
-          "_tag": "NotAvailablePage"
-        },
-        "isPrivate": false
-      }
-    },
-    {
-      "action": "Follow",
-      "href": "https://instagram.com/justtkellyyy",
-      "info": {
-        "_tag": "NotFollowed",
-        "reason": {
-          "_tag": "NotAvailablePage"
-        },
-        "isPrivate": false
-      }
-    },
-    {
-      "action": "Follow",
-      "href": "https://instagram.com/riccardoleonelli",
+      "href": "https://instagram.com/martinellidetailingcenter",
       "info": {
         "_tag": "NotFollowed",
         "reason": {
@@ -74,15 +30,30 @@
       }
     },
     {
-      "action": "Comment",
-      "href": "https://instagram.com/p/CQWpphWnQPD",
+      "action": "Follow",
+      "href": "https://instagram.com/martinellidetailingcenter",
       "info": {
-        "message": "Comment skipped because of option's skip === true"
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
       }
     },
     {
       "action": "Follow",
-      "href": "https://instagram.com/sabatiello.lorenzo",
+      "href": "https://instagram.com/martinellidetailingcenter",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/mag_official19",
       "info": {
         "_tag": "NotFollowed",
         "reason": {
@@ -93,7 +64,7 @@
     },
     {
       "action": "Follow",
-      "href": "https://instagram.com/rosariotripi_baz",
+      "href": "https://instagram.com/nicola_selvaggio_nick_wilde",
       "info": {
         "_tag": "NotFollowed",
         "reason": {
