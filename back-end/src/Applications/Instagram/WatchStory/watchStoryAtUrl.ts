@@ -7,7 +7,7 @@ import {
     Settings as SettingsOfInstagram, settingsByLanguage
 } from 'WT-Instagram/SettingsByLanguage';
 
-import { goto } from '../goto';
+import { goto, StateOfInstagramPage } from '../goto';
 import { Options, Output as OutputOfScrollStories, scrollStories, tag } from './scrollStories';
 
 interface Settings {
@@ -27,13 +27,13 @@ interface InputOfBody {
  * @category type-classes
  * @subcategory Output
  */
-interface NotAvailablePage extends tag {
-  _tag: "NotAvailablePage";
+interface PageState extends tag {
+  _tag: StateOfInstagramPage;
 }
 /**
  * @category Output
  */
-type Output = NotAvailablePage | OutputOfScrollStories;
+type Output = PageState | OutputOfScrollStories;
 /**
  * @category Body
  */
@@ -108,9 +108,9 @@ const bodyOfWatchStoryAtUrl = (I: InputOfBody) => {
    */
   return pipe(
     goto(I.language)(I.storyUrl.href),
-    WT.chain((a) =>
-      a !== "AvailablePage"
-        ? WT.of<Output>({ _tag: "NotAvailablePage" })
+    WT.chain((pageState) =>
+      pageState !== "AvailablePage"
+        ? WT.of<Output>({ _tag: pageState })
         : pipe(
             showStories(500, 10),
             WT.chain((permissionIsGiven) =>

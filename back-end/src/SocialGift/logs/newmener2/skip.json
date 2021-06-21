@@ -1,5 +1,5 @@
 {
-  "counter": 1,
+  "counter": 9,
   "reports": [
     {
       "action": "Follow",
@@ -14,6 +14,90 @@
               ""
             ]
           ]
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/black_got_talent",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/ceramica_luciano_amicuzi",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/guadagnarescommettendo",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/justtkellyyy",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/riccardoleonelli",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Comment",
+      "href": "https://instagram.com/p/CQWpphWnQPD",
+      "info": {
+        "message": "Comment skipped because of option's skip === true"
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/sabatiello.lorenzo",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/rosariotripi_baz",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
         },
         "isPrivate": false
       }

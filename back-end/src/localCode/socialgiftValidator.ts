@@ -2,7 +2,6 @@ import { pipe } from 'fp-ts/lib/function';
 import P from 'puppeteer';
 import { validator } from 'WebTeer/SocialGift/validator';
 
-import { myProfiles } from './myProfiles';
 import * as NU from './nodeVariablesForPuppeteer';
 import { runAndLog } from './runAndLog';
 
@@ -17,7 +16,7 @@ import { runAndLog } from './runAndLog';
     defaultViewport: { width: 1050, height: 568 },
   });
   const page = await browser.newPage();
-  page.setDefaultTimeout(15000);
+  page.setDefaultTimeout(JSON.parse(NU.options("--setDefaultTimeout")()));
 
   await pipe(
     { page },

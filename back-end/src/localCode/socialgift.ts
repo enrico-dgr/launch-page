@@ -16,7 +16,7 @@ import { runAndLog } from './runAndLog';
     defaultViewport: { width: 1050, height: 568 },
   });
   const page = await browser.newPage();
-  page.setDefaultTimeout(15000);
+  page.setDefaultTimeout(JSON.parse(NU.options("--setDefaultTimeout")()));
 
   await pipe(
     { page },

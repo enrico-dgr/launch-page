@@ -1,4 +1,3 @@
-import { log } from 'fp-ts/Console';
 import { pipe } from 'fp-ts/function';
 import { Reader } from 'fp-ts/lib/Reader';
 import * as O from 'fp-ts/Option';
@@ -21,8 +20,7 @@ import { Bots, getPropertiesFromSettingsAndBotChoice } from './settingsByBotChoi
 const ABSOLUTE_PATH = path.resolve(__dirname, "./index.ts");
 
 /**
- * @name enumOfActions
- * @category enumeration
+ *
  */
 enum enumOfActions {
   Follow = "Follow",
@@ -32,20 +30,17 @@ enum enumOfActions {
   Extra = "EXTRA",
 }
 /**
- * @name enumOfActions
- * @category keys
+ *
  */
 export type TypeOfActions = keyof typeof enumOfActions;
 /**
- * @name Options
- * @category type-classes
+ *
  */
 type Options = {
   skip: { [key in TypeOfActions]: boolean };
 };
 /**
- * @name Settings
- * @category type-classes
+ *
  */
 interface Settings {
   chatUrl: URL;
@@ -69,8 +64,7 @@ interface Settings {
   };
 }
 /**
- * @name InputOfBody
- * @category type-classes
+ *
  */
 interface InputOfBody {
   nameOfBot: Bots;
@@ -84,17 +78,13 @@ interface InputOfBody {
 /**
  *
  */
-/**
- * @name Output
- * @category type-classes
- */
 type Output = {};
 /**
- * @category type
+ *
  */
 type BodyOfActuator = Reader<InputOfBody, WT.WebProgram<Output>>;
 /**
- * Body
+ *
  */
 const bodyOfActuator: BodyOfActuator = (D) => {
   // --------------------------
@@ -109,7 +99,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     found: false,
   };
   /**
-   * @category semigroup-instance
+   *
    */
   const semigroupChainMatchedAction: S.Semigroup<
     WT.WebProgram<ActionAndFound>
@@ -120,6 +110,9 @@ const bodyOfActuator: BodyOfActuator = (D) => {
         WT.chain((a) => (a.found ? WT.of(a) : y))
       ),
   };
+  /**
+   *
+   */
   const concatAll = S.concatAll(semigroupChainMatchedAction)(
     WT.of(defaultActionAndWrongprops)
   );
@@ -131,10 +124,19 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     el: ElementHandle<Element>;
     action: TypeOfActions;
   }
+  /**
+   *
+   */
   interface NotFoundMessage {
     _tag: "NotFoundMessage";
   }
+  /**
+   *
+   */
   type LastMessageWithAction = FoundMessage | NotFoundMessage;
+  /**
+   *
+   */
   const findLastMessageWithAction = (
     els: ElementHandle<Element>[]
   ): WT.WebProgram<LastMessageWithAction> =>
@@ -190,9 +192,15 @@ const bodyOfActuator: BodyOfActuator = (D) => {
         WT.chain((els) =>
           els.length === 1
             ? WT.of(els[0])
-            : WT.left(
-                new Error(
-                  `Found ${els.length} HTMLAnchorElement(s) containing 'http'.`
+            : pipe(
+                getInnerText(messageWithAction),
+                WT.chain((text) =>
+                  WT.left(
+                    new Error(
+                      `Found ${els.length} HTMLAnchorElement(s) containing 'http'.\n` +
+                        `Text of message is: ${text}`
+                    )
+                  )
                 )
               )
         ),
@@ -210,11 +218,11 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     // Actions Implementation
     // --------------------------
     /**
-     * @category type
+     *
      */
     type OutcomeOfAction = { outcome: "Confirm" | "Skip"; info: {} };
     /**
-     * @category constructors
+     *
      */
     const returnSkip = (info: {}): OutcomeOfAction => ({
       outcome: "Skip",
@@ -225,7 +233,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
       info,
     });
     /**
-     * implementations
+     *
      */
     const implementations: {
       [k in TypeOfActions]: (url: URL) => WT.WebProgram<OutcomeOfAction>;
@@ -400,7 +408,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
     }
   };
   /**
-   * @name cycle
+   *
    */
   const cycle = (
     soc: StateOfCycle = {

@@ -30,6 +30,9 @@ export interface Settings {
   notAvailablePage: {
     XPath: string;
   };
+  waitForTimePage: {
+    XPath: string;
+  };
   profilePage: {
     elements: {
       privateProfile: {

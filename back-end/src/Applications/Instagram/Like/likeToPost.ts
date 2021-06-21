@@ -80,9 +80,9 @@ const notLiked = (reason: Reason): NotLiked => ({
  * @category Output
  * @subcategory Util
  */
-const returnOutputNotAvailablePage = () =>
+const returnOutputNotAvailablePage = (state: StateOfInstagramPage) =>
   notLiked({
-    _tag: "NotAvailablePage",
+    _tag: state,
   });
 
 /**
@@ -154,8 +154,8 @@ const bodyOfLikeToPost = (I: InputOfBody): WT.WebProgram<Output> => {
         : goto(I.language)(I.urlOfPost.href)
     ),
     WT.chain<StateOfInstagramPage, Output>((res) =>
-      res === "NotAvailablePage"
-        ? WT.of<Output>(returnOutputNotAvailablePage())
+      res !== "AvailablePage"
+        ? WT.of<Output>(returnOutputNotAvailablePage(res))
         : like()
     )
   );

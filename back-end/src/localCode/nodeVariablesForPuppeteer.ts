@@ -71,6 +71,7 @@ export const variables = (variable: Variables) =>
 type Options = keyof typeof EnumOfOptions;
 enum EnumOfOptions {
   "--headless",
+  "--setDefaultTimeout",
 }
 /**
  *
@@ -83,6 +84,7 @@ type DefaultOptions = {
  */
 const defaultOptions: DefaultOptions = {
   "--headless": "true",
+  "--setDefaultTimeout": "30000",
 };
 /**
  *
@@ -93,6 +95,13 @@ const validateOption = (option: Options, value: string): string => {
       if (value !== "true" && value !== "false")
         throw new Error(
           `--headless mode should be 'true' or 'false'.` + ` You typed ${value}`
+        );
+      return value;
+    case "--setDefaultTimeout":
+      if (typeof JSON.parse(value) !== "number")
+        throw new Error(
+          `--setDefaultTimeout in page should be a number.` +
+            ` You typed ${value}`
         );
       return value;
 

@@ -124,10 +124,10 @@ const returnCannotFollowPrivateAsOutput = (isPrivate: boolean) =>
  * @category Output
  * @subcategory Util
  */
-const returnNotAvailablePageAsOutput = () =>
+const returnNotAvailablePageAsOutput = (state: StateOfInstagramPage) =>
   notFollowed(
     {
-      _tag: "NotAvailablePage",
+      _tag: state,
     },
     false
   );
@@ -242,8 +242,8 @@ const bodyOfFollowUser = (I: InputOfBody): WT.WebProgram<Output> => {
         : goto(I.language)(I.profileUrl.href)
     ),
     WT.chain<StateOfInstagramPage, Output>((res) =>
-      res === "NotAvailablePage"
-        ? WT.of<Output>(returnNotAvailablePageAsOutput())
+      res !== "AvailablePage"
+        ? WT.of<Output>(returnNotAvailablePageAsOutput(res))
         : tryToFollowCheckingForPrivateProfile()
     )
   );

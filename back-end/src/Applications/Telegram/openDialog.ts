@@ -26,8 +26,7 @@ const settingsByLanguage = getPropertiesFromSettingsAndLanguage<
   dialogXPath: sets.dialogLink.returnXPath,
 }))(settingsByLanguageTelegram);
 /**
- * @name Input of Body
- * @category type-classes
+ *
  */
 interface InputOfBody {
   settings: Settings;
@@ -38,11 +37,11 @@ interface InputOfBody {
 // Body
 // --------------------------------
 /**
- * @category type-classes
+ *
  */
 type BodyOfOpenDialog = Reader<InputOfBody, WT.WebProgram<void>>;
 /**
- * Body
+ *
  */
 const bodyOfOpenDialog: BodyOfOpenDialog = (D) =>
   pipe(
@@ -61,9 +60,6 @@ const bodyOfOpenDialog: BodyOfOpenDialog = (D) =>
   );
 /**
  *
- * @param language
- * @param interlocutor
- * @returns
  */
 export const openDialog = (language: Languages) => (interlocutor: string) =>
   bodyOfOpenDialog({ settings: settingsByLanguage(language), interlocutor });

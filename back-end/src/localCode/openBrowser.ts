@@ -8,7 +8,7 @@ import * as NU from './nodeVariablesForPuppeteer';
 (async () => {
   const browser = await P.launch({
     headless: false,
-    userDataDir: NU.variables("--user")(),
+    userDataDir: `src/../userDataDirs/folders/${NU.variables("--user")()}`,
     args: ["--lang=it"],
     defaultViewport: { width: 1150, height: 868 },
   });

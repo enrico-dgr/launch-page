@@ -29,6 +29,9 @@ export const settingsByLanguage: SettingsByLanguage<Settings> = {
     notAvailablePage: {
       XPath: `//*[contains(.,'Spiacenti, questa pagina non è disponibile')]`,
     },
+    waitForTimePage: {
+      XPath: `//*[contains(.,'Attendi qualche minuto prima di riprovare.')]`,
+    },
     profilePage: {
       elements: {
         privateProfile: {
