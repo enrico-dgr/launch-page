@@ -13,6 +13,7 @@ import { runAndLog } from './runAndLog';
     headless: JSON.parse(NU.options("--headless")()),
     userDataDir: `src/../userDataDirs/folders/${NU.variables("--user")()}`,
     args: ["--lang=it"],
+    executablePath: NU.optionsExecutablePath(),
     defaultViewport: { width: 1050, height: 568 },
   });
   const page = await browser.newPage();

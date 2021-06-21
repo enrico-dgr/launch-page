@@ -1,3 +1,3 @@
-const data = JSON.parse("4000");
+const data = JSON.parse("undefined");
 
 console.log(data);

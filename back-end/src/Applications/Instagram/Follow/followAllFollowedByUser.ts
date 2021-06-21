@@ -1,51 +1,28 @@
 import * as A from 'fp-ts/Array';
-import { log } from 'fp-ts/lib/Console';
 import { pipe } from 'fp-ts/lib/function';
-import * as RTE from 'fp-ts/ReaderTaskEither';
-import * as T from 'fp-ts/Task';
-import * as TE from 'fp-ts/TaskEither';
 import path from 'path';
 import { ElementHandle } from 'puppeteer';
 import * as WT from 'src';
 import { waitFor$x } from 'src/dependencies';
 import { click, expectedLength } from 'src/elementHandle';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
+import {
+    Settings as SettingsOfInstagram, settingsByLanguage as settingsByLanguageOfInstagram
+} from 'WT-Instagram/SettingsByLanguage';
 
-import { followed } from '../../XPaths/profilePage';
+import { goto } from '../goto';
+import { clickButtonFollow } from './clickButtonFollow';
 
 const ABSOLUTE_PATH = path.resolve(__dirname, "./followAllFollowedByUser.ts");
 
-interface FollowAllFollowedDeps {
-  link_XPath_OR_selector: string;
-  followFollowed_XPath_OR_selector: string;
-  unfollowFollowed_XPath_OR_selector: string;
-  scroller_XPath_OR_selector: string;
-  getElementHandles: (
-    xPath_OR_selector: string
-  ) => WT.WebProgram<ElementHandle[] | []>;
-  click: RTE.ReaderTaskEither<ElementHandle<Element>, Error, void>;
-  msDelayBetweenFollows: number;
-  settings: Settings;
-  profileUrl: URL;
-}
-export const followed = {
-  link: `//a[@class='-nal3 ' and contains(.,' profili seguiti')]`,
-  follow: `//ul/div/li/div/div/button[text()='Segui']`,
-  unfollow: `//ul/div/li/div/div/button[text()='Segui già']`,
-  ul: `//ul[./div/li/div/div/button[contains(.,'Segui')]]`,
-  divUl: `//div[./ul/div/li/div/div/button[contains(.,'Segui')]]`,
-};
-export const followButton = {
-  // public: `//div[1]/div[1]/div/div/div/span/span[1]/button[contains(.,'Segui')]`,
-  toClick: `//header//*/button[contains(text(),'Segui')]`,
-  private: `//section/div/div/div/div/button[contains(.,'Segui')]`,
-  official: `//section/div/div/div/div/div/span/span/button[contains(.,'Segui')]`,
-  clicked: `//header//*/button[./div/span[@aria-label='Segui già']]`,
-};
 // -------------------------------
 // Input of body
 // -------------------------------
 interface Settings {
   xpathOfLinkToListOfFollowed: string;
+  xpathOfButtonFollowForFollowed: string;
+  xpathOfButtonUnfollowForFollowed: string;
+  xpathOfScrollableElement: string;
 }
 /**
  *
@@ -53,13 +30,12 @@ interface Settings {
 interface InputOfBody {
   settings: Settings;
   profileUrl: URL;
+  language: Languages;
 }
 /**
  *
  */
-export const bodyOfProgram = (
-  I: FollowAllFollowedDeps
-): WT.WebProgram<void> => {
+const bodyOfProgram = (I: InputOfBody): WT.WebProgram<void> => {
   // -------------------------------
   // Show list of followed users
   // -------------------------------
@@ -78,137 +54,75 @@ export const bodyOfProgram = (
       filePath: ABSOLUTE_PATH,
     })
   );
-  const getFollowButtons = pipe(
-    I.followFollowed_XPath_OR_selector,
-    I.getElementHandles
-  );
-  const getUnfollowButtons = pipe(
-    I.unfollowFollowed_XPath_OR_selector,
-    I.getElementHandles
-  );
-  const getScroller = pipe(
-    I.scroller_XPath_OR_selector,
-    I.getElementHandles,
-    RTE.chainTaskEitherK((els) =>
-      A.isEmpty(els)
-        ? TE.left(
-            new Error(`No followed-list found for: ${I.link_XPath_OR_selector}`)
-          )
-        : TE.right(els)
-    )
-  );
-  /**
-   * -------------- Delay
-   */
-  /** */
-  const delay_custom = (delay: number) => <A>(a: A): T.Task<A> => () =>
-    new Promise((resolve) => setTimeout(resolve, delay)).then(() => a);
-  // const wait = <A>(a: A): T.Task<A> => T.delay(deps.msDelayBtFollows)(T.of(a));
-  const delay_default = delay_custom(I.msDelayBetweenFollows);
-  /**
-   * -------------- Single Follow
-   */
-  /** */
-  const FollowButton = {
-    texts: ["Segui", "Segui già", "Richiesta effettuata"],
-    isValid: (textToMatch: string) =>
-      FollowButton.texts.findIndex((text) => text === textToMatch) > -1,
-    isFollow: (textToMatch: string) => FollowButton.texts[0] === textToMatch,
-  };
   /**
    *
    */
-  const checkFollow: RTE.ReaderTaskEither<
-    ElementHandle<Element>,
-    Error,
-    void
-  > = pipe(
-    RTE.ask<ElementHandle<Element>, Error>(),
-    RTE.chainTaskK((elHandle) => () =>
-      elHandle.evaluate((el: HTMLButtonElement) => ({
-        followText: el.textContent,
-        profileName: (
-          el.parentElement?.parentElement?.childNodes[0].childNodes[1] ??
-          el.parentElement?.parentElement?.childNodes[1]
-        )?.childNodes[0].textContent,
+  const getFollowButtons = pipe(
+    I.settings.xpathOfButtonFollowForFollowed,
+    waitFor$x
+  );
+  /**
+   *
+   */
+  const getUnfollowButtons = pipe(
+    I.settings.xpathOfButtonUnfollowForFollowed,
+    waitFor$x
+  );
+  /**
+   *
+   */
+  const scroller: WT.WebProgram<ElementHandle<Element>> = pipe(
+    I.settings.xpathOfScrollableElement,
+    waitFor$x,
+    WT.chain(
+      expectedLength((n) => n === 1)(() => ({
+        message: `No element to scroll in followed-list found for: ${I.settings.xpathOfScrollableElement}`,
       }))
     ),
-    RTE.chain(({ followText, profileName }) =>
-      followText === null
-        ? RTE.left(new Error(`No text found on follow button`))
-        : !FollowButton.isValid(followText)
-        ? RTE.left(
-            new Error(`No text match on follow button for: ${followText}`)
-          )
-        : FollowButton.isFollow(followText)
-        ? RTE.left(
-            new Error(
-              `Profile "${
-                typeof profileName === "string"
-                  ? profileName
-                  : "NO_PROFILE_NAME_FOUND"
-              }" NOT followed`
-            )
-          )
-        : typeof profileName !== "string"
-        ? RTE.left(new Error(`"NO_PROFILE_NAME_FOUND" after follow.`))
-        : RTE.fromIO(log(`Followed profile: ${profileName}`))
-    )
+    WT.map((els) => els[0]),
+    WT.orElseStackErrorInfos({
+      message: `Problem at page ${I.profileUrl.href}`,
+      nameOfFunction: "scroller",
+      filePath: ABSOLUTE_PATH,
+    })
   );
   /**
    *
    */
-  const followAfterTimeout: RTE.ReaderTaskEither<
-    ElementHandle<Element>,
-    Error,
-    void
-  > = pipe(
-    RTE.of<ElementHandle<Element>, Error, void>(undefined),
-    RTE.chainTaskK(delay_default),
-    RTE.chain(() => I.click),
-    RTE.chainTaskK(delay_custom(6000)),
-    RTE.chain(() => checkFollow)
-  );
-  /**
-   *
-   */
-  const followCurrents: RTE.ReaderTaskEither<
-    ElementHandle<Element>[],
-    Error,
-    void
-  > = pipe(
-    RTE.ask<ElementHandle<Element>[]>(),
-    RTE.chain((els) =>
-      RTE.of({
-        els: els,
-        noElements: els.length < 1,
-        isOneElementOnly: els.length === 1,
-      })
-    ),
-    RTE.chainTaskEitherK((elements) =>
-      elements.noElements
-        ? TE.of(undefined)
-        : pipe(
-            followAfterTimeout(elements.els[0]),
-            TE.chain(() =>
-              elements.isOneElementOnly
-                ? TE.of(undefined)
-                : followCurrents(elements.els.slice(1))
-            )
-          )
-    )
-  );
-  /**
-   *
-   */
-  const scroll = pipe(
-    getScroller,
-    RTE.chainTaskK((scrollers) => () =>
-      scrollers[0].evaluate((scroller: HTMLDivElement) =>
-        scroller.scroll(0, scroller.scrollHeight)
+  const scroll: () => WT.WebProgram<void> = () =>
+    pipe(
+      scroller,
+      WT.chainTaskK((scrollers) => () =>
+        scrollers.evaluate((scroller: HTMLDivElement) =>
+          scroller.scroll(0, scroller.scrollHeight)
+        )
       )
-    )
-  );
+    );
+
+  /**
+   *
+   */
+  const followCurrents = (els: ElementHandle<Element>[]): WT.WebProgram<void> =>
+    A.isEmpty(els)
+      ? WT.of(undefined)
+      : pipe(
+          clickButtonFollow({
+            button: els[0],
+            language: "it",
+            options: {},
+          }),
+          WT.chainFirst((output) =>
+            output._tag === "Followed"
+              ? WT.of(undefined)
+              : WT.leftFromErrorInfos({
+                  message: JSON.stringify(output),
+                  nameOfFunction: "followCurrents",
+                  filePath: ABSOLUTE_PATH,
+                })
+          ),
+          WT.chain(WT.delay(4000)),
+          WT.chain(() => followCurrents(els.slice(1)))
+        );
   // -------------------------------
   // Follow all followed users
   // -------------------------------
@@ -216,32 +130,62 @@ export const bodyOfProgram = (
     attempts > 1
       ? pipe(
           getFollowButtons,
-          RTE.chain((els) =>
+          WT.chain((els) =>
             A.isEmpty(els)
-              ? RTE.of(attempts - 1)
+              ? followAll(attempts - 1)
               : pipe(
-                  RTE.fromTaskEither(followCurrents(els)),
-                  RTE.chain(() => scroll),
-                  RTE.chain(() => RTE.of(attempts))
+                  followCurrents(els),
+                  WT.chain(scroll),
+                  WT.chain(() => followAll(attempts))
                 )
-          ),
-          RTE.chainTaskK(delay_custom(3000)),
-          RTE.chain(followAll)
+          )
         )
       : pipe(
           getUnfollowButtons,
-          RTE.chain((els) =>
-            A.isEmpty(els)
-              ? RTE.left(
+          WT.chain((els) =>
+            A.isNonEmpty(els)
+              ? WT.of(undefined)
+              : WT.left(
                   new Error(
                     "Follow attempts finished, but no 'Already followed' button matched."
                   )
                 )
-              : RTE.of(undefined)
           )
         );
   return pipe(
-    showListOfFollowed,
-    RTE.chain(() => followAll(3))
+    goto(I.language)(I.profileUrl.href),
+    WT.chain(() => showListOfFollowed),
+    WT.chain(() => followAll(3))
   );
 };
+// -------------------------------
+// Program
+// -------------------------------
+interface Input {
+  language: Languages;
+  profileUrl: URL;
+}
+/**
+ *
+ */
+const settingsByLanguage = getPropertiesFromSettingsAndLanguage<
+  Settings,
+  SettingsOfInstagram
+>((sets) => ({
+  xpathOfButtonFollowForFollowed:
+    sets.profilePage.elements.followedUsers.buttonFollow.XPath,
+  xpathOfButtonUnfollowForFollowed:
+    sets.profilePage.elements.followedUsers.buttonAlreadyFollow.XPath,
+  xpathOfLinkToListOfFollowed: sets.profilePage.elements.followedUsers.XPath,
+  xpathOfScrollableElement:
+    sets.profilePage.elements.followedUsers.containerToScroll.XPath,
+}))(settingsByLanguageOfInstagram);
+
+/**
+ *
+ */
+export const followAllFollowedByUser = (I: Input) =>
+  bodyOfProgram({
+    ...I,
+    settings: settingsByLanguage(I.language),
+  });

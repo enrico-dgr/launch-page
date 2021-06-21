@@ -12,7 +12,10 @@ export const settingsByLanguage: SettingsByLanguage<Settings> = {
           [["innerText", "Segui"]],
           [["innerText", "Segui anche tu"]],
         ],
-        postFollow: [[["innerText", ""]]],
+        postFollow: [
+          [["innerText", ""]],
+          [["innerText", "Richiesta effettuata"]],
+        ],
       },
     },
     buttonLike: {
@@ -42,6 +45,18 @@ export const settingsByLanguage: SettingsByLanguage<Settings> = {
         },
         buttonAlreadyFollow: {
           XPath: `//button[./div/span[@aria-label='Segui già']]`,
+        },
+        followedUsers: {
+          XPath: `//a[@class='-nal3 ' and contains(.,' profili seguiti')]`,
+          containerToScroll: {
+            XPath: `//div[./ul/div/li/div/div/button[contains(.,'Segui')]]`,
+          },
+          buttonFollow: {
+            XPath: `//ul/div/li/div/div/button[text()='Segui']`,
+          },
+          buttonAlreadyFollow: {
+            XPath: `//ul/div/li/div/div/button[text()='Segui già']`,
+          },
         },
       },
     },

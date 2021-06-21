@@ -44,6 +44,18 @@ export interface Settings {
       buttonAlreadyFollow: {
         XPath: string;
       };
+      followedUsers: {
+        XPath: string;
+        containerToScroll: {
+          XPath: string;
+        };
+        buttonFollow: {
+          XPath: string;
+        };
+        buttonAlreadyFollow: {
+          XPath: string;
+        };
+      };
     };
   };
   igPostPage: {

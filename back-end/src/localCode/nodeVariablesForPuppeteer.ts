@@ -72,6 +72,7 @@ type Options = keyof typeof EnumOfOptions;
 enum EnumOfOptions {
   "--headless",
   "--setDefaultTimeout",
+  "--executablePath",
 }
 /**
  *
@@ -85,6 +86,7 @@ type DefaultOptions = {
 const defaultOptions: DefaultOptions = {
   "--headless": "true",
   "--setDefaultTimeout": "30000",
+  "--executablePath": "undefined",
 };
 /**
  *
@@ -103,6 +105,8 @@ const validateOption = (option: Options, value: string): string => {
           `--setDefaultTimeout in page should be a number.` +
             ` You typed ${value}`
         );
+      return value;
+    case "--executablePath":
       return value;
 
     default:
@@ -137,4 +141,11 @@ export const options = (option: Options) =>
       },
       (value) => validateOption(option, value)
     )
+  );
+/**
+ *
+ */
+export const optionsExecutablePath = () =>
+  pipe(options("--executablePath")(), (exPath) =>
+    exPath === "undefined" ? undefined : exPath
   );

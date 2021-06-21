@@ -10,6 +10,7 @@ import * as NU from './nodeVariablesForPuppeteer';
     headless: false,
     userDataDir: `src/../userDataDirs/folders/${NU.variables("--user")()}`,
     args: ["--lang=it"],
+    executablePath: NU.optionsExecutablePath(),
     defaultViewport: { width: 1150, height: 868 },
   });
   const page = await browser.newPage();
