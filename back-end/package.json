@@ -6,10 +6,10 @@
   "homepage": "https://gitlab.com/enrico-dgr/webteer",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register build/src/localCode/socialgift.js --setDefaultTimeout 15000",
-    "start:validator": "ts-node -r tsconfig-paths/register build/src/localCode/socialgiftValidator.js",
+    "start:validator": "ts-node -r tsconfig-paths/register build/src/localCode/socialgiftValidator.js --setDefaultTimeout 15000",
     "start:ob": "ts-node -r tsconfig-paths/register build/src/localCode/openBrowser.js",
-    "pi:start": "ts-node -r tsconfig-paths/register build/src/localCode/socialgift.js --setDefaultTimeout 15000 ----executablePath /usr/bin/chromium-browser",
-    "pi:start:validator": "ts-node -r tsconfig-paths/register build/src/localCode/socialgiftValidator.js --setDefaultTimeout 15000 ----executablePath /usr/bin/chromium-browser",
+    "pi:start": "ts-node -r tsconfig-paths/register build/src/localCode/socialgift.js --setDefaultTimeout 15000 --executablePath /usr/bin/chromium-browser",
+    "pi:start:validator": "ts-node -r tsconfig-paths/register build/src/localCode/socialgiftValidator.js --setDefaultTimeout 15000 --executablePath /usr/bin/chromium-browser",
     "nodemon": "nodemon",
     "local:ts:debug": "ts-node -r tsconfig-paths/register src/localCode/debug.ts",
     "local:ts:eg": "ts-node -r tsconfig-paths/register src/localCode/example.ts",

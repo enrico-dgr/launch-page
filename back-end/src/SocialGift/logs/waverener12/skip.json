@@ -1,6 +1,17 @@
 {
-  "counter": 1,
+  "counter": 2,
   "reports": [
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/steveregina",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
     {
       "action": "Follow",
       "href": "https://instagram.com/steveregina",
