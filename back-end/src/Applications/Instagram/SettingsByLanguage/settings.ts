@@ -1,6 +1,9 @@
 import { ElementProps, HTMLElementProperties } from 'src/elementHandle';
 
 export interface Settings {
+  urls: {
+    base: URL;
+  };
   buttonFollow: {
     expectedProps: {
       preFollow: ElementProps<HTMLButtonElement, string>[];
@@ -81,6 +84,38 @@ export interface Settings {
       };
       buttonToScrollStory: {
         expectedProps: HTMLElementProperties<HTMLButtonElement, string>;
+        XPath: string;
+      };
+    };
+  };
+  genericLoggedInPage: {
+    elements: {
+      buttonForNewPost: {
+        XPath: string;
+      };
+      inputToUploadMedia: {
+        XPath: string;
+      };
+      buttonForNextOperation: {
+        XPath: string;
+      };
+      textareaForDescription: {
+        XPath: string;
+      };
+      buttonToShareMedia: {
+        XPath: string;
+      };
+    };
+  };
+  notLoggedInPage: {
+    elements: {
+      inputForPassword: {
+        XPath: string;
+      };
+      inputForId: {
+        XPath: string;
+      };
+      buttonToLogin: {
         XPath: string;
       };
     };

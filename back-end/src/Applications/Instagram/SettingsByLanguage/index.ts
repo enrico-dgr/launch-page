@@ -6,6 +6,9 @@ export { Settings } from "./settings";
 
 export const settingsByLanguage: SettingsByLanguage<Settings> = {
   it: {
+    urls: {
+      base: new URL("https://www.instagram.com"),
+    },
     buttonFollow: {
       expectedProps: {
         preFollow: [
@@ -86,6 +89,39 @@ export const settingsByLanguage: SettingsByLanguage<Settings> = {
             [{ xpath: `./div[@class='coreSpriteRightChevron']` }, "Found"],
           ],
           XPath: `//button[./div[@class='coreSpriteRightChevron']]`,
+        },
+      },
+    },
+    genericLoggedInPage: {
+      elements: {
+        buttonForNewPost: {
+          XPath: '//div[./*[@aria-label="Nuovo post"]]',
+        },
+        buttonForNextOperation: {
+          XPath: `//button[contains(text(),'Avanti')]`,
+        },
+        buttonToShareMedia: {
+          XPath: `//button[contains(text(),'Condividi')]`,
+        },
+        textareaForDescription: {
+          XPath: `//textarea[@aria-label='Scrivi una didascalia...']`,
+        },
+        inputToUploadMedia: {
+          XPath: `//div[./div/div/div[@data-testid='mobile-nav-logged-in']/div[@data-testid='new-post-button']]/form/input`,
+        },
+      },
+    },
+    notLoggedInPage: {
+      elements: {
+        inputForId: {
+          XPath: `//input[@name='username']`,
+          // `//input[@aria-label="Numero di telefono, nome utente o e-mail"]`,
+        },
+        inputForPassword: {
+          XPath: `//input[@name='password']`,
+        },
+        buttonToLogin: {
+          XPath: `//button[./div[text()='Accedi']]`,
         },
       },
     },

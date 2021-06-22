@@ -3,10 +3,12 @@
  */
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
-import { Browser, ElementHandle, Page } from 'puppeteer';
+import path from 'path';
+import { Browser, ElementHandle, HTTPResponse, Keyboard, Page, WaitForOptions } from 'puppeteer';
 
 import * as WT from './';
 
+const ABSOLUTE_PATH = path.resolve(__dirname, "./page.ts");
 /**
  * @param xPath
  * @returns Array or empty array.
@@ -185,3 +187,102 @@ export const closeOtherPages: (page: Page) => WT.WebProgram<Page> = (
  */
 export const bringToFront = (page: Page): WT.WebProgram<void> =>
   WT.fromTaskK(() => () => page.bringToFront())();
+/**
+ * @param options Look at puppeteer docs.
+ *
+ * @example
+ * // You can simply emulate a device as
+ * // it happens for puppeteer.
+ * import { emulate } from 'WebTeer/page.ts';
+ * import * as WT from 'WebTeer/index.ts';
+ * import { devices } from "puppeteer";
+ *
+ * const iPhone = devices["iPhone 6"];
+ *
+ * (async ()=>{
+ *  // ... launching puppeteer and deps
+ *  pipe(
+ *    WT.ask(),
+ *    WT.chain(r =>
+ *      emulate(iPhone)(r.page)
+ *    )
+ *    // then change page or reload to see the effects
+ *  )(deps: WT.WebDeps)
+ * })()
+ * @since 1.0.0
+ */
+export const emulate = (options: {
+  /**
+   * This is of type `Viewport`.
+   * For info go to puppeteer docs.
+   */
+  viewport: {};
+  userAgent: string;
+}) => (page: Page): WT.WebProgram<void> =>
+  WT.fromTaskK(() => () => page.emulate(options as any))();
+/**
+ * @since 1.0.0
+ */
+export const setUserAgent = (userAgent: string) => (
+  page: Page
+): WT.WebProgram<void> =>
+  WT.fromTaskK(() => () => page.setUserAgent(userAgent))();
+
+/**
+ * @since 1.0.0
+ */
+export const reload = (options?: WaitForOptions) => (
+  page: Page
+): WT.WebProgram<HTTPResponse> =>
+  pipe(
+    WT.fromTaskK(() => () => page.reload(options))(),
+    WT.chain((res) =>
+      res === null
+        ? WT.leftFromErrorInfos({
+            message: `Page reloading returned 'null' value.`,
+            nameOfFunction: "reload",
+            filePath: ABSOLUTE_PATH,
+          })
+        : WT.right(res)
+    )
+  );
+/**
+ * @since 1.0.0
+ */
+export const screen = (path: string) => (page: Page) =>
+  WT.fromTaskEither(() =>
+    page
+      .screenshot({
+        path,
+      })
+      .then(E.right)
+      .catch(flow(WT.anyToError, E.left))
+  );
+
+// -----------------------
+// page.keyboard
+// -----------------------
+/**
+ * @since 1.0.0
+ */
+export const keyboard = {
+  type: (
+    text: string,
+    options?: {
+      delay?: number | undefined;
+    }
+  ) => (page: Page): WT.WebProgram<void> =>
+    pipe(
+      WT.fromTaskEither(() =>
+        page.keyboard
+          .type(text, options)
+          .then(E.right)
+          .catch(flow(WT.anyToError, E.left))
+      ),
+      WT.orElseStackErrorInfos({
+        message: `Page's keyboard failed to type.`,
+        nameOfFunction: "keyboard.type",
+        filePath: ABSOLUTE_PATH,
+      })
+    ),
+};

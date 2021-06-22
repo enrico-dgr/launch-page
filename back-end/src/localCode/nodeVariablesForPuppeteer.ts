@@ -17,7 +17,7 @@ enum EnumOfVariables {
 /**
  * @name users
  */
-const users: string[] = ["waverener12", "newmener2"];
+const users: string[] = ["waverener12", "newmener2", "im_noone1789"];
 /**
  *
  */

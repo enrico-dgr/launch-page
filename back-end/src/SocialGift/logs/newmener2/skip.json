@@ -1,5 +1,5 @@
 {
-  "counter": 14,
+  "counter": 40,
   "reports": [
     {
       "action": "Follow",
@@ -69,6 +69,284 @@
         "_tag": "NotFollowed",
         "reason": {
           "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/mickivanni",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "CannotFollowPrivate"
+        },
+        "isPrivate": true
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/mariafederico_real",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/federicogeminian",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/simonebordinofc",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/carlo_ancilotto",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/miloanto79",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/antoninocedrohautecouture",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/wikymoto",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/ilsorrentino_",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/il_viaggiatore_di_lusso",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/daga.food",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/il_turista_di_lusso",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/gaglio_francesco",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/testa_di_marmo_",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/critelli_vivi",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/antoniofischetto_official",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/__jimmy__sc",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/elvyverareal",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/escoacorrere",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/official_leemat_11.11",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/official_leemat_11.11",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Comment",
+      "href": "https://instagram.com/p/CQa1XddFlq0",
+      "info": {
+        "message": "Comment skipped because of option's skip === true"
+      }
+    },
+    {
+      "action": "Comment",
+      "href": "https://instagram.com/p/CQYaYmmoHqe",
+      "info": {
+        "message": "Comment skipped because of option's skip === true"
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/p1erluc4",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/_pace_04",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/urbansun.official",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
         },
         "isPrivate": false
       }

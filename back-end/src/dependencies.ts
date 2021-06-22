@@ -1,8 +1,8 @@
 /**
  * @since 1.0.0
  */
-import { pipe } from 'fp-ts/lib/function';
-import { Browser, ElementHandle, Page } from 'puppeteer';
+import { flow, pipe } from 'fp-ts/lib/function';
+import { Browser, ElementHandle, HTTPResponse, Page, WaitForOptions } from 'puppeteer';
 
 import * as WT from './';
 import * as PageUtils from './page';
@@ -85,3 +85,47 @@ export const bringToFront: WT.WebProgram<void> = onReaderPage(
 export const otherPages: WT.WebProgram<Page[]> = onReaderPage(
   PageUtils.otherPages
 );
+/**
+ * @param options Look at puppeteer docs.
+ *
+ * @example
+ * // You can simply emulate a device as
+ * // it happens for puppeteer.
+ * import { emulate } from 'WebTeer/dependencies.ts';
+ * import * as WT from 'WebTeer/index.ts';
+ * import { devices } from "puppeteer";
+ *
+ * const iPhone = devices["iPhone 6"];
+ *
+ * (async ()=>{
+ *  // ... launching puppeteer and deps
+ *  pipe(
+ *    emulate(iPhone)(r.page)
+ *    // then change page or reload to see the effects
+ *  )(deps: WT.WebDeps)
+ * })()
+ * @since 1.0.0
+ */
+export const emulate = flow(PageUtils.emulate, onReaderPage);
+
+/**
+ * @since 1.0.0
+ */
+export const setUserAgent = flow(PageUtils.setUserAgent, onReaderPage);
+/**
+ * @since 1.0.0
+ */
+export const reload = flow(PageUtils.reload, onReaderPage);
+/**
+ * @since 1.0.0
+ */
+export const screen = flow(PageUtils.screen, onReaderPage);
+/**
+ * @since 1.0.0
+ */
+// -----------------------
+// page.keyboard
+// -----------------------
+export const keyboard = {
+  type: flow(PageUtils.keyboard.type, onReaderPage),
+};

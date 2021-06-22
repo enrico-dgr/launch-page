@@ -5,28 +5,10 @@ import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import { pipe, Predicate } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
-import * as RTE from 'fp-ts/ReaderTaskEither';
 import { ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
 
 import * as WT from './index';
 
-/**
- * @deprecated
- * @since 1.0.0
- */
-export const oldClick: RTE.ReaderTaskEither<
-  ElementHandle<Element>,
-  Error,
-  void
-> = pipe(
-  RTE.ask<ElementHandle<Element>, Error>(),
-  RTE.chainTaskEitherK((el) => () =>
-    el
-      .evaluate((el: HTMLButtonElement) => el.click())
-      .then(E.right)
-      .catch((err) => E.left(WT.anyToError(err)))
-  )
-);
 /**
  * @since 1.0.0
  */
@@ -409,4 +391,18 @@ export const matchOneSetOfHTMLProperties = <El extends Element, A>(
         )
       )
     )
+  );
+/**
+ * @since 1.0.0
+ */
+export const uploadFile: (
+  ...filePaths: string[]
+) => (el: ElementHandle<Element>) => WT.WebProgram<void> = (...filePaths) => (
+  el
+) =>
+  WT.fromTaskEither(() =>
+    el
+      .uploadFile(...filePaths)
+      .then(() => E.right<Error, void>(undefined))
+      .catch((err) => E.left<Error, void>(WT.anyToError(err)))
   );
