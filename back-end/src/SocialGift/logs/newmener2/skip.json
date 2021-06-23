@@ -1,5 +1,5 @@
 {
-  "counter": 47,
+  "counter": 48,
   "reports": [
     {
       "action": "Follow",
@@ -422,6 +422,17 @@
           "_tag": "AlreadyFollowed"
         },
         "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/bernadettecurci",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "CannotFollowPrivate"
+        },
+        "isPrivate": true
       }
     }
   ]

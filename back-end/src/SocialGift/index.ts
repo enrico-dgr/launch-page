@@ -176,13 +176,18 @@ const bodyOfActuator: BodyOfActuator = (D) => {
           concatAll,
           WT.chain(({ action, found }) =>
             found
-              ? WT.of({
+              ? WT.of<LastMessageWithAction>({
                   _tag: "FoundMessage",
                   el: els[els.length - 1],
                   action,
                 })
               : findLastMessageWithAction(els.slice(0, els.length - 1))
-          )
+          ),
+          WT.orElseStackErrorInfos({
+            message: "",
+            nameOfFunction: "findLastMessageWithAction",
+            filePath: ABSOLUTE_PATH,
+          })
         );
   // --------------------------
   // Cycle
@@ -309,7 +314,12 @@ const bodyOfActuator: BodyOfActuator = (D) => {
                         : returnEnd(outputOfCheck)
                     )
                   )
-            )
+            ),
+            WT.orElseStackErrorInfos({
+              message: "",
+              nameOfFunction: "Follow",
+              filePath: ABSOLUTE_PATH,
+            })
           ),
         Like: (url: URL) =>
           pipe(
@@ -333,7 +343,12 @@ const bodyOfActuator: BodyOfActuator = (D) => {
                         : returnEnd(outputOfCheck)
                     )
                   )
-            )
+            ),
+            WT.orElseStackErrorInfos({
+              message: "",
+              nameOfFunction: "Like",
+              filePath: ABSOLUTE_PATH,
+            })
           ),
         WatchStory: (url: URL) =>
           pipe(
@@ -344,7 +359,12 @@ const bodyOfActuator: BodyOfActuator = (D) => {
             }),
             WT.map((o) =>
               o._tag === "AllWatched" ? returnConfirm(o) : returnSkip(o)
-            )
+            ),
+            WT.orElseStackErrorInfos({
+              message: "",
+              nameOfFunction: "WatchStory",
+              filePath: ABSOLUTE_PATH,
+            })
           ),
         Comment: (url: URL) =>
           WT.of(
@@ -459,7 +479,12 @@ const bodyOfActuator: BodyOfActuator = (D) => {
               WT.map<void, ResultOfCycle>(() => "NewAction")
             )
           : pipe(runAction(messageWithAction.action)(messageWithAction.el))
-      )
+      ),
+      WT.orElseStackErrorInfos({
+        message: "",
+        nameOfFunction: "routineOfBot",
+        filePath: ABSOLUTE_PATH,
+      })
     );
 
     return soc._tag === "End"
@@ -475,7 +500,12 @@ const bodyOfActuator: BodyOfActuator = (D) => {
             updateState({ ...soc, _tag })
           ),
 
-          WT.chain(cycle)
+          WT.chain(cycle),
+          WT.orElseStackErrorInfos({
+            message: "",
+            nameOfFunction: "cycle",
+            filePath: ABSOLUTE_PATH,
+          })
         );
   };
   /**
