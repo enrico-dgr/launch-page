@@ -3,6 +3,7 @@ import P from 'puppeteer';
 import { actuator } from 'src/SocialGift';
 
 import * as NU from './nodeVariablesForPuppeteer';
+import * as NB from './nodeVariablesForSocialgiftBot';
 import { runAndLog } from './runAndLog';
 
 /**
@@ -19,15 +20,7 @@ import { runAndLog } from './runAndLog';
       actuator({
         language: "it",
         nameOfBot: "Socialgift",
-        options: {
-          skip: {
-            Follow: false,
-            Like: false,
-            Comment: true,
-            WatchStory: false,
-            Extra: true,
-          },
-        },
+        options: NB.optionsOfInput,
       })
     )
   )();

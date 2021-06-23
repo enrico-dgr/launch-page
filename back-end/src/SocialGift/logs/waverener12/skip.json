@@ -1,4 +1,19 @@
 {
-  "counter": 40,
-  "reports": []
+  "counter": 42,
+  "reports": [
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQbZfF8N3EW",
+      "info": {
+        "message": "Like skipped because of option's skip === true"
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CPGLDWHNVyC",
+      "info": {
+        "message": "Like skipped because of option's skip === true"
+      }
+    }
+  ]
 }

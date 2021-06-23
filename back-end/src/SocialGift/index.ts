@@ -416,7 +416,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
         Confirm: abstractionOfConfirmAndSkip(
           "Confirm",
           D.settings.message.buttonConfirm.relativeXPath,
-          newConfirmedReport
+          (report: Report) => () => console.log(report)
         ),
         Skip: abstractionOfConfirmAndSkip(
           "Skip",
