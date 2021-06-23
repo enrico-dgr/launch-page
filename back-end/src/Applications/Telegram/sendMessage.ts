@@ -1,5 +1,6 @@
 import { pipe } from 'fp-ts/function';
 import { Reader } from 'fp-ts/Reader';
+import path from 'path';
 import { waitFor$x } from 'src/dependencies';
 import { click, expectedLength, type } from 'src/elementHandle';
 import * as WT from 'src/index';
@@ -11,6 +12,7 @@ import {
     Settings as SettingsTelegram, settingsByLanguage as settingsByLanguageTelegram
 } from './SettingsByLanguage';
 
+const PATH = path.resolve(__dirname, "./sendMessage.ts");
 interface Settings {
   xpathOfTextAreaInDialog: string;
 }
@@ -47,14 +49,16 @@ const bodyOfSendMessage: BodyOfSendMessage = (D) =>
     WT.chain((els) => WT.of(els[0])),
     WT.chainFirst(click()),
     WT.chain(WT.delay(700)),
-    WT.chain(type(D.text + String.fromCharCode(13), { delay: 150 }))
+    WT.chain(type(D.text + String.fromCharCode(13), { delay: 150 })),
+    WT.orElseStackErrorInfos({
+      message: "",
+      nameOfFunction: "bodyOfSendMessage",
+      filePath: PATH,
+    })
   );
 
 /**
  *
- * @param language
- * @param interlocutor
- * @returns
  */
 export const sendMessage = (language: Languages) => (text: string) =>
   bodyOfSendMessage({ settings: settingsByLanguage(language), text });

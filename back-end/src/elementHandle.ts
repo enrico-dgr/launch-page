@@ -5,10 +5,12 @@ import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import { pipe, Predicate } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
+import path from 'path';
 import { ClickOptions, ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
 
 import * as WT from './index';
 
+const PATH = path.resolve(__dirname, "./elementHandle.ts");
 /**
  * @since 1.0.0
  */
@@ -112,13 +114,13 @@ export const expectedLength: (
   pipe(
     WT.ask(),
     WT.chain((r) =>
-      pipe(
-        r,
-        WT.fromPredicate(
-          () => predicate(els.length),
-          () => new Error(JSON.stringify(errorObject(els, r)))
-        )
-      )
+      predicate(els.length)
+        ? WT.of(undefined)
+        : WT.leftFromErrorInfos<ElementHandle<Element>[]>({
+            message: JSON.stringify(errorObject(els, r)),
+            nameOfFunction: "expectedLength",
+            filePath: PATH,
+          })
     ),
     WT.chain(() => WT.of(els))
   );
