@@ -177,7 +177,7 @@ const bodyOfScrollStories = (I: InputOfBody): WT.WebProgram<Output> => {
             stillExists.length < 1
               ? pipe(
                   I.buttonNext,
-                  click,
+                  click(),
                   WT.chain(WT.delay(delayBetweenClicks)),
                   WT.chain(() =>
                     tryToScrollStories(delayBetweenClicks)({

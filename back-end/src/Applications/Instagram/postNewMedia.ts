@@ -177,20 +177,20 @@ const bodyOfPostNewMedia = (I: InputOfBody): WT.WebProgram<void> => {
    */
   return pipe(
     newPostButton,
-    WT.chain(click),
+    WT.chain(click()),
     WT.chain(validateMedia),
     WT.chain(() =>
       pipe(inputForMedia, WT.chain(uploadFile(I.imageSystemPath)))
     ),
-    WT.chain(() => pipe(buttonForNextOperation, WT.chain(click))),
+    WT.chain(() => pipe(buttonForNextOperation, WT.chain(click()))),
     WT.chain(() =>
       pipe(
         textareaForDescription,
-        WT.chain(click),
+        WT.chain(click()),
         WT.chain(() => keyboard.type(I.description, { delay: 150 }))
       )
     ),
-    WT.chain(() => pipe(buttonToShareMedia, WT.chain(click))),
+    WT.chain(() => pipe(buttonToShareMedia, WT.chain(click()))),
     WT.chain(() =>
       pipe(
         browser,

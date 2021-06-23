@@ -5,16 +5,17 @@ import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import { pipe, Predicate } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
-import { ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
+import { ClickOptions, ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
 
 import * as WT from './index';
 
 /**
  * @since 1.0.0
  */
-export const click: (el: ElementHandle<Element>) => WT.WebProgram<void> = (
-  el
-) => WT.fromTaskK(() => () => el.click())();
+export const click: (
+  options?: ClickOptions | undefined
+) => (el: ElementHandle<Element>) => WT.WebProgram<void> = (options) => (el) =>
+  WT.fromTaskK(() => () => el.click(options))();
 /**
  * @since 1.0.0
  */

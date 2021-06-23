@@ -4,7 +4,9 @@
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
 import path from 'path';
-import { Browser, ElementHandle, HTTPResponse, Keyboard, Page, WaitForOptions } from 'puppeteer';
+import {
+    Browser, ElementHandle, HTTPResponse, Keyboard, KeyInput, Page, WaitForOptions
+} from 'puppeteer';
 
 import * as WT from './';
 
@@ -282,6 +284,26 @@ export const keyboard = {
       WT.orElseStackErrorInfos({
         message: `Page's keyboard failed to type.`,
         nameOfFunction: "keyboard.type",
+        filePath: ABSOLUTE_PATH,
+      })
+    ),
+  press: (
+    text: KeyInput,
+    options?: {
+      delay?: number | undefined;
+      text?: string | undefined;
+    }
+  ) => (page: Page): WT.WebProgram<void> =>
+    pipe(
+      WT.fromTaskEither(() =>
+        page.keyboard
+          .press(text, options)
+          .then(E.right)
+          .catch(flow(WT.anyToError, E.left))
+      ),
+      WT.orElseStackErrorInfos({
+        message: `Page's keyboard failed to press.`,
+        nameOfFunction: "keyboard.press",
         filePath: ABSOLUTE_PATH,
       })
     ),

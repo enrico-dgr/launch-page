@@ -45,7 +45,7 @@ const bodyOfSendMessage: BodyOfSendMessage = (D) =>
       )
     ),
     WT.chain((els) => WT.of(els[0])),
-    WT.chainFirst(click),
+    WT.chainFirst(click()),
     WT.chain(WT.delay(700)),
     WT.chain(type(D.text + String.fromCharCode(13), { delay: 150 }))
   );

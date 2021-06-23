@@ -111,7 +111,7 @@ export const settingsByLanguage: SettingsByLanguage<Settings> = {
         },
       },
     },
-    notLoggedInPage: {
+    loginPage: {
       elements: {
         inputForId: {
           XPath: `//input[@name='username']`,

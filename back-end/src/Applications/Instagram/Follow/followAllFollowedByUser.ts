@@ -47,7 +47,7 @@ const bodyOfProgram = (I: InputOfBody): WT.WebProgram<void> => {
         message: `No followed-list found for: ${I.settings.xpathOfLinkToListOfFollowed}`,
       }))
     ),
-    WT.chain((els) => click(els[0])),
+    WT.chain((els) => click()(els[0])),
     WT.orElseStackErrorInfos({
       message: `Problem at page ${I.profileUrl.href}`,
       nameOfFunction: "showListOfFollowed",

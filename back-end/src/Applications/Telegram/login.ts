@@ -1,14 +1,13 @@
 import { pipe } from 'fp-ts/function';
 import path from 'path';
 import { askData as askDataFromConsole } from 'src/console';
-import { keyboard, setUserAgent, waitFor$x } from 'src/dependencies';
+import { goto, keyboard, setUserAgent, waitFor$x } from 'src/dependencies';
 import * as WT from 'src/index';
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
 import { click } from 'WebTeer/elementHandle';
 
-import { goto } from './goto';
 import {
-    Settings as SettingsOfInstagram, settingsByLanguage as settingsByLanguageOfInstagram
+    Settings as SettingsOfTelegram, settingsByLanguage as settingsByLanguageOfTelegram
 } from './SettingsByLanguage';
 
 const ABSOLUTE_PATH = path.resolve(__dirname, "./login.ts");
@@ -20,17 +19,18 @@ const ABSOLUTE_PATH = path.resolve(__dirname, "./login.ts");
  *
  */
 interface Settings {
-  xpathOfInputForPassword: string;
-  xpathOfInputForId: string;
-  xpathOfButtonToLogin: string;
+  xpathOfButtonToSwitchToAccessByNumber: string;
+  xpathOfInputForNumber: string;
+  xpathOfInputForOTP: string;
+  xpathOfButtonToGoToOTP: string;
   baseUrl: URL;
 }
 /**
  *
  */
 enum EnumOfData {
-  "Id",
-  "Password",
+  "NumberWithPrefix",
+  "OTP",
 }
 type DataNames = keyof typeof EnumOfData;
 /**
@@ -48,43 +48,59 @@ const bodyOfLogin = (I: InputOfBody): WT.WebProgram<void> => {
   /**
    *
    */
-  const inputForId = pipe(
-    waitFor$x(I.settings.xpathOfInputForId),
+  const inputForOTP = pipe(
+    waitFor$x(I.settings.xpathOfInputForOTP),
     WT.chain((els) =>
       els.length === 1
         ? WT.right(els[0])
-        : WT.leftAny(`Found '${els.length}' id-input(s).`)
+        : WT.leftAny(`Found '${els.length}' OTP-input(s).`)
     ),
     WT.orElseStackErrorInfos({
-      message: `Not valid id-input.`,
-      nameOfFunction: "inputForId",
+      message: `Not valid OTP-input.`,
+      nameOfFunction: "inputForOTP",
       filePath: ABSOLUTE_PATH,
     })
   );
   /**
    *
    */
-  const inputForPassword = pipe(
-    waitFor$x(I.settings.xpathOfInputForPassword),
+  const inputForNumber = pipe(
+    waitFor$x(I.settings.xpathOfInputForNumber),
     WT.chain((els) =>
       els.length === 1
         ? WT.right(els[0])
-        : WT.leftAny(`Found '${els.length}' password-input(s).`)
+        : WT.leftAny(`Found '${els.length}' number-input(s).`)
     ),
     WT.orElseStackErrorInfos({
-      message: `Not valid password-input.`,
-      nameOfFunction: "inputForPassword",
+      message: `Not valid number-input.`,
+      nameOfFunction: "inputForNumber",
       filePath: ABSOLUTE_PATH,
     })
   );
   /**
    *
    */
-  const buttonToLogin = pipe(
-    waitFor$x(I.settings.xpathOfButtonToLogin),
+  const buttonToGoToOTP = pipe(
+    waitFor$x(I.settings.xpathOfButtonToGoToOTP),
     WT.chain((els) =>
       els.length === 1
         ? WT.right(els[0])
+        : WT.leftAny(`Found '${els.length}' goToOTP-button(s).`)
+    ),
+    WT.orElseStackErrorInfos({
+      message: `Not valid goToOTP-button.`,
+      nameOfFunction: "buttonToGoToOTP",
+      filePath: ABSOLUTE_PATH,
+    })
+  );
+  /**
+   *
+   */
+  const buttonToSwitchToAccessByNumber = pipe(
+    waitFor$x(I.settings.xpathOfButtonToSwitchToAccessByNumber),
+    WT.chain((els) =>
+      els.length < 2
+        ? WT.right(els)
         : WT.leftAny(`Found '${els.length}' login-button(s).`)
     ),
     WT.orElseStackErrorInfos({
@@ -113,37 +129,39 @@ const bodyOfLogin = (I: InputOfBody): WT.WebProgram<void> => {
         })
       )
     ),
-    WT.chain(() => goto(I.language)(I.settings.baseUrl.href)),
-    WT.chainFirst((a) =>
-      a === "AvailablePage"
-        ? WT.of(undefined)
-        : WT.leftFromErrorInfos({
-            message: a,
-            nameOfFunction: "login > goto",
-            filePath: ABSOLUTE_PATH,
-          })
-    ),
+    WT.chain(() => goto(I.settings.baseUrl.href)),
     WT.chain(() =>
       pipe(
-        inputForId,
-        WT.chain(click()),
-        WT.chain(() => I.askData("Id")),
-        WT.chain((Id) => keyboard.type(Id, { delay: 150 }))
+        buttonToSwitchToAccessByNumber,
+        // could be already at number input
+        WT.chain((els) =>
+          els.length === 1 ? click()(els[0]) : WT.of(undefined)
+        )
       )
     ),
     WT.chain(() =>
       pipe(
-        inputForPassword,
-        WT.chain(click()),
-        WT.chain(() => I.askData("Password")),
-        WT.chain((password) => keyboard.type(password, { delay: 150 }))
+        inputForNumber,
+        WT.chain(click({ clickCount: 3 })),
+        WT.chain(() => I.askData("NumberWithPrefix")),
+        WT.chain((numberWithPrefix) =>
+          keyboard.type(numberWithPrefix, { delay: 150 })
+        )
       )
     ),
     WT.chain(() =>
-      pipe(buttonToLogin, WT.chain(WT.delay(750)), WT.chain(click()))
+      pipe(buttonToGoToOTP, WT.chain(WT.delay(750)), WT.chain(click()))
     ),
-    WT.chainFirst(WT.delay(1500)),
-    WT.chainFirst(WT.delay(3000)),
+    WT.chain(() =>
+      pipe(
+        inputForOTP,
+        // to avoid to check for visibility
+        WT.chain(WT.delay(2000)),
+        WT.chain(click()),
+        WT.chain(() => I.askData("OTP")),
+        WT.chain((OTP) => keyboard.type(OTP, { delay: 150 }))
+      )
+    ),
     WT.map(() => undefined),
     WT.orElseStackErrorInfos({
       message: `Failed to login.`,
@@ -164,13 +182,15 @@ interface InputWithSettingsImplemented {
  */
 const settingsByLanguage = getPropertiesFromSettingsAndLanguage<
   Settings,
-  SettingsOfInstagram
+  SettingsOfTelegram
 >((sets) => ({
-  xpathOfInputForId: sets.loginPage.elements.inputForId.XPath,
-  xpathOfInputForPassword: sets.loginPage.elements.inputForPassword.XPath,
-  xpathOfButtonToLogin: sets.loginPage.elements.buttonToLogin.XPath,
+  xpathOfButtonToSwitchToAccessByNumber:
+    sets.loginPage.elements.buttonToSwitchToAccessByNumber.XPath,
+  xpathOfInputForOTP: sets.loginPage.elements.inputForOTP.XPath,
+  xpathOfInputForNumber: sets.loginPage.elements.inputForNumber.XPath,
+  xpathOfButtonToGoToOTP: sets.loginPage.elements.buttonToGoToOTP.XPath,
   baseUrl: sets.urls.base,
-}))(settingsByLanguageOfInstagram);
+}))(settingsByLanguageOfTelegram);
 // -----------------------------------
 // Program
 // -----------------------------------

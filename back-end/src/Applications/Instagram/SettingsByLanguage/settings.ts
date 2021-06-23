@@ -107,7 +107,7 @@ export interface Settings {
       };
     };
   };
-  notLoggedInPage: {
+  loginPage: {
     elements: {
       inputForPassword: {
         XPath: string;

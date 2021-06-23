@@ -195,7 +195,7 @@ const bodyOfClickButtonFollow: (I: InputOfBody) => WT.WebProgram<Output> = (
     WT.chain((wrongPropsBF) =>
       wrongPropsBF.length < 1
         ? pipe(
-            click(I.button),
+            click()(I.button),
             WT.map(() => returnFollowedAsOutput())
           )
         : pipe(

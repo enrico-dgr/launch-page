@@ -1,12 +1,10 @@
 import * as A from 'fp-ts/Array';
-import { flow, pipe } from 'fp-ts/lib/function';
+import { pipe } from 'fp-ts/lib/function';
 import { ElementHandle } from 'puppeteer';
 import {
     Settings as SettingsInstagram, settingsByLanguage
 } from 'src/Applications/Instagram/SettingsByLanguage';
-import {
-    $x, click, expectedLength, HTMLElementProperties, matchOneSetOfHTMLProperties
-} from 'src/elementHandle';
+import { click, HTMLElementProperties, matchOneSetOfHTMLProperties } from 'src/elementHandle';
 import * as WT from 'src/index';
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
 
@@ -147,7 +145,7 @@ const getBodyOfClickButtonLike: (I: InputOfBody) => WT.WebProgram<Output> = (
    * @category Body
    * @subcategory Abstraction
    */
-  const like = () => pipe(click(I.button), WT.map(returnLikedAsOutput));
+  const like = () => pipe(click()(I.button), WT.map(returnLikedAsOutput));
   /**
    * @category Body
    * @subcategory Abstraction

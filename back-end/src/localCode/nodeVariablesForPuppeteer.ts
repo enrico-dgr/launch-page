@@ -1,5 +1,6 @@
 import * as IOE from 'fp-ts/IOEither';
 import { pipe } from 'fp-ts/lib/function';
+import * as P from 'puppeteer';
 
 /**
  *
@@ -149,3 +150,21 @@ export const optionsExecutablePath = () =>
   pipe(options("--executablePath")(), (exPath) =>
     exPath === "undefined" ? undefined : exPath
   );
+// ----------------------------
+// Launch options
+// ----------------------------
+export const launchOptions: P.LaunchOptions &
+  P.ChromeArgOptions &
+  P.BrowserOptions & {
+    product?: P.Product | undefined;
+    extraPrefsFirefox?: Record<string, unknown> | undefined;
+  } = {
+  headless: JSON.parse(options("--headless")()) as boolean,
+  userDataDir: `src/../userDataDirs/folders/${variables("--user")()}`,
+  args: [
+    "--lang=it",
+    "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4403.0 Safari/537.36",
+  ],
+  executablePath: optionsExecutablePath(),
+  defaultViewport: { width: 1050, height: 800 },
+};

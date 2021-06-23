@@ -26,5 +26,21 @@ export const settingsByLanguage: SettingsByLanguage<Settings> = {
         },
       },
     },
+    loginPage: {
+      elements: {
+        buttonToSwitchToAccessByNumber: {
+          XPath: `//button[contains(.,'Log in by phone Number')]`,
+        },
+        inputForNumber: {
+          XPath: `//input[@name='phone']`,
+        },
+        buttonToGoToOTP: {
+          XPath: `//button[contains(.,'Next')]`,
+        },
+        inputForOTP: {
+          XPath: `//div[contains(.,'We have sent')]/div/div/input[@type='tel']`,
+        },
+      },
+    },
   },
 };

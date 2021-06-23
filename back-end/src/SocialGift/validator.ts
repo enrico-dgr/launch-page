@@ -181,7 +181,7 @@ const bodyOfValidator: BodyOfActuator = (D) => {
           ? WT.of("END")
           : runAction(report.action)(report.href)
       ),
-      WT.chain(WT.delay(1 * 60 * 1000)),
+      WT.chain(WT.delay(2 * 60 * 1000)),
       WT.chain((res) => (res === "END" ? WT.of(undefined) : cycle()))
     );
   return pipe(cycle());

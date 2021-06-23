@@ -1,5 +1,5 @@
 {
-  "counter": 40,
+  "counter": 47,
   "reports": [
     {
       "action": "Follow",
@@ -343,6 +343,79 @@
     {
       "action": "Follow",
       "href": "https://instagram.com/urbansun.official",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Comment",
+      "href": "https://instagram.com/p/CQbZfF8N3EW",
+      "info": {
+        "message": "Comment skipped because of option's skip === true"
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/nutrition_coach24",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/elykick",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/imma_palmas",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/professormathi22",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/fit_papi_333",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/andreaapurple",
       "info": {
         "_tag": "NotFollowed",
         "reason": {

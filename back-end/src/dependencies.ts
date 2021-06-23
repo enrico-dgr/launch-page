@@ -128,4 +128,26 @@ export const screen = flow(PageUtils.screen, onReaderPage);
 // -----------------------
 export const keyboard = {
   type: flow(PageUtils.keyboard.type, onReaderPage),
+  press: flow(PageUtils.keyboard.press, onReaderPage),
 };
+/**
+ *
+ */
+export const runOnAnyDifferentPage = <A>(
+  wpa: WT.WebProgram<A>
+): WT.WebProgram<A> =>
+  pipe(
+    otherPages,
+    WT.chain((pages) => (pages.length > 0 ? WT.of(pages[0]) : openNewPage)),
+    WT.chain<Page, A>((page) =>
+      pipe(
+        WT.ask(),
+        WT.chainTaskEitherK((r) =>
+          pipe(
+            bringToFront,
+            WT.chain(() => wpa)
+          )({ ...r, page })
+        )
+      )
+    )
+  );

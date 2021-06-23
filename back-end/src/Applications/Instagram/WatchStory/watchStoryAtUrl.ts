@@ -61,7 +61,7 @@ const bodyOfWatchStoryAtUrl = (I: InputOfBody) => {
             )
           ),
           WT.map((els) => els[0]),
-          WT.chain(click),
+          WT.chain(click()),
           WT.map(() => true),
           WT.orElse(() =>
             pipe(

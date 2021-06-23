@@ -1,11 +1,14 @@
-import { pipe } from 'fp-ts/function';
+import { flow, pipe } from 'fp-ts/function';
+import { IO } from 'fp-ts/lib/IO';
 import { Reader } from 'fp-ts/lib/Reader';
 import * as O from 'fp-ts/Option';
 import * as S from 'fp-ts/Semigroup';
 import path from 'path';
 import { ElementHandle, Page } from 'puppeteer';
 import * as WT from 'src/index';
-import { bringToFront, goto, openNewPage, otherPages, waitFor$x } from 'WebTeer/dependencies';
+import {
+    bringToFront, goto, openNewPage, otherPages, runOnAnyDifferentPage, waitFor$x
+} from 'WebTeer/dependencies';
 import { $x, click, getHref, getInnerText, HTMLElementProperties } from 'WebTeer/elementHandle';
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
 import { FollowUser, LikeToPost, WatchStoryAtUrl } from 'WT-Instagram/index';
@@ -13,12 +16,12 @@ import {
     sendMessage, Settings as SettingsOfTelegram, settingsByLanguage as settingsOfTelegramByLanguage
 } from 'WT-Telegram/index';
 
-import { newConfirmedReport, newSkipReport, Report } from './logs/jsonDB';
+import { newBadReport, newConfirmedReport, newSkipReport, Report } from './logs/jsonDB';
 import { Settings as SettingsOfBots, settingsByBotChoice } from './settings';
 import { Bots, getPropertiesFromSettingsAndBotChoice } from './settingsByBotChoice';
 
 const ABSOLUTE_PATH = path.resolve(__dirname, "./index.ts");
-
+const CYCLE_DELAY = 3 * 60 * 1000;
 /**
  *
  */
@@ -72,6 +75,7 @@ interface InputOfBody {
   settings: Settings;
   options: Options;
 }
+
 // ----------------------------------
 // Output
 // ----------------------------------
@@ -87,6 +91,10 @@ type BodyOfActuator = Reader<InputOfBody, WT.WebProgram<Output>>;
  *
  */
 const bodyOfActuator: BodyOfActuator = (D) => {
+  // --------------------------
+  // Retrieve all loaded messages
+  // --------------------------
+  const messages = () => waitFor$x(D.settings.message.xpath);
   // --------------------------
   // Find message of Action
   // --------------------------
@@ -135,7 +143,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
    */
   type LastMessageWithAction = FoundMessage | NotFoundMessage;
   /**
-   *
+   * @todo refactor
    */
   const findLastMessageWithAction = (
     els: ElementHandle<Element>[]
@@ -176,210 +184,6 @@ const bodyOfActuator: BodyOfActuator = (D) => {
               : findLastMessageWithAction(els.slice(0, els.length - 1))
           )
         );
-
-  // --------------------------
-  // Action
-  // --------------------------
-  const runAction = (action: TypeOfActions) => (
-    messageWithAction: ElementHandle<Element>
-  ): WT.WebProgram<ResultOfCycle> => {
-    // --------------------------
-    // Get Infos for Action
-    // --------------------------
-    const getActionHref: () => WT.WebProgram<string> = () =>
-      pipe(
-        $x(D.settings.message.link.relativeXPath)(messageWithAction),
-        WT.chain((els) =>
-          els.length === 1
-            ? WT.of(els[0])
-            : pipe(
-                getInnerText(messageWithAction),
-                WT.chain((text) =>
-                  WT.left(
-                    new Error(
-                      `Found ${els.length} HTMLAnchorElement(s) containing 'http'.\n` +
-                        `Text of message is: ${text}`
-                    )
-                  )
-                )
-              )
-        ),
-        WT.chain(getHref),
-        WT.chain(
-          O.match(() => WT.left(new Error("No link at bot message")), WT.of)
-        ),
-        WT.orElseStackErrorInfos({
-          message: `In message with bot ${D.nameOfBot}`,
-          nameOfFunction: "getActionHref",
-          filePath: ABSOLUTE_PATH,
-        })
-      );
-    // --------------------------
-    // Actions Implementation
-    // --------------------------
-    /**
-     *
-     */
-    type OutcomeOfAction = { outcome: "Confirm" | "Skip"; info: {} };
-    /**
-     *
-     */
-    const returnSkip = (info: {}): OutcomeOfAction => ({
-      outcome: "Skip",
-      info,
-    });
-    const returnConfirm = (info: {}): OutcomeOfAction => ({
-      outcome: "Confirm",
-      info,
-    });
-    /**
-     *
-     */
-    const implementations: {
-      [k in TypeOfActions]: (url: URL) => WT.WebProgram<OutcomeOfAction>;
-    } = {
-      Follow: (url: URL) =>
-        pipe(
-          FollowUser.followUser({
-            language: D.language,
-            profileUrl: url,
-            options: { allowPrivate: false },
-          }),
-          WT.map<FollowUser.Output, OutcomeOfAction>((o) =>
-            o._tag === "NotFollowed" ? returnSkip(o) : returnConfirm(o)
-          )
-        ),
-      Like: (url: URL) =>
-        pipe(
-          LikeToPost.likeToPost({
-            language: D.language,
-            urlOfPost: url,
-            options: {},
-          }),
-          WT.map((o) =>
-            o._tag === "NotLiked" ? returnSkip(o) : returnConfirm(o)
-          )
-        ),
-      WatchStory: (url: URL) =>
-        pipe(
-          WatchStoryAtUrl.watchStoryAtUrl({
-            language: D.language,
-            storyUrl: url,
-            options: {},
-          }),
-          WT.map((o) =>
-            o._tag === "AllWatched" ? returnConfirm(o) : returnSkip(o)
-          )
-        ),
-      Comment: (url: URL) =>
-        WT.of(
-          returnSkip({ message: "Comment is not implemented", url: url.href })
-        ),
-      Extra: (url: URL) =>
-        WT.of(
-          returnSkip({ message: "Extra is not implemented", url: url.href })
-        ),
-    };
-
-    // --------------------------
-    // Skip, Confirm
-    // --------------------------
-    const skip: (report: Report) => WT.WebProgram<ResultOfCycle> = (report) =>
-      pipe(
-        $x(D.settings.message.buttonSkip.relativeXPath)(messageWithAction),
-        WT.chain((els) =>
-          els.length === 1
-            ? WT.of(els[0])
-            : WT.left(
-                new Error(
-                  `Found ${els.length} HTMLButtonElement(s) containing skip-button.`
-                )
-              )
-        ),
-        WT.chain(click),
-        WT.chain(() => WT.fromIO(newSkipReport(report))),
-        WT.map<void, ResultOfCycle>(() => "Skip"),
-        WT.orElseStackErrorInfos({
-          message: `In message with bot ${D.nameOfBot}`,
-          nameOfFunction: "skip",
-          filePath: ABSOLUTE_PATH,
-        })
-      );
-    const confirm: (report: Report) => WT.WebProgram<ResultOfCycle> = (
-      report
-    ) =>
-      pipe(
-        $x(D.settings.message.buttonConfirm.relativeXPath)(messageWithAction),
-        WT.chain((els) =>
-          els.length === 1
-            ? WT.of(els[0])
-            : WT.left(
-                new Error(
-                  `Found ${els.length} HTMLButtonElement(s) containing confirm-button.`
-                )
-              )
-        ),
-        WT.chain(click),
-        WT.chainFirst(() => WT.fromIO(newConfirmedReport(report))),
-        WT.map<void, ResultOfCycle>(() => "Confirm"),
-        WT.orElseStackErrorInfos({
-          message: `In message with bot ${D.nameOfBot}`,
-          nameOfFunction: "confirm",
-          filePath: ABSOLUTE_PATH,
-        })
-      );
-    // --------------------------
-    // Core of RunAction
-    // --------------------------
-    return pipe(
-      getActionHref(),
-      WT.chain((href) =>
-        D.options.skip[action]
-          ? pipe(
-              WT.of(
-                returnSkip({
-                  message: `${action} skipped because of option's skip === true`,
-                })
-              ),
-              WT.map((outcomeOfAction) => ({ ...outcomeOfAction, href }))
-            )
-          : pipe(
-              otherPages,
-              WT.chain((pages) =>
-                pages.length > 0 ? WT.of(pages[0]) : openNewPage
-              ),
-              WT.chain<Page, OutcomeOfAction>((page) =>
-                pipe(
-                  WT.ask(),
-                  WT.chainTaskEitherK((r) =>
-                    pipe(
-                      bringToFront,
-                      WT.chain(() => implementations[action](new URL(href)))
-                    )({ ...r, page })
-                  )
-                )
-              ),
-              WT.map((outcomeOfAction) => ({ ...outcomeOfAction, href }))
-            )
-      ),
-      WT.chainFirst(WT.delay(1000)),
-      WT.chainFirst(() => bringToFront),
-      WT.chain(({ outcome, info, href }) =>
-        outcome === "Confirm"
-          ? confirm({
-              action,
-              href,
-              info,
-            })
-          : skip({
-              action,
-              href,
-              info,
-            })
-      )
-    );
-  };
-
   // --------------------------
   // Cycle
   // --------------------------
@@ -416,31 +220,270 @@ const bodyOfActuator: BodyOfActuator = (D) => {
       consecutiveSkips: 0,
       consecutiveNewActions: 0,
     }
-  ): WT.WebProgram<StateOfCycle> =>
-    soc._tag === "End"
+  ): WT.WebProgram<StateOfCycle> => {
+    // --------------------------
+    // Action
+    // --------------------------
+    const runAction = (action: TypeOfActions) => (
+      messageWithAction: ElementHandle<Element>
+    ): WT.WebProgram<ResultOfCycle> => {
+      // --------------------------
+      // Get Infos for Action
+      // --------------------------
+      const getActionHref: () => WT.WebProgram<string> = () =>
+        pipe(
+          $x(D.settings.message.link.relativeXPath)(messageWithAction),
+          WT.chain((els) =>
+            els.length === 1
+              ? WT.of(els[0])
+              : pipe(
+                  getInnerText(messageWithAction),
+                  WT.chain((text) =>
+                    WT.left(
+                      new Error(
+                        `Found ${els.length} HTMLAnchorElement(s) containing 'http'.\n` +
+                          `Text of message is: ${text}`
+                      )
+                    )
+                  )
+                )
+          ),
+          WT.chain(getHref),
+          WT.chain(
+            O.match(() => WT.left(new Error("No link at bot message")), WT.of)
+          ),
+          WT.orElseStackErrorInfos({
+            message: `In message with bot ${D.nameOfBot}`,
+            nameOfFunction: "getActionHref",
+            filePath: ABSOLUTE_PATH,
+          })
+        );
+      // --------------------------
+      // Actions Implementation
+      // --------------------------
+      /**
+       *
+       */
+      type KindsOfOutcomeOfAction = "Confirm" | "Skip" | "End";
+      type OutcomeOfAction = { outcome: KindsOfOutcomeOfAction; info: {} };
+      /**
+       *
+       */
+      const returnSkip = (info: {}): OutcomeOfAction => ({
+        outcome: "Skip",
+        info,
+      });
+      const returnConfirm = (info: {}): OutcomeOfAction => ({
+        outcome: "Confirm",
+        info,
+      });
+      const returnEnd = (info: {}): OutcomeOfAction => ({
+        outcome: "End",
+        info,
+      });
+      /**
+       *
+       */
+      const implementationsOfActions: {
+        [k in TypeOfActions]: (url: URL) => WT.WebProgram<OutcomeOfAction>;
+      } = {
+        Follow: (url: URL) =>
+          pipe(
+            FollowUser.followUser({
+              language: D.language,
+              profileUrl: url,
+              options: { allowPrivate: false },
+            }),
+            WT.chain((outputOfFollowUser) =>
+              outputOfFollowUser._tag === "NotFollowed"
+                ? WT.of(returnSkip(outputOfFollowUser))
+                : pipe(
+                    FollowUser.followUser({
+                      language: D.language,
+                      profileUrl: url,
+                      options: { allowPrivate: false },
+                    }),
+                    WT.map((outputOfCheck) =>
+                      outputOfCheck._tag === "NotFollowed"
+                        ? returnConfirm(outputOfFollowUser)
+                        : returnEnd(outputOfCheck)
+                    )
+                  )
+            )
+          ),
+        Like: (url: URL) =>
+          pipe(
+            LikeToPost.likeToPost({
+              language: D.language,
+              urlOfPost: url,
+              options: {},
+            }),
+            WT.chain((outputOfLike) =>
+              outputOfLike._tag === "NotLiked"
+                ? WT.of(returnSkip(outputOfLike))
+                : pipe(
+                    LikeToPost.likeToPost({
+                      language: D.language,
+                      urlOfPost: url,
+                      options: {},
+                    }),
+                    WT.map((outputOfCheck) =>
+                      outputOfCheck._tag === "NotLiked"
+                        ? returnConfirm(outputOfLike)
+                        : returnEnd(outputOfCheck)
+                    )
+                  )
+            )
+          ),
+        WatchStory: (url: URL) =>
+          pipe(
+            WatchStoryAtUrl.watchStoryAtUrl({
+              language: D.language,
+              storyUrl: url,
+              options: {},
+            }),
+            WT.map((o) =>
+              o._tag === "AllWatched" ? returnConfirm(o) : returnSkip(o)
+            )
+          ),
+        Comment: (url: URL) =>
+          WT.of(
+            returnSkip({ message: "Comment is not implemented", url: url.href })
+          ),
+        Extra: (url: URL) =>
+          WT.of(
+            returnSkip({ message: "Extra is not implemented", url: url.href })
+          ),
+      };
+
+      // --------------------------
+      // Skip, Confirm, End
+      // --------------------------
+      const abstractionOfConfirmAndSkip: (
+        nameOfFunction: KindsOfOutcomeOfAction,
+        xpathOfButton: string,
+        newReport: (newReport: Report) => IO<void>
+      ) => (report: Report) => WT.WebProgram<ResultOfCycle> = (
+        _nameOfFunction,
+        _xpathOfButton,
+        _newReport
+      ) => (report) =>
+        pipe(
+          $x(_xpathOfButton)(messageWithAction),
+          WT.chain((els) =>
+            els.length === 1
+              ? WT.of(els[0])
+              : WT.left(
+                  new Error(
+                    `Found ${els.length} HTMLButtonElement(s) containing confirm-button.`
+                  )
+                )
+          ),
+          WT.chain(click()),
+          WT.chainFirst(() => WT.fromIO(_newReport(report))),
+          WT.map<void, ResultOfCycle>(() => _nameOfFunction),
+          WT.orElseStackErrorInfos({
+            message: `In message with bot ${D.nameOfBot}`,
+            nameOfFunction: _nameOfFunction,
+            filePath: ABSOLUTE_PATH,
+          })
+        );
+      const fromActionToNewCycle: {
+        [k in KindsOfOutcomeOfAction]: (
+          report: Report
+        ) => WT.WebProgram<ResultOfCycle>;
+      } = {
+        Confirm: abstractionOfConfirmAndSkip(
+          "Confirm",
+          D.settings.message.buttonConfirm.relativeXPath,
+          newConfirmedReport
+        ),
+        Skip: abstractionOfConfirmAndSkip(
+          "Skip",
+          D.settings.message.buttonSkip.relativeXPath,
+          newSkipReport
+        ),
+        End: (report) =>
+          pipe(
+            WT.fromIO(newBadReport(report)),
+            WT.map<void, ResultOfCycle>(() => "End"),
+            WT.orElseStackErrorInfos({
+              message: `In message with bot ${D.nameOfBot}`,
+              nameOfFunction: "End",
+              filePath: ABSOLUTE_PATH,
+            })
+          ),
+      };
+
+      /**
+       *
+       */
+      return pipe(
+        getActionHref(),
+        WT.chain((href) =>
+          pipe(
+            D.options.skip[action]
+              ? WT.of(
+                  returnSkip({
+                    message: `${action} skipped because of option's skip === true`,
+                  })
+                )
+              : runOnAnyDifferentPage<OutcomeOfAction>(
+                  implementationsOfActions[action](new URL(href))
+                ),
+            WT.map((outcomeOfAction) => ({ ...outcomeOfAction, href }))
+          )
+        ),
+
+        WT.chainFirst(WT.delay(1000)),
+
+        WT.chainFirst(() => bringToFront),
+        WT.chain(({ outcome: kindOfOutcome, info, href }) =>
+          fromActionToNewCycle[kindOfOutcome]({
+            action,
+            href,
+            info,
+          })
+        )
+      );
+    };
+    /**
+     *
+     */
+    const routineOfBot = flow(
+      findLastMessageWithAction,
+      WT.chain((messageWithAction) =>
+        messageWithAction._tag === "NotFoundMessage"
+          ? pipe(
+              sendMessage(D.language)(D.settings.buttonNewAction.text),
+              WT.map<void, ResultOfCycle>(() => "NewAction")
+            )
+          : pipe(runAction(messageWithAction.action)(messageWithAction.el))
+      )
+    );
+
+    return soc._tag === "End"
       ? WT.of(soc)
       : soc.consecutiveNewActions > 2 || soc.consecutiveSkips > 4
       ? WT.of(updateState({ ...soc, _tag: "End" }))
       : pipe(
-          waitFor$x(D.settings.message.xpath),
-          WT.chain(findLastMessageWithAction),
-          WT.chain((messageWithAction) =>
-            messageWithAction._tag === "NotFoundMessage"
-              ? pipe(
-                  sendMessage(D.language)(D.settings.buttonNewAction.text),
-                  WT.map<void, ResultOfCycle>(() => "NewAction")
-                )
-              : pipe(runAction(messageWithAction.action)(messageWithAction.el))
-          ),
+          WT.delay(CYCLE_DELAY)(undefined),
+
+          WT.chain(() => messages()),
+          WT.chain((messages) => routineOfBot(messages)),
           WT.map<ResultOfCycle, StateOfCycle>((_tag) =>
             updateState({ ...soc, _tag })
           ),
-          WT.chain(WT.delay(3 * 60 * 1000)),
+
           WT.chain(cycle)
         );
+  };
+  /**
+   *
+   */
   return pipe(
     goto(D.settings.chatUrl.href),
-    WT.chain(WT.delay(2000)),
+
     WT.chain(() => cycle())
   );
 };

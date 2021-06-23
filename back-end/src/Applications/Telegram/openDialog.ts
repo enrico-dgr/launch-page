@@ -48,7 +48,7 @@ const bodyOfOpenDialog: BodyOfOpenDialog = (D) =>
     waitFor$x(D.settings.dialogXPath(D.interlocutor)),
     WT.chain((els) =>
       els.length === 1
-        ? click(els[0])
+        ? click()(els[0])
         : WT.leftFromErrorInfos({
             message:
               `Chat with ${D.interlocutor} has not been opened.\n` +

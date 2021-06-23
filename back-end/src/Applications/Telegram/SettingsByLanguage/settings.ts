@@ -15,4 +15,20 @@ export interface Settings {
       };
     };
   };
+  loginPage: {
+    elements: {
+      buttonToSwitchToAccessByNumber: {
+        XPath: string;
+      };
+      inputForNumber: {
+        XPath: string;
+      };
+      buttonToGoToOTP: {
+        XPath: string;
+      };
+      inputForOTP: {
+        XPath: string;
+      };
+    };
+  };
 }
