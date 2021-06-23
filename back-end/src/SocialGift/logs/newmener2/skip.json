@@ -1,5 +1,5 @@
 {
-  "counter": 48,
+  "counter": 49,
   "reports": [
     {
       "action": "Follow",
@@ -433,6 +433,17 @@
           "_tag": "CannotFollowPrivate"
         },
         "isPrivate": true
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/xrosana5",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
       }
     }
   ]
