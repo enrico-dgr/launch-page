@@ -1,12 +1,12 @@
 import { pipe } from 'fp-ts/function';
 import { Reader } from 'fp-ts/Reader';
 import path from 'path';
-import { waitFor$x } from 'src/dependencies';
 import { click, expectedLength } from 'src/elementHandle';
-import * as WT from 'src/index';
+import { waitFor$x } from 'WebTeer/pageOfWebDeps';
 import {
     getPropertiesFromSettingsAndLanguage, Languages, SettingsByLanguage
-} from 'src/settingsByLanguage';
+} from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 
 import {
     Settings as SettingsTelegram, settingsByLanguage as settingsByLanguageTelegram

@@ -1,9 +1,9 @@
 import * as A from 'fp-ts/Array';
 import { pipe } from 'fp-ts/function';
 import * as S from 'fp-ts/Semigroup';
-import { $x, goto as gotoWD } from 'src//dependencies';
-import * as WT from 'src/index';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
+import { $x, goto as gotoWD } from 'WebTeer/pageOfWebDeps';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 
 import { Settings, settingsByLanguage } from './SettingsByLanguage';
 

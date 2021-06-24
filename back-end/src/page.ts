@@ -8,7 +8,8 @@ import {
     Browser, ElementHandle, HTTPResponse, Keyboard, KeyInput, Page, WaitForOptions
 } from 'puppeteer';
 
-import * as WT from './';
+import { anyToError } from './ErrorInfos';
+import * as WT from './WebProgram';
 
 const ABSOLUTE_PATH = path.resolve(__dirname, "./page.ts");
 /**
@@ -45,7 +46,7 @@ export const $x = (XPath: string) => (
           : // : E.left(new Error(`No element found at XPath ${XPath}`))
             E.right([])
       )
-      .catch((err) => E.left(WT.anyToError(err)))
+      .catch((err) => anyToError(err))
   );
 /**
  * @param selector
@@ -76,7 +77,7 @@ export const $$ = (selector: string) => (
     page
       .$$(selector)
       .then((els) => E.right(els))
-      .catch((err) => E.left(WT.anyToError(err)))
+      .catch((err) => anyToError(err))
   );
 /**
  * @since 1.0.0
@@ -86,7 +87,7 @@ export const goto = (url: string) => (page: Page): WT.WebProgram<void> =>
     page
       .goto(url)
       .then(() => E.right(undefined))
-      .catch((err) => E.left(WT.anyToError(err)))
+      .catch((err) => anyToError(err))
   );
 /**
  * @since 1.0.0
@@ -258,7 +259,7 @@ export const screen = (path: string) => (page: Page) =>
         path,
       })
       .then(E.right)
-      .catch(flow(WT.anyToError, E.left))
+      .catch((err) => anyToError(err))
   );
 
 // -----------------------
@@ -279,7 +280,7 @@ export const keyboard = {
         page.keyboard
           .type(text, options)
           .then(E.right)
-          .catch(flow(WT.anyToError, E.left))
+          .catch((err) => anyToError<any, void>(err))
       ),
       WT.orElseStackErrorInfos({
         message: `Page's keyboard failed to type.`,
@@ -299,7 +300,7 @@ export const keyboard = {
         page.keyboard
           .press(text, options)
           .then(E.right)
-          .catch(flow(WT.anyToError, E.left))
+          .catch((err) => anyToError<any, void>(err))
       ),
       WT.orElseStackErrorInfos({
         message: `Page's keyboard failed to press.`,

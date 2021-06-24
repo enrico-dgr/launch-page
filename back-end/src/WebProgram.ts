@@ -9,17 +9,10 @@ import * as RTE from 'fp-ts/ReaderTaskEither';
 import * as S from 'fp-ts/Semigroup';
 import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
-import { Page } from 'puppeteer';
 
-import { createErrorFromErrorInfos, ErrorInfos, stackErrorInfos } from './errorInfos';
+import { anyToError, createErrorFromErrorInfos, ErrorInfos, stackErrorInfos } from './ErrorInfos';
+import { WebDeps } from './WebDeps';
 
-/**
- * @category Dependencies
- * @since 1.0.0
- */
-export interface WebDeps {
-  page: Page;
-}
 /**
  * @category model
  * @since 1.0.0
@@ -132,17 +125,15 @@ export const left: <A = never>(e: Error) => WebProgram<A> = RTE.left;
  * @category constructors
  * @since 1.0.0
  */
-export const anyToError: <E>(err: E) => Error = (err) =>
-  err instanceof Error ? err : new Error(JSON.stringify(err));
+export const leftAny: <E = never, A = never>(err: E) => WebProgram<A> = (err) =>
+  fromEither(anyToError(err));
 /**
- * Derivable from `anyToError`
  * @category constructors
  * @since 1.0.0
  */
-export const leftAny: <E = never, A = never>(err: E) => WebProgram<A> = (err) =>
-  fromEither(
-    err instanceof Error ? E.left(err) : E.left(new Error(JSON.stringify(err)))
-  );
+export const leftFromErrorInfos = <A = never>(
+  errorInfos: ErrorInfos
+): WebProgram<A> => left(createErrorFromErrorInfos(errorInfos));
 /**
  * @category instances
  * @since 1.0.0
@@ -152,14 +143,6 @@ export const getSemigroupChain = <A>(
 ): S.Semigroup<(a: A) => WebProgram<A>> => ({
   concat: (x, y) => flow(x, chain_(y)),
 });
-/**
- * @since 1.0.0
- */
-export const chainConcatAll: <A>(
-  startWith: (a: A) => WebProgram<A>
-) => (
-  as: readonly ((a: A) => WebProgram<A>)[]
-) => (a: A) => WebProgram<A> = S.concatAll(getSemigroupChain(chain));
 
 /**
  * @category constructors
@@ -194,13 +177,6 @@ export const orElse: <A>(
 export const orElseW: <B>(
   onLeft: (e: Error) => WebProgram<B>
 ) => <A>(ma: WebProgram<A>) => WebProgram<B | A> = RTE.orElseW;
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const leftFromErrorInfos = <A = never>(
-  errorInfos: ErrorInfos
-): WebProgram<A> => left(createErrorFromErrorInfos(errorInfos));
 /**
  * @category combinators
  * @since 1.0.0

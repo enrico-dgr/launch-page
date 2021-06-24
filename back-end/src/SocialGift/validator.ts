@@ -1,9 +1,9 @@
 import { pipe } from 'fp-ts/function';
 import { Reader } from 'fp-ts/lib/Reader';
 import path from 'path';
-import * as WT from 'src/index';
 import { HTMLElementProperties } from 'WebTeer/elementHandle';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 import { FollowUser, LikeToPost, WatchStoryAtUrl } from 'WT-Instagram/index';
 import {
     Settings as SettingsOfTelegram, settingsByLanguage as settingsOfTelegramByLanguage

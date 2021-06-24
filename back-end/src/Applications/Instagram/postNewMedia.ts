@@ -4,10 +4,10 @@ import { pipe } from 'fp-ts/function';
 import * as fs from 'fs';
 import path from 'path';
 import { devices } from 'puppeteer';
-import { browser, emulate, keyboard, reload, waitFor$x } from 'src/dependencies';
-import * as WT from 'src/index';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
 import { click, uploadFile } from 'WebTeer/elementHandle';
+import { browser, emulate, keyboard, reload, waitFor$x } from 'WebTeer/pageOfWebDeps';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 
 import {
     Settings as SettingsOfInstagram, settingsByLanguage as settingsByLanguageOfInstagram

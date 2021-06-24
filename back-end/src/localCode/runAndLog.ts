@@ -1,7 +1,13 @@
 import { log } from 'fp-ts/Console';
 import { pipe } from 'fp-ts/function';
-import * as WT from 'src';
-import { errorInfosToString } from 'src/errorInfos';
+import { format } from 'prettier';
+import * as WT from 'WebTeer/WebProgram';
+
+/**
+ * @since 1.0.0
+ */
+export const errorInfosToString = (e: Error) =>
+  format(e.message, { parser: "json" }) + "\n Source path:" + e.stack ?? "";
 
 const runAndLog = <A>(wp: WT.WebProgram<A>) =>
   pipe(

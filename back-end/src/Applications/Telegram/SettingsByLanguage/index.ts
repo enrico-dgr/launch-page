@@ -1,4 +1,4 @@
-import { SettingsByLanguage } from 'src/settingsByLanguage';
+import { SettingsByLanguage } from 'WebTeer/SettingsByLanguage';
 
 import { Settings } from './settings';
 

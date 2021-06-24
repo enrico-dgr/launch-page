@@ -5,8 +5,8 @@ import {
     Settings as SettingsInstagram, settingsByLanguage
 } from 'src/Applications/Instagram/SettingsByLanguage';
 import { click, HTMLElementProperties, matchOneSetOfHTMLProperties } from 'src/elementHandle';
-import * as WT from 'src/index';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 
 /**
  * @category Input of Body

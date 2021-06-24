@@ -2,10 +2,10 @@ import * as A from 'fp-ts/Array';
 import { pipe } from 'fp-ts/lib/function';
 import path from 'path';
 import { ElementHandle } from 'puppeteer';
-import * as WT from 'src';
-import { waitFor$x } from 'src/dependencies';
 import { click, expectedLength } from 'src/elementHandle';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
+import { waitFor$x } from 'WebTeer/pageOfWebDeps';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 import {
     Settings as SettingsOfInstagram, settingsByLanguage as settingsByLanguageOfInstagram
 } from 'WT-Instagram/SettingsByLanguage';

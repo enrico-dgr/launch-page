@@ -1,10 +1,11 @@
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as P from 'puppeteer';
+import { anyToError } from 'WebTeer/ErrorInfos';
 
 import * as ElH from '../src/elementHandle';
-import * as WT from '../src/index';
 import * as _ from '../src/page';
+import * as WT from '../src/WebProgram';
 
 describe("Utils/Page", () => {
   const timeout = 5000;
@@ -52,7 +53,7 @@ describe("Utils/Page", () => {
       await expect(
         pipe({ page }, _.$x("a bad XPath")(page))()
       ).resolves.toStrictEqual(
-        await page.$x("a bad XPath").catch((err) => E.left(WT.anyToError(err)))
+        await page.$x("a bad XPath").catch((err) => anyToError(err))
       );
     });
   });

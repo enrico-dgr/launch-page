@@ -4,8 +4,8 @@
 import { flow, pipe } from 'fp-ts/lib/function';
 import { Browser, ElementHandle, HTTPResponse, Page, WaitForOptions } from 'puppeteer';
 
-import * as WT from './';
 import * as PageUtils from './page';
+import * as WT from './WebProgram';
 
 /**
  * @since 1.0.0

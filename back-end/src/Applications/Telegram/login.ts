@@ -1,10 +1,10 @@
 import { pipe } from 'fp-ts/function';
 import path from 'path';
-import { askData as askDataFromConsole } from 'src/console';
-import { goto, keyboard, setUserAgent, waitFor$x } from 'src/dependencies';
-import * as WT from 'src/index';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
 import { click } from 'WebTeer/elementHandle';
+import { goto, keyboard, setUserAgent, waitFor$x } from 'WebTeer/pageOfWebDeps';
+import { askData as askDataFromConsole } from 'WebTeer/readline';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 
 import {
     Settings as SettingsOfTelegram, settingsByLanguage as settingsByLanguageOfTelegram

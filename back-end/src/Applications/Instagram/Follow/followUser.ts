@@ -3,11 +3,11 @@ import { pipe } from 'fp-ts/lib/function';
 import {
     Settings as SettingsInstagram, settingsByLanguage
 } from 'src/Applications/Instagram/SettingsByLanguage';
-import { $x } from 'src/dependencies';
 import { expectedLength } from 'src/elementHandle';
-import * as WT from 'src/index';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
 import { goto, StateOfInstagramPage } from 'WebTeer/Applications/Instagram/goto';
+import { $x } from 'WebTeer/pageOfWebDeps';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 
 import {
     clickButtonFollow, Followed as FollowedOfClickButtonFollow,

@@ -1,9 +1,9 @@
 import { pipe } from 'fp-ts/lib/function';
 import { ElementHandle } from 'puppeteer';
 import { checkHTMLProperties, click, HTMLElementProperties } from 'src/elementHandle';
-import * as WT from 'src/index';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'src/settingsByLanguage';
-import { $x } from 'WebTeer/dependencies';
+import { $x } from 'WebTeer/pageOfWebDeps';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 import {
     Settings as SettingsOfInstagram, settingsByLanguage
 } from 'WT-Instagram/SettingsByLanguage';

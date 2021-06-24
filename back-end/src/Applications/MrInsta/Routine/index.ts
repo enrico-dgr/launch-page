@@ -1,7 +1,7 @@
 import { pipe } from 'fp-ts/lib/function';
 import * as S from 'fp-ts/lib/Semigroup';
 
-import * as WT from '../../../index';
+import * as WT from '../../../WebProgram';
 import { chainNOrElse } from '../index';
 
 export interface RoutineDeps<ProfileType> {

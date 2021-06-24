@@ -1,6 +1,6 @@
 import { createInterface } from 'readline';
 
-import * as WT from './index';
+import * as WT from './WebProgram';
 
 export const askData: (
   nameOdData: string

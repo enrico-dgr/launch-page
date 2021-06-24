@@ -7,8 +7,10 @@ import { pipe, Predicate } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import path from 'path';
 import { ClickOptions, ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
+import { anyToError, stackErrorInfos } from 'WebTeer/ErrorInfos';
 
-import * as WT from './index';
+import { WebDeps } from './WebDeps';
+import * as WT from './WebProgram';
 
 const PATH = path.resolve(__dirname, "./elementHandle.ts");
 /**
@@ -40,7 +42,7 @@ export const getProperty = <T = never, El extends Element = never>(
           ? E.right(O.none)
           : E.right<Error, O.Option<T>>(O.some(json))
       )
-      .catch((err) => E.left(WT.anyToError(err)))
+      .catch((err) => anyToError(err))
   );
 /**
  * @since 1.0.0
@@ -78,7 +80,7 @@ export const getAttribute = <El extends Element = never>(
           ? E.right(O.none)
           : E.right<Error, O.Option<string>>(O.some(value))
       )
-      .catch((err) => E.left(WT.anyToError(err)))
+      .catch((err) => anyToError(err))
   );
 /**
  * @since 1.0.0
@@ -105,7 +107,7 @@ export const getHref = getProperty<string, HTMLAnchorElement>("href");
 export const expectedLength: (
   predicate: Predicate<number>
 ) => (
-  errorObject: (els: ElementHandle<Element>[], r: WT.WebDeps) => Object
+  errorObject: (els: ElementHandle<Element>[], r: WebDeps) => Object
 ) => (
   els: ElementHandle<Element>[]
 ) => WT.WebProgram<ElementHandle<Element>[]> = (
@@ -132,7 +134,7 @@ export const expectedLength: (
 export const isNElementArray: (
   howMany: (n: number) => boolean
 ) => (
-  errorMessage: (els: ElementHandle<Element>[], r: WT.WebDeps) => string
+  errorMessage: (els: ElementHandle<Element>[], r: WebDeps) => string
 ) => (
   els: ElementHandle<Element>[]
 ) => WT.WebProgram<ElementHandle<Element>[]> = (
@@ -186,7 +188,7 @@ export const $x = (XPath: string) => (
     el
       .$x(XPath)
       .then((els) => (els !== undefined ? E.right(els) : E.right([])))
-      .catch((err) => E.left(WT.anyToError(err)))
+      .catch((err) => anyToError(err))
   );
 
 /**
@@ -202,7 +204,7 @@ export const type: (
     el
       .type(text, options)
       .then(() => E.right(undefined))
-      .catch((err) => E.left(WT.anyToError(err)))
+      .catch((err) => anyToError(err))
   );
 
 /**
@@ -407,5 +409,5 @@ export const uploadFile: (
     el
       .uploadFile(...filePaths)
       .then(() => E.right<Error, void>(undefined))
-      .catch((err) => E.left<Error, void>(WT.anyToError(err)))
+      .catch((err) => anyToError(err))
   );

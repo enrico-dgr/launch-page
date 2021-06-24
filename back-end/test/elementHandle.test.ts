@@ -3,9 +3,9 @@ import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as P from 'puppeteer';
 
-import * as WD from '../src/dependencies';
 import * as _ from '../src/elementHandle';
-import * as WT from '../src/index';
+import * as WD from '../src/pageOfWebDeps';
+import * as WT from '../src/WebProgram';
 
 describe("Utils/ElementHandle", () => {
   const timeout = 5000;

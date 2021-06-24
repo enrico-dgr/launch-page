@@ -5,12 +5,12 @@ import * as O from 'fp-ts/Option';
 import * as S from 'fp-ts/Semigroup';
 import path from 'path';
 import { ElementHandle, Page } from 'puppeteer';
-import * as WT from 'src/index';
+import { $x, click, getHref, getInnerText, HTMLElementProperties } from 'WebTeer/elementHandle';
 import {
     bringToFront, goto, openNewPage, otherPages, runOnAnyDifferentPage, waitFor$x
-} from 'WebTeer/dependencies';
-import { $x, click, getHref, getInnerText, HTMLElementProperties } from 'WebTeer/elementHandle';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
+} from 'WebTeer/pageOfWebDeps';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 import { FollowUser, LikeToPost, WatchStoryAtUrl } from 'WT-Instagram/index';
 import {
     sendMessage, Settings as SettingsOfTelegram, settingsByLanguage as settingsOfTelegramByLanguage

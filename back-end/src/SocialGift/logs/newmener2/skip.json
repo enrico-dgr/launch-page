@@ -1,5 +1,5 @@
 {
-  "counter": 49,
+  "counter": 62,
   "reports": [
     {
       "action": "Follow",
@@ -444,6 +444,144 @@
           "_tag": "NotAvailablePage"
         },
         "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/drinktome_",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/beebeebrands",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/antonioalberton_",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "CannotFollowPrivate"
+        },
+        "isPrivate": true
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/jacopo_gaga",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/_drago_falcox2_",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/mattiacozzolino24",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "CannotFollowPrivate"
+        },
+        "isPrivate": true
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/alisaahodzic",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "CannotFollowPrivate"
+        },
+        "isPrivate": true
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/giuliaa.castelli",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "CannotFollowPrivate"
+        },
+        "isPrivate": true
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/germana_martemucci_makeup",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/euro_pubblicita",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQgT7vPK735",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "NotAvailablePage"
+        }
+      }
+    },
+    {
+      "action": "Comment",
+      "href": "https://instagram.com/p/CQgg305Nz3O",
+      "info": {
+        "message": "Comment skipped because of option's skip === true"
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/pjergjunto",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "CannotFollowPrivate"
+        },
+        "isPrivate": true
       }
     }
   ]

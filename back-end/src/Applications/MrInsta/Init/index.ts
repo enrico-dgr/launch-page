@@ -1,5 +1,6 @@
-import * as WT from "../../../index";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from 'fp-ts/lib/function';
+
+import * as WT from '../../../WebProgram';
 
 export interface InitDeps {
   readonly goToGrowthPlansPage: WT.WebProgram<void>;

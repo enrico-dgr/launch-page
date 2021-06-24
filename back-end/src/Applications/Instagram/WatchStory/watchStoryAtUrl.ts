@@ -1,8 +1,8 @@
 import { pipe } from 'fp-ts/lib/function';
-import { $x, waitFor$x } from 'src/dependencies';
 import { click, expectedLength } from 'src/elementHandle';
-import * as WT from 'src/index';
-import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/settingsByLanguage';
+import { $x, waitFor$x } from 'WebTeer/pageOfWebDeps';
+import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
+import * as WT from 'WebTeer/WebProgram';
 import {
     Settings as SettingsOfInstagram, settingsByLanguage
 } from 'WT-Instagram/SettingsByLanguage';
