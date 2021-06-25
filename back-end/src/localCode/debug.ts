@@ -33,6 +33,7 @@ const PROFILE = myProfiles.waverener12;
             WatchStory: false,
             Extra: true,
           },
+          delayBetweenCycles: 3 * 60 * 1000,
         },
       })
     )

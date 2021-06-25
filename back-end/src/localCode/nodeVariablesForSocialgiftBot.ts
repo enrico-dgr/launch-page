@@ -18,6 +18,7 @@ enum EnumOfOptions {
   "--skip-follow",
   "--skip-like",
   "--skip-story",
+  "--delay",
 }
 /**
  *
@@ -32,6 +33,7 @@ const defaultOptions: DefaultOptions = {
   "--skip-follow": "false",
   "--skip-like": "false",
   "--skip-story": "false",
+  "--delay": String(3 * 60 * 1000),
 };
 /**
  *
@@ -57,6 +59,12 @@ const validateOption = (option: Options, value: string): string => {
         throw new Error(
           `--skip-story mode should be 'true' or 'false'.` +
             ` You typed ${value}`
+        );
+      return value;
+    case "--delay":
+      if (Number(value) === NaN)
+        throw new Error(
+          `--delay mode should be a number.` + ` You typed ${value}`
         );
       return value;
 
@@ -105,4 +113,5 @@ export const optionsOfInput = {
     WatchStory: JSON.parse(options("--skip-story")()) as boolean,
     Extra: true,
   },
+  delayBetweenCycles: JSON.parse(options("--delay")()) as number,
 };

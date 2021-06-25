@@ -1,11 +1,14 @@
+/**
+ * @since 1.0.0
+ */
 import * as C from 'fp-ts/Console';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as TE from 'fp-ts/TaskEither';
 import { Page } from 'puppeteer';
-import { toString } from 'WebTeer/ErrorInfos';
-import * as J from 'WebTeer/Json';
-import * as WT from 'WebTeer/WebProgram';
+import { toString } from 'src/ErrorInfos';
+import * as J from 'src/Json';
+import * as WT from 'src/WebProgram';
 
 import { WebDeps } from './WebDeps';
 

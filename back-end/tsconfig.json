@@ -9,7 +9,6 @@
       "WT-MrInsta/*": ["src/Applications/MrInsta/*"]
     },
     "strict": true,
-    // "lib": ["es2018", "dom", "esnext"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "./build",
@@ -17,8 +16,9 @@
     "sourceMap": true,
     "target": "es2016",
     "removeComments": true,
-    "typeRoots": ["src/@types", "./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"]
   },
+  "include": ["./src", "./examples"],
   "exclude": [
     "node_modules",
     "**/node_modules/*",

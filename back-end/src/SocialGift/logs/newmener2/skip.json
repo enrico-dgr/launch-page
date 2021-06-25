@@ -1,5 +1,5 @@
 {
-  "counter": 62,
+  "counter": 70,
   "reports": [
     {
       "action": "Follow",
@@ -582,6 +582,86 @@
           "_tag": "CannotFollowPrivate"
         },
         "isPrivate": true
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQgqCHvtdgh",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "AlreadyLiked"
+        }
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQgqCHvtdgh",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "AlreadyLiked"
+        }
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQgkUqiBFH-",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "AlreadyLiked"
+        }
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQgkUqiBFH-",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "AlreadyLiked"
+        }
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQgkUqiBFH-",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "AlreadyLiked"
+        }
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQgkUqiBFH-",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "AlreadyLiked"
+        }
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQgkUqiBFH-",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "AlreadyLiked"
+        }
+      }
+    },
+    {
+      "action": "Like",
+      "href": "https://instagram.com/p/CQg8GlxhHUW",
+      "info": {
+        "_tag": "NotLiked",
+        "reason": {
+          "_tag": "AlreadyLiked"
+        }
       }
     }
   ]

@@ -40,12 +40,7 @@ export const $x = (XPath: string) => (
   WT.fromTaskEither(() =>
     page
       .$x(XPath)
-      .then((els) =>
-        els !== undefined
-          ? E.right(els)
-          : // : E.left(new Error(`No element found at XPath ${XPath}`))
-            E.right([])
-      )
+      .then((els) => (els !== undefined ? E.right(els) : E.right([])))
       .catch((err) => anyToError(err))
   );
 /**

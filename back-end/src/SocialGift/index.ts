@@ -4,11 +4,9 @@ import { Reader } from 'fp-ts/lib/Reader';
 import * as O from 'fp-ts/Option';
 import * as S from 'fp-ts/Semigroup';
 import path from 'path';
-import { ElementHandle, Page } from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
 import { $x, click, getHref, getInnerText, HTMLElementProperties } from 'WebTeer/elementHandle';
-import {
-    bringToFront, goto, openNewPage, otherPages, runOnAnyDifferentPage, waitFor$x
-} from 'WebTeer/pageOfWebDeps';
+import { bringToFront, goto, runOnAnyDifferentPage, waitFor$x } from 'WebTeer/pageOfWebDeps';
 import { getPropertiesFromSettingsAndLanguage, Languages } from 'WebTeer/SettingsByLanguage';
 import * as WT from 'WebTeer/WebProgram';
 import { FollowUser, LikeToPost, WatchStoryAtUrl } from 'WT-Instagram/index';
@@ -16,7 +14,7 @@ import {
     sendMessage, Settings as SettingsOfTelegram, settingsByLanguage as settingsOfTelegramByLanguage
 } from 'WT-Telegram/index';
 
-import { newBadReport, newConfirmedReport, newSkipReport, Report } from './logs/jsonDB';
+import { newBadReport, newSkipReport, Report } from './logs/jsonDB';
 import { Settings as SettingsOfBots, settingsByBotChoice } from './settings';
 import { Bots, getPropertiesFromSettingsAndBotChoice } from './settingsByBotChoice';
 
@@ -41,6 +39,10 @@ export type TypeOfActions = keyof typeof enumOfActions;
  */
 type Options = {
   skip: { [key in TypeOfActions]: boolean };
+  /**
+   * Default to `3 * 60 * 1000 ms` (3 mins)
+   */
+  delayBetweenCycles: number;
 };
 /**
  *
@@ -395,7 +397,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
               ? WT.of(els[0])
               : WT.left(
                   new Error(
-                    `Found ${els.length} HTMLButtonElement(s) containing confirm-button.`
+                    `Found ${els.length} HTMLButtonElement(s) containing ${_nameOfFunction}-button.`
                   )
                 )
           ),
@@ -492,7 +494,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
       : soc.consecutiveNewActions > 2 || soc.consecutiveSkips > 4
       ? WT.of(updateState({ ...soc, _tag: "End" }))
       : pipe(
-          WT.delay(CYCLE_DELAY)(undefined),
+          WT.delay(D.options.delayBetweenCycles)(undefined),
 
           WT.chain(() => messages()),
           WT.chain((messages) => routineOfBot(messages)),
