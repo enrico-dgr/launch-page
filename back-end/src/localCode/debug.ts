@@ -1,6 +1,6 @@
+import { actuator } from 'examples/SocialGift';
 import { pipe } from 'fp-ts/lib/function';
 import P from 'puppeteer';
-import { actuator } from 'src/SocialGift';
 
 import { myProfiles } from './myProfiles';
 import { runAndLog } from './runAndLog';

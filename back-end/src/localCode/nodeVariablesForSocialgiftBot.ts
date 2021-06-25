@@ -1,7 +1,7 @@
+import { Input } from 'examples/SocialGift';
 import * as IOE from 'fp-ts/IOEither';
 import { pipe } from 'fp-ts/lib/function';
 import * as P from 'puppeteer';
-import { Input } from 'src/SocialGift';
 
 /**
  *

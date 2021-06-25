@@ -1,5 +1,5 @@
+import * as Telegram from 'examples/Applications/Telegram/index';
 import P from 'puppeteer';
-import * as Telegram from 'src/Applications/Telegram/index';
 
 import * as NU from './nodeVariablesForPuppeteer';
 

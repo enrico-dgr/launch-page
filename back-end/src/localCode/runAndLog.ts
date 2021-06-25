@@ -1,7 +1,8 @@
 import { log } from 'fp-ts/Console';
 import { pipe } from 'fp-ts/function';
 import { format } from 'prettier';
-import * as WT from 'WebTeer/WebProgram';
+
+import * as WP from '../WebProgram';
 
 /**
  * @since 1.0.0
@@ -9,10 +10,10 @@ import * as WT from 'WebTeer/WebProgram';
 export const errorInfosToString = (e: Error) =>
   format(e.message, { parser: "json" }) + "\n Source path:" + e.stack ?? "";
 
-const runAndLog = <A>(wp: WT.WebProgram<A>) =>
+const runAndLog = <A>(wp: WP.WebProgram<A>) =>
   pipe(
     wp,
-    WT.match(
+    WP.match(
       (e) =>
         log(
           `--------- --------- --------- ---------\n` +

@@ -1,6 +1,6 @@
+import { loginFromConsole } from 'examples/Applications/Telegram/index';
 import { pipe } from 'fp-ts/lib/function';
 import P from 'puppeteer';
-import { loginFromConsole } from 'WT-Telegram/index';
 
 import * as NU from './nodeVariablesForPuppeteer';
 import { runAndLog } from './runAndLog';

@@ -4,9 +4,7 @@ import * as J from 'fp-ts/lib/Json';
 import path from 'path';
 import { format } from 'prettier';
 
-import { stackErrorInfos } from './ErrorInfos';
-
-const PATH = path.resolve(__dirname, "./jsonDB.ts");
+const PATH = path.resolve(__filename);
 /**
  *
  */
@@ -25,16 +23,6 @@ export const stringify = <A>(a: A) =>
         ),
         E.chain<Error, Error, string>(E.left)
       )
-    ),
-    E.orElse<Error, string, Error>(
-      flow(
-        stackErrorInfos({
-          message: "Error while stringifying object",
-          nameOfFunction: "stringify",
-          filePath: PATH,
-        }),
-        E.left
-      )
     )
   );
 /**
@@ -43,17 +31,7 @@ export const stringify = <A>(a: A) =>
 export const parseToFormattedJson = <A>(a: A) =>
   pipe(
     stringify<A>(a),
-    E.map((stringified) => format(stringified, { parser: "json-stringify" })),
-    E.orElse<Error, string, Error>(
-      flow(
-        stackErrorInfos({
-          message: "Error while stringifying object",
-          nameOfFunction: "stringify",
-          filePath: PATH,
-        }),
-        E.left
-      )
-    )
+    E.map((stringified) => format(stringified, { parser: "json-stringify" }))
   );
 /**
  *
@@ -64,20 +42,10 @@ export const parse = <A extends Json>(s: string) =>
     E.orElse((u) =>
       pipe(
         E.tryCatch(
-          () => new Error(JSON.stringify(u)),
+          () => (u instanceof Error ? u : new Error(JSON.stringify(u))),
           () => new Error("Not stringifiable error object.")
         ),
         E.chain<Error, Error, A>(E.left)
-      )
-    ),
-    E.orElse<Error, A, Error>(
-      flow(
-        stackErrorInfos({
-          message: "Error while stringifying object",
-          nameOfFunction: "stringify",
-          filePath: PATH,
-        }),
-        E.left
       )
     )
   );

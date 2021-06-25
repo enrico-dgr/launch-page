@@ -1,6 +1,6 @@
+import { loginFromConsole } from 'examples/Applications/Instagram/index';
 import { pipe } from 'fp-ts/lib/function';
 import P from 'puppeteer';
-import { loginFromConsole } from 'WT-Instagram/index';
 
 import * as NU from './nodeVariablesForPuppeteer';
 import { runAndLog } from './runAndLog';

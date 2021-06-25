@@ -1,7 +1,7 @@
 import { pipe } from 'fp-ts/lib/function';
 import P from 'puppeteer';
-import { actuator } from 'src/SocialGift';
 
+import { actuator } from '../../examples/SocialGift/index';
 import * as NU from './nodeVariablesForPuppeteer';
 import * as NB from './nodeVariablesForSocialgiftBot';
 import { runAndLog } from './runAndLog';

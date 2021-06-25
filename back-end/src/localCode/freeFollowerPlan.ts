@@ -1,8 +1,8 @@
+import * as MrInsta from 'examples/Applications/MrInsta';
+import { Input } from 'examples/SocialGift';
 import * as IOE from 'fp-ts/IOEither';
 import { pipe } from 'fp-ts/lib/function';
 import P from 'puppeteer';
-import { Input } from 'src/SocialGift';
-import * as MrInsta from 'WebTeer/Applications/MrInsta';
 
 import * as NU from './nodeVariablesForPuppeteer';
 import { runAndLog } from './runAndLog';

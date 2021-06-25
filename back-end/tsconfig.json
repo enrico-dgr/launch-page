@@ -2,12 +2,6 @@
   "compilerOptions": {
     "module": "commonjs",
     "baseUrl": ".",
-    "paths": {
-      "WebTeer/*": ["src/*"],
-      "WT-Telegram/*": ["src/Applications/Telegram/*"],
-      "WT-Instagram/*": ["src/Applications/Instagram/*"],
-      "WT-MrInsta/*": ["src/Applications/MrInsta/*"]
-    },
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -25,6 +19,7 @@
     "./build",
     "./node_modules/@types/mongoose/**",
     "./srcOld",
-    "docs"
+    "docs",
+    "./src/localCode"
   ]
 }

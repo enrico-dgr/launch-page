@@ -1,10 +1,10 @@
 import { createInterface } from 'readline';
 
-import * as WT from './WebProgram';
+import * as WP from './WebProgram';
 
 export const askData: (
   nameOdData: string
-) => WT.WebProgram<string> = WT.fromTaskK((nameOdData) => () =>
+) => WP.WebProgram<string> = WP.fromTaskK((nameOdData) => () =>
   new Promise((resolve) => {
     const rl = createInterface({
       input: process.stdin,

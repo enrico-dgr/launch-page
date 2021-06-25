@@ -6,9 +6,10 @@ import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
 import * as path from 'path';
 import { format } from 'prettier';
-import * as J from 'WebTeer/Json';
 
-const PATH = path.resolve(__dirname, "./errorInfos.ts");
+import * as J from './Json';
+
+const PATH = path.resolve(__filename);
 /**
  * @since 1.0.0
  */
@@ -25,21 +26,27 @@ export const toString = (e: Error) => {
     `Error's name: ${name}\n` +
     `Error's message: ${message}\n` +
     `Error's stack: ${stack}`;
-  return E.tryCatch(
-    () =>
-      destructError(
-        e.name,
-        format(e.message, { parser: "json-stringify" }),
-        e.stack
-      ),
-    (err) => {
-      C.warn(
-        `### NOTE: error's message has not been formatted because it is not a valid ` +
-          `stringified json. Consider using 'stackErrorInfos' in file errorInfos.ts or similar tools.\n` +
-          `Format's error: ${err} ###\n`
-      )();
-      return destructError(e.name, e.message, e.stack);
-    }
+  return pipe(
+    E.tryCatch(
+      () =>
+        destructError(
+          e.name,
+          format(e.message, { parser: "json-stringify" }),
+          e.stack
+        ),
+      (err) => {
+        C.warn(
+          `### NOTE: error's message has not been formatted because it is not a valid ` +
+            `stringified json. Consider using 'stackErrorInfos' in file errorInfos.ts or similar tools.\n` +
+            `Format's error: ${err} ###\n`
+        )();
+        return destructError(e.name, e.message, e.stack);
+      }
+    ),
+    E.match(
+      (e) => e,
+      (a) => a
+    )
   );
 };
 /**

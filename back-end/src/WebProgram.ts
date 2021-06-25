@@ -1,7 +1,7 @@
 /**
  * @since 1.0.0
  */
-import * as E from 'fp-ts/Either';
+import * as WP from 'fp-ts/Either';
 import * as IO from 'fp-ts/IO';
 import { flow, pipe, Predicate } from 'fp-ts/lib/function';
 import * as RT from 'fp-ts/ReaderTask';
@@ -109,7 +109,7 @@ export const fromTaskEither: <A>(ma: TE.TaskEither<Error, A>) => WebProgram<A> =
  * @category constructors
  * @since 1.0.0
  */
-export const fromEither: <A>(e: E.Either<Error, A>) => WebProgram<A> =
+export const fromEither: <A>(e: WP.Either<Error, A>) => WebProgram<A> =
   RTE.fromEither;
 /**
  * @category constructors

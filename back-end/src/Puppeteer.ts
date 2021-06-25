@@ -6,22 +6,24 @@ import { flow, pipe } from 'fp-ts/lib/function';
 import * as TE from 'fp-ts/TaskEither';
 import path from 'path';
 import P from 'puppeteer';
-import { anyToError, stackErrorInfos } from 'WebTeer/ErrorInfos';
 
-const PATH = path.resolve(__dirname, "./puppeteer.ts");
+import { anyToError, stackErrorInfos } from './ErrorInfos';
+
+const PATH = path.resolve(__filename);
 /**
  * @returns A page for `WebDeps`
  *
  * (`type WebProgram<A> = ReaderTaskEither<WebDeps,Error,A>`)
  * @since 1.0.0
  */
+export type LaunchOptions = P.LaunchOptions &
+  P.ChromeArgOptions &
+  P.BrowserOptions & {
+    product?: P.Product;
+    extraPrefsFirefox?: Record<string, unknown>;
+  };
 export const launchPage = (
-  options?: P.LaunchOptions &
-    P.ChromeArgOptions &
-    P.BrowserOptions & {
-      product?: P.Product;
-      extraPrefsFirefox?: Record<string, unknown>;
-    }
+  options?: LaunchOptions
 ): TE.TaskEither<Error, P.Page> =>
   pipe(
     () =>

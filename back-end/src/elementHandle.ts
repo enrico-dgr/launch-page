@@ -7,12 +7,12 @@ import { pipe, Predicate } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import path from 'path';
 import { ClickOptions, ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
-import { anyToError, stackErrorInfos } from 'WebTeer/ErrorInfos';
 
+import { anyToError } from './ErrorInfos';
 import { WebDeps } from './WebDeps';
 import * as WT from './WebProgram';
 
-const PATH = path.resolve(__dirname, "./elementHandle.ts");
+const PATH = path.resolve(__filename);
 /**
  * @since 1.0.0
  */

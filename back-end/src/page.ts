@@ -11,7 +11,7 @@ import {
 import { anyToError } from './ErrorInfos';
 import * as WT from './WebProgram';
 
-const ABSOLUTE_PATH = path.resolve(__dirname, "./page.ts");
+const ABSOLUTE_PATH = path.resolve(__filename);
 /**
  * @param xPath
  * @returns Array or empty array.
