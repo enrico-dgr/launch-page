@@ -1,9 +1,9 @@
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as P from 'puppeteer';
-import { anyToError } from 'WebTeer/ErrorInfos';
 
 import * as ElH from '../src/elementHandle';
+import { anyToError } from '../src/ErrorInfos';
 import * as _ from '../src/page';
 import * as WT from '../src/WebProgram';
 

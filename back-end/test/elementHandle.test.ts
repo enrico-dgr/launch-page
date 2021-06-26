@@ -4,7 +4,6 @@ import * as O from 'fp-ts/Option';
 import * as P from 'puppeteer';
 
 import * as _ from '../src/elementHandle';
-import * as WD from '../src/pageOfWebDeps';
 import * as WT from '../src/WebProgram';
 
 describe("Utils/ElementHandle", () => {
