@@ -13,7 +13,6 @@ import { Page } from 'puppeteer';
 
 import { createErrorFromErrorInfos, toString } from './ErrorInfos';
 import * as J from './Json';
-import { launchPage } from './Puppeteer';
 import { WebDeps } from './WebDeps';
 import * as WP from './WebProgram';
 
@@ -94,9 +93,16 @@ export const log = <A>(tea: TE.TaskEither<Error, A>) =>
         )(),
       (a) =>
         pipe(
-          J.stringify(a),
+          a === undefined || a === null
+            ? E.right<Error, string>(`${a}`)
+            : J.stringify(a),
           E.orElse((e) =>
-            pipe(C.warn(e)(), () => E.right<Error, string>(`${a}`))
+            pipe(
+              C.warn(
+                `Returned object is not stringifiable, undefined or null.\n` + e
+              )(),
+              () => E.right<Error, string>(`${a}`)
+            )
           ),
           E.map((toLog) =>
             C.log(

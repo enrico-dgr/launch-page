@@ -1,6 +1,6 @@
 import { flow, pipe } from 'fp-ts/function';
-import { IO } from 'fp-ts/lib/IO';
 import { Reader } from 'fp-ts/lib/Reader';
+import * as TE from 'fp-ts/lib/TaskEither';
 import * as O from 'fp-ts/Option';
 import * as S from 'fp-ts/Semigroup';
 import path from 'path';
@@ -14,7 +14,6 @@ import { FollowUser, LikeToPost, WatchStoryAtUrl } from '../Instagram/index';
 import {
     sendMessage, Settings as SettingsOfTelegram, settingsByLanguage as settingsOfTelegramByLanguage
 } from '../Telegram';
-import { newBadReport, newSkipReport, Report } from './logs/jsonDB';
 import { Settings as SettingsOfBots, settingsByBotChoice } from './settings';
 import { Bots, getPropertiesFromSettingsAndBotChoice } from './settingsByBotChoice';
 
@@ -34,6 +33,7 @@ enum enumOfActions {
  *
  */
 export type TypeOfActions = keyof typeof enumOfActions;
+
 /**
  *
  */
@@ -71,9 +71,30 @@ interface Settings {
 /**
  *
  */
+type KindsOfOutcomeOfAction = "Confirm" | "Skip" | "End";
+/**
+ *
+ */
+type Report = {
+  action: TypeOfActions;
+  href: string;
+  info: {};
+};
+/**
+ *
+ */
+type Loggers = {
+  [k in KindsOfOutcomeOfAction]: ((
+    newReport: Report
+  ) => TE.TaskEither<Error, void>)[];
+};
+/**
+ *
+ */
 interface InputOfBody {
   nameOfBot: Bots;
   language: Languages;
+  loggers?: Loggers;
   settings: Settings;
   options: Options;
 }
@@ -271,7 +292,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
       /**
        *
        */
-      type KindsOfOutcomeOfAction = "Confirm" | "Skip" | "End";
+
       type OutcomeOfAction = { outcome: KindsOfOutcomeOfAction; info: {} };
       /**
        *
@@ -381,10 +402,28 @@ const bodyOfActuator: BodyOfActuator = (D) => {
       // --------------------------
       // Skip, Confirm, End
       // --------------------------
+      const semigroupReportLoggers: S.Semigroup<
+        (newReport: Report) => TE.TaskEither<Error, void>
+      > = {
+        concat: (x, y) =>
+          flow((newReport: Report) =>
+            pipe(
+              x(newReport),
+              TE.chain(() => y(newReport))
+            )
+          ),
+      };
+      const ___emptyLogger = () => TE.of(undefined);
+      const concatAllReportLoggers = S.concatAll(semigroupReportLoggers)(
+        ___emptyLogger
+      );
+      /**
+       *
+       */
       const abstractionOfConfirmAndSkip: (
         nameOfFunction: KindsOfOutcomeOfAction,
         xpathOfButton: string,
-        newReport: (newReport: Report) => IO<void>
+        newReport?: ((newReport: Report) => TE.TaskEither<Error, void>)[]
       ) => (report: Report) => WP.WebProgram<ResultOfCycle> = (
         _nameOfFunction,
         _xpathOfButton,
@@ -402,7 +441,11 @@ const bodyOfActuator: BodyOfActuator = (D) => {
                 )
           ),
           WP.chain(EH.click()),
-          WP.chainFirst(() => WP.fromIO(_newReport(report))),
+          WP.chainFirst(() =>
+            WP.fromTaskEither(
+              concatAllReportLoggers(_newReport ?? [___emptyLogger])(report)
+            )
+          ),
           WP.map<void, ResultOfCycle>(() => _nameOfFunction),
           WP.orElseStackErrorInfos({
             message: `In message with bot ${D.nameOfBot}`,
@@ -418,16 +461,18 @@ const bodyOfActuator: BodyOfActuator = (D) => {
         Confirm: abstractionOfConfirmAndSkip(
           "Confirm",
           D.settings.message.buttonConfirm.relativeXPath,
-          (report: Report) => () => console.log(report)
+          D.loggers?.Confirm
         ),
         Skip: abstractionOfConfirmAndSkip(
           "Skip",
           D.settings.message.buttonSkip.relativeXPath,
-          newSkipReport
+          D.loggers?.Skip
         ),
         End: (report) =>
           pipe(
-            WP.fromIO(newBadReport(report)),
+            WP.fromTaskEither(
+              concatAllReportLoggers(D.loggers?.End ?? [___emptyLogger])(report)
+            ),
             WP.map<void, ResultOfCycle>(() => "End"),
             WP.orElseStackErrorInfos({
               message: `In message with bot ${D.nameOfBot}`,
@@ -523,6 +568,7 @@ const bodyOfActuator: BodyOfActuator = (D) => {
 export interface Input {
   nameOfBot: Bots;
   language: Languages;
+  loggers?: Loggers;
   options: Options;
 }
 export const actuator = (I: Input) => {

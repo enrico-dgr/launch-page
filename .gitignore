@@ -8,3 +8,5 @@ package-lock.json
 photos
 srcOld
 .*.md
+localCode
+playground

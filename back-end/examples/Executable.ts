@@ -21,10 +21,11 @@ const INJS = path.resolve(__dirname, "./deps.json");
 /**
  *
  */
-enum EnumNamesOfPrograms {
+export enum EnumNamesOfPrograms {
   "Socialgift",
+  "OpenBrowser",
 }
-type NamesOfPrograms = keyof typeof EnumNamesOfPrograms;
+export type NamesOfPrograms = keyof typeof EnumNamesOfPrograms;
 /**
  *
  */
@@ -50,7 +51,7 @@ type Runner<R extends J.Json, A> = (D: Deps<R>) => TE.TaskEither<Error, A>;
 /**
  *
  */
-type Executable<R extends J.Json, A> = {
+export type Executable<R extends J.Json, A> = {
   injecter: Injecter<R>;
   modifier: Modifier<R>;
   runner: Runner<R, A>;

@@ -12,7 +12,7 @@
     "removeComments": true,
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["./src", "./examples"],
+  "include": ["./src", "./examples", "./playground"],
   "exclude": [
     "node_modules",
     "**/node_modules/*",
