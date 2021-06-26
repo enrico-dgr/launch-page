@@ -1,5 +1,5 @@
 {
-  "counter": 71,
+  "counter": 74,
   "reports": [
     {
       "action": "Follow",
@@ -669,6 +669,39 @@
       "href": "https://instagram.com/p/CQjjXrTtRUt",
       "info": {
         "message": "Comment skipped because of option's skip === true"
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/thisisdamp",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/upaolamake",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
+      }
+    },
+    {
+      "action": "Follow",
+      "href": "https://instagram.com/upaolamake",
+      "info": {
+        "_tag": "NotFollowed",
+        "reason": {
+          "_tag": "AlreadyFollowed"
+        },
+        "isPrivate": false
       }
     }
   ]

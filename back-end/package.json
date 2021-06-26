@@ -5,11 +5,10 @@
   "main": "index.ts",
   "homepage": "https://gitlab.com/enrico-dgr/webteer",
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register build/src/localCode/socialgift.js --setDefaultTimeout 15000",
-    "start:validator": "ts-node -r tsconfig-paths/register build/src/localCode/socialgiftValidator.js --setDefaultTimeout 15000",
+    "start": "ts-node build/examples/index.js",
     "start:ob": "ts-node -r tsconfig-paths/register build/src/localCode/openBrowser.js",
     "nodemon": "nodemon",
-    "ts:start": "ts-node examples/executables.ts",
+    "ts:start": "ts-node examples/index.ts",
     "build": "tsc -b",
     "prod": "node build copy/index.js",
     "test": "jest",

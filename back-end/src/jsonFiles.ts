@@ -6,7 +6,7 @@ import { flow, pipe } from 'fp-ts/lib/function';
 import fs from 'fs';
 import path from 'path';
 
-import { createErrorFromErrorInfos, stackErrorInfos } from './ErrorInfos';
+import { stackErrorInfos } from './ErrorInfos';
 import * as J from './Json';
 
 const PATH = path.resolve(__filename);
@@ -23,8 +23,8 @@ export const getFromJsonFile = <A extends J.Json>(pathToJsonFile: string) =>
     E.orElse<Error, A, Error>(
       flow(
         stackErrorInfos({
-          message: "Some error while getting object from a json-file.",
-          nameOfFunction: "getFullJson",
+          message: "Some error while reading a json-file.",
+          nameOfFunction: getFromJsonFile.name,
           filePath: PATH,
         }),
         E.left
@@ -43,8 +43,8 @@ export const postToJsonFile = <A extends J.Json>(pathToJsonFile: string) => (
     E.orElse<Error, void, Error>(
       flow(
         stackErrorInfos({
-          message: "Some error while getting object from a json-file.",
-          nameOfFunction: "getFullJson",
+          message: "Some error while getting writing to a json-file.",
+          nameOfFunction: postToJsonFile.name,
           filePath: PATH,
         }),
         E.left

@@ -10,18 +10,18 @@ import P from 'puppeteer';
 import { anyToError, stackErrorInfos } from './ErrorInfos';
 
 const PATH = path.resolve(__filename);
-/**
- * @returns A page for `WebDeps`
- *
- * (`type WebProgram<A> = ReaderTaskEither<WebDeps,Error,A>`)
- * @since 1.0.0
- */
 export type LaunchOptions = P.LaunchOptions &
   P.ChromeArgOptions &
   P.BrowserOptions & {
     product?: P.Product;
     extraPrefsFirefox?: Record<string, unknown>;
   };
+/**
+ * @returns A page for `WebDeps`
+ *
+ * (`type WebProgram<A> = ReaderTaskEither<WebDeps,Error,A>`)
+ * @since 1.0.0
+ */
 export const launchPage = (
   options?: LaunchOptions
 ): TE.TaskEither<Error, P.Page> =>

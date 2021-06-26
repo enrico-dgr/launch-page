@@ -1,10 +1,35 @@
-import { pipe } from 'fp-ts/function';
-import * as TE from 'fp-ts/TaskEither';
-
-import { log } from '../src/utils';
-import { socialgiftExec as socialgift } from './socialgift';
+import { Deps, jsonExecutable, launchOptions } from './Executable';
+import { actuator, Options, Output } from './SocialGift/index';
 
 // -----------------------
 // Socialgift
 // -----------------------
-pipe(socialgift.injecter, TE.chain(socialgift.runner), log)();
+
+const socialgift = (opts: Options) =>
+  actuator({
+    language: "it",
+    nameOfBot: "Socialgift",
+    options: opts,
+  });
+
+const defaultDeps: Deps<Options> = {
+  nameOfProgram: "Socialgift",
+  user: null,
+  programOptions: {
+    skip: {
+      Follow: false,
+      Like: false,
+      Comment: true,
+      WatchStory: false,
+      Extra: true,
+    },
+    delayBetweenCycles: 3 * 60 * 1000,
+  },
+  launchOptions: {
+    ...launchOptions.default,
+    headless: true,
+  },
+};
+
+export const socialgiftExec = (user: string | null) =>
+  jsonExecutable<Options, Output>("Socialgift", user, socialgift)(defaultDeps);
