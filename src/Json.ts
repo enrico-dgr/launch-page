@@ -4,7 +4,6 @@
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as J from 'fp-ts/lib/Json';
-import { format } from 'prettier';
 
 /**
  * @ignore
@@ -32,7 +31,7 @@ export const stringify = <A>(a: A) =>
 export const parseToFormattedJson = <A>(a: A) =>
   pipe(
     stringify<A>(a),
-    E.map((stringified) => format(stringified, { parser: "json-stringify" }))
+    E.map((stringified) => JSON.stringify(stringified, null, 2))
   );
 /**
  * @since 1.0.0

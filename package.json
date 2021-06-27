@@ -1,6 +1,6 @@
 {
   "name": "launch-page",
-  "version": "1.0.3",
+  "version": "1.0.7",
   "description": "",
   "main": "lib/index.js",
   "module": "es6/index.js",
@@ -15,8 +15,11 @@
   },
   "scripts": {
     "clean": "rimraf ./build",
-    "pre-build": "npm run clean",
+    "prebuild": "npm run clean",
     "build": "tsc -p ./tsconfig.build.json && tsc -p ./tsconfig.build-es6.json",
+    "postbuild": "prettier --loglevel=silent --write \"./build/**/*.ts\"",
+    "prerelease": "cp package.json README.md build",
+    "release": "cd ./build && npm publish && cd ..",
     "dev:start": "ts-node build/examples/index.js",
     "dev:ts:start": "ts-node examples/index.ts",
     "dev:ts:listPrograms": "ts-node examples/Scripts/listPrograms.ts",
@@ -45,7 +48,7 @@
     "typescript": "^4.1.5"
   },
   "files": [
-    "build/es6",
-    "build/lib"
+    "es6",
+    "lib"
   ]
 }

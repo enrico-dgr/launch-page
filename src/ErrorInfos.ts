@@ -27,7 +27,7 @@ export const toString = (e: Error) => {
     `Error's stack: ${stack}`;
   return pipe(
     E.tryCatch(
-      () => destructError(e.name, JSON.stringify(e.message, null, 3), e.stack),
+      () => destructError(e.name, JSON.stringify(e.message, null, 2), e.stack),
       (err) => {
         C.warn(
           `### NOTE: error's message has not been formatted because it is not a valid ` +
