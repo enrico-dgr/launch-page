@@ -1,20 +1,52 @@
-## Available Scripts
+# Using fp-ts with puppeteer
 
-In the project directory, you can run:
+**:warning: DISCLAIMER :warning:**
 
-### `npm run server`
+This was just a way to learn fp-ts library using puppeteer. The main learning-project was the one contained in `example` dir.
 
-Runs the server API in the development mode.
+Eventually I decided to separate the main library from programs.
 
-./index.ts is the entry and ts-node will compile everything in src and front-end directories into the build dir.
-Open [http://localhost:5000](http://localhost:5000) to view it in the browser.
-The page will reload if you make edits.
+---
+`launch-page` centralizes the page for every operation you would do with puppeteer.
 
-### `npm run build`
+## Installation
 
-Build src, index.ts, front-ent into corrispondent directories into ./build.
+```bash
+npm install launch-page
+```
 
-### `npm run start`
+## Usage
 
-Will run the build dir.
+```ts
+import { 
+    LaunchOptions, launchPage
+    } from 'launch-page/Puppeteer';
+import { 
+    log, startFrom 
+    } from 'launch-page/utils';
 
+const launchOptions: LaunchOptions = {
+    headless: false,
+    userDataDir: `path/to/userDataDir`,
+    args: ["--lang=it"],
+    defaultViewport: { width: 1050, height: 800 }
+};
+
+const program: WP.WebProgram<void> = WP.of(undefined);
+
+// returns a `TE.TaskEither<Error, A>`,
+// where `A` is the output of `program`.
+const taskEitherOfProgram = 
+    startFrom(program)(launchPage(launchOptions));
+
+// returns a `TE.Task<void>`.
+// Logs the result, taking into 
+// account left type Error could have a 
+// json message to format. (This is because
+// I tried to format error message, keeping
+// the stack)
+const taskOfProgram = 
+    log(startFrom(program)(launchPage(launchOptions)));
+```
+
+To run the two programs, simply call them, as defined for `Task` type in `fp-ts`.
