@@ -44,7 +44,7 @@ const semigroupChainChecks: S.Semigroup<
   concat: (x, y) =>
     pipe(
       x,
-      WP.chain(({ isEmpty, badState }) => (isEmpty ? y : x))
+      WP.chain(({ isEmpty }) => (isEmpty ? y : x))
     ),
 };
 /**

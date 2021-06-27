@@ -48,7 +48,7 @@ export const chainAdd: <A, B>(
   chain((a) =>
     pipe(
       f(a),
-      RTE.chain((b) => of({ ...a, ...b }))
+      chain((b) => of({ ...a, ...b }))
     )
   );
 /**

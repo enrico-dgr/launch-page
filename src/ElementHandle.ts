@@ -406,7 +406,7 @@ export const matchOneSetOfHTMLProperties = <El extends Element, A>(
         A.findFirst(A.isEmpty)(setsOfWrongProps),
         O.match(
           () => setsOfWrongProps,
-          (a_) => [[]]
+          () => [[]]
         )
       )
     )

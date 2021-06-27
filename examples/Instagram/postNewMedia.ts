@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import path from 'path';
 import { devices } from 'puppeteer';
 
-import { click, uploadFile } from '../../src/elementHandle';
+import { click, uploadFile } from '../../src/ElementHandle';
 import { getPropertiesFromSettingsAndLanguage, Languages } from '../../src/SettingsByLanguage';
 import { browser, emulate, keyboard, reload, waitFor$x } from '../../src/WebDeps';
 import * as WP from '../../src/WebProgram';

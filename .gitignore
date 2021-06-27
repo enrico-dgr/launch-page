@@ -12,3 +12,4 @@ localCode
 playground
 logs
 .vscode
+deps.json

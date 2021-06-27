@@ -1,7 +1,7 @@
 import { pipe } from 'fp-ts/function';
 import path from 'path';
 
-import { click } from '../../src/elementHandle';
+import { click } from '../../src/ElementHandle';
 import { askData as askDataFromConsole } from '../../src/readline';
 import { getPropertiesFromSettingsAndLanguage, Languages } from '../../src/SettingsByLanguage';
 import { goto, keyboard, setUserAgent, waitFor$x } from '../../src/WebDeps';

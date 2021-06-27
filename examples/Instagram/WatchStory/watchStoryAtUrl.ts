@@ -55,7 +55,7 @@ const bodyOfWatchStoryAtUrl = (I: InputOfBody) => {
           WD.$x(I.settings.xpathOfButtonPermission),
           WP.chain(
             expectedLength((n) => n === 1)(
-              (els, r) => `${els.length} permission-button to story`
+              (els) => `${els.length} permission-button to story`
             )
           ),
           WP.map((els) => els[0]),
@@ -80,7 +80,7 @@ const bodyOfWatchStoryAtUrl = (I: InputOfBody) => {
       WD.$x(I.settings.xpathOfButtonPermission),
       WP.chain(
         expectedLength((n) => n === 0)(
-          (els, r) => `${els.length} permission-button to story`
+          (els) => `${els.length} permission-button to story`
         )
       ),
       WP.map(() => true),
@@ -96,7 +96,7 @@ const bodyOfWatchStoryAtUrl = (I: InputOfBody) => {
       WD.$x(I.settings.xpathOfButtonNext),
       WP.chain(
         expectedLength((n) => n === 1)(
-          (els, r) => `${els.length} scrollRight-button in story`
+          (els) => `${els.length} scrollRight-button in story`
         )
       ),
       WP.map((btns) => btns[0])

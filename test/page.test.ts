@@ -2,35 +2,20 @@ import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as P from 'puppeteer';
 
-import * as ElH from '../src/elementHandle';
+import * as ElH from '../src/ElementHandle';
 import { anyToError } from '../src/ErrorInfos';
-import * as _ from '../src/page';
+import * as _ from '../src/Page';
 import * as WT from '../src/WebProgram';
 
 describe("Utils/Page", () => {
   const timeout = 5000;
   let page: P.Page;
-  let inputSearch: P.ElementHandle;
-  let linkGoogleStore: P.ElementHandle;
   let titleXPath = '//*[text()="Google"]';
-  let title: P.ElementHandle[];
+
   beforeAll(async () => {
     // page
     page = await global.__BROWSER__.newPage();
     await page.goto("https://google.com");
-    //
-    inputSearch =
-      (await page.waitForXPath(`//input[@title='Cerca']`)) ??
-      (() => {
-        throw new Error("searchInput element is null");
-      })();
-    linkGoogleStore =
-      (await page.waitForXPath(`//a[text()='Google Store']`)) ??
-      (() => {
-        throw new Error("linkGoogleStore element is null");
-      })();
-
-    title = await page.$x(titleXPath);
   }, timeout);
   /**
    * $x

@@ -1,5 +1,6 @@
 import * as A from 'fp-ts/Array';
 import { pipe } from 'fp-ts/lib/function';
+import path from 'path';
 
 import { expectedLength } from '../../../src/ElementHandle';
 import { getPropertiesFromSettingsAndLanguage, Languages } from '../../../src/SettingsByLanguage';
@@ -13,6 +14,7 @@ import {
     Output as OutputOfClickButtonFollow, Reason as ReasonOfClickButtonFollow, tag
 } from './clickButtonFollow';
 
+const PATH = path.resolve(__filename);
 /**
  * @category Input of Body
  * @subcategory Subtype
@@ -175,12 +177,17 @@ const bodyOfFollowUser = (I: InputOfBody): WP.WebProgram<Output> => {
       WebDeps.$x(XPath),
       WP.chain(
         expectedLength((n) => n === 1)((els, r) => ({
-          // buttonFollowXPath: XPath,
-          // lenght: els.length,
-          // url: r.page.url(),
+          buttonFollowXPath: XPath,
+          lenght: els.length,
+          url: r.page.url(),
         }))
       ),
-      WP.map((els) => els[0])
+      WP.map((els) => els[0]),
+      WP.orElseStackErrorInfos({
+        message: `Can't find button-follow in profile page.`,
+        nameOfFunction: button.name,
+        filePath: PATH,
+      })
     );
   const buttonFollow = () => button(I.settings.buttonFollowXPath);
   const buttonAlreadyFollow = () => button(I.settings.buttonAlreadyFollowXPath);

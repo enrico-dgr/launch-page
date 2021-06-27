@@ -71,6 +71,7 @@ export const stackErrorInfos = (errorInfos: ErrorInfos) => (
 ): Error => {
   try {
     let tryToParseOrThrowOtherwise = JSON.parse(e.message);
+    tryToParseOrThrowOtherwise;
     return {
       message: e.message.replace(
         "[",

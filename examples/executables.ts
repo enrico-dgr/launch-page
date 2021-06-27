@@ -1,4 +1,3 @@
-import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as TE from 'fp-ts/TaskEither';
@@ -6,7 +5,7 @@ import * as fs from 'fs';
 import path from 'path';
 
 import { createErrorFromErrorInfos } from '../src/ErrorInfos';
-import { jsonFiles, readline, WebProgram as WP } from '../src/index';
+import { jsonFiles, readline, WebDeps, WebProgram as WP } from '../src/index';
 import * as J from '../src/Json';
 import { Deps, jsonExecutable, launchOptions, NamesOfPrograms } from './Executable';
 import { actuator, Options, Output } from './Socialgift/index';
@@ -19,13 +18,14 @@ const PATH = path.resolve(__dirname, "./executables.ts");
  * last element in path must be the file
  */
 const mkdir = (path: string) =>
-  pipe(path.split("/").reverse(), ([file, ...dirs]) =>
+  pipe(path.split("/").reverse().slice(1), ([...dirs]) =>
     pipe(
       dirs.reverse().forEach((dir, i) => {
         let subPathToDir: string = "";
-        for (let j = 0; j <= i; j++) {
+        for (let j = 0; j < i; j++) {
           subPathToDir = subPathToDir + `${dirs[j]}/`;
         }
+        subPathToDir += `${dir}/`;
         fs.existsSync(subPathToDir) ? undefined : fs.mkdirSync(subPathToDir);
       })
     )
@@ -127,10 +127,17 @@ export const socialgiftExec = (user: string | null) =>
 // Open browser
 // ----------------------------------
 
-const openBrowser = (): WP.WebProgram<undefined> =>
+const openBrowser = (): WP.WebProgram<void> =>
   pipe(
     readline.askData("Type `exit` to end browser session."),
-    WP.chain((read) => (read === "exit" ? WP.of(undefined) : openBrowser()))
+    WP.chain((read) =>
+      read !== "exit"
+        ? openBrowser()
+        : pipe(
+            WebDeps.browser,
+            WP.chainTaskK((browser) => () => browser.close())
+          )
+    )
   );
 
 const defaultDepsOB: Deps<null> = {

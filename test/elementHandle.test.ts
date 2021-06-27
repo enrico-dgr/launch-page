@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as P from 'puppeteer';
 
-import * as _ from '../src/elementHandle';
+import * as _ from '../src/ElementHandle';
 import * as WT from '../src/WebProgram';
 
 describe("Utils/ElementHandle", () => {

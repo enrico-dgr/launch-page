@@ -1,6 +1,5 @@
 import * as IOE from 'fp-ts/IOEither';
 import { pipe } from 'fp-ts/lib/function';
-import * as P from 'puppeteer';
 
 // ----------------------------
 // Variables

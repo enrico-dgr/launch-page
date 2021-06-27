@@ -1,4 +1,4 @@
-import { HTMLElementProperties, RelativeXPath } from 'src/elementHandle';
+import { HTMLElementProperties } from 'src/ElementHandle';
 
 import { TypeOfActions } from './index';
 
