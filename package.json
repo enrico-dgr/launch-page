@@ -1,5 +1,5 @@
 {
-  "name": "webteer",
+  "name": "launch-page",
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
@@ -18,7 +18,7 @@
     "dev:test": "jest",
     "docs": "docs-ts"
   },
-  "author": "enrico-dgr",
+  "author": "Enrico Di Grazia <enrico.digrazia98@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "fp-ts": "^2.10.4",
