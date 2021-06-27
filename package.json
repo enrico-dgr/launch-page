@@ -1,10 +1,18 @@
 {
   "name": "launch-page",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "lib/index.js",
   "module": "es6/index.js",
   "typings": "lib/index.d.ts",
+  "homepage": "https://github.com/enrico-dgr/launch-page",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enrico-dgr/launch-page"
+  },
+  "bugs": {
+    "url": "https://github.com/enrico-dgr/launch-page/issues"
+  },
   "scripts": {
     "clean": "rimraf ./build",
     "pre-build": "npm run clean",
@@ -35,5 +43,8 @@
     "ts-node": "^10.0.0",
     "tslint": "^6.1.3",
     "typescript": "^4.1.5"
-  }
+  },
+  "files": [
+    "./build/*"
+  ]
 }
