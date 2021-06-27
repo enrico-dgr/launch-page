@@ -104,18 +104,23 @@ export const otherPages: WP.WebProgram<Page[]> = onReaderPage(
  * @example
  * // You can simply emulate a device as
  * // it happens for puppeteer.
- * import { emulate } from 'WebTeer/dependencies.ts';
- * import * as WT from 'WebTeer/index.ts';
- * import { devices } from "puppeteer";
+ * import { pipe } from 'fp-ts/lib/function';
+ * import { emulate } from '../../src/Page';
+ * import * as WP from '../../src/WebProgram';
+ * import * as WD from '../../src/WebDeps';
+ * import { devices, launch } from "puppeteer";
  *
  * const iPhone = devices["iPhone 6"];
  *
  * (async ()=>{
  *  // ... launching puppeteer and deps
- *  pipe(
- *    emulate(iPhone)(r.page)
+ *  const browser = await launch();
+ *  const page = await browser.newPage();
+ *  //
+ *  await pipe(
+ *    WD.emulate(iPhone)
  *    // then change page or reload to see the effects
- *  )(deps: WT.WebDeps)
+ *  )(({ page }) as WD.WebDeps)()
  * })()
  * @since 1.0.0
  */
@@ -144,7 +149,7 @@ export const keyboard = {
   press: flow(PageUtils.keyboard.press, onReaderPage),
 };
 /**
- *
+ * @since 1.0.0
  */
 export const runOnAnyDifferentPage = <A>(
   wpa: WP.WebProgram<A>

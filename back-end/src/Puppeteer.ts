@@ -10,6 +10,9 @@ import P from 'puppeteer';
 import { anyToError, stackErrorInfos } from './ErrorInfos';
 
 const PATH = path.resolve(__filename);
+/**
+ * @ignore
+ */
 export type LaunchOptions = P.LaunchOptions &
   P.ChromeArgOptions &
   P.BrowserOptions & {

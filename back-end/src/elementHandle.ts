@@ -10,7 +10,7 @@ import { ClickOptions, ElementHandle, EvaluateFn, SerializableOrJSHandle } from 
 
 import { anyToError } from './ErrorInfos';
 import { WebDeps } from './WebDeps';
-import * as WT from './WebProgram';
+import * as WP from './WebProgram';
 
 const PATH = path.resolve(__filename);
 /**
@@ -18,22 +18,22 @@ const PATH = path.resolve(__filename);
  */
 export const click: (
   options?: ClickOptions | undefined
-) => (el: ElementHandle<Element>) => WT.WebProgram<void> = (options) => (el) =>
-  WT.fromTaskK(() => () => el.click(options))();
+) => (el: ElementHandle<Element>) => WP.WebProgram<void> = (options) => (el) =>
+  WP.fromTaskK(() => () => el.click(options))();
 /**
  * @since 1.0.0
  */
 export const evaluateClick: (
   el: ElementHandle<Element>
-) => WT.WebProgram<void> = (el) =>
-  WT.fromTaskK(() => () => el.evaluate((el: HTMLElement) => el.click()))();
+) => WP.WebProgram<void> = (el) =>
+  WP.fromTaskK(() => () => el.evaluate((el: HTMLElement) => el.click()))();
 /**
  * @since 1.0.0
  */
 export const getProperty = <T = never, El extends Element = never>(
   property: keyof El
-) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<T>> =>
-  WT.fromTaskEither(() =>
+) => (el: ElementHandle<Element>): WP.WebProgram<O.Option<T>> =>
+  WP.fromTaskEither(() =>
     el
       .getProperty(String(property))
       .then((jsh) => jsh?.jsonValue<T>())
@@ -67,8 +67,8 @@ export const isQualifiedAttributeName = (
  */
 export const getAttribute = <El extends Element = never>(
   qualifiedAttributeName: QualifiedAttributeName
-) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<string>> =>
-  WT.fromTaskEither(() =>
+) => (el: ElementHandle<Element>): WP.WebProgram<O.Option<string>> =>
+  WP.fromTaskEither(() =>
     el
       .evaluate(
         (el: El, qualifiedAttributeName) =>
@@ -87,7 +87,7 @@ export const getAttribute = <El extends Element = never>(
  */
 export const getPropertyOrAttribute = <T = never, El extends Element = never>(
   property: keyof El | QualifiedAttributeName
-) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<T | string>> =>
+) => (el: ElementHandle<Element>): WP.WebProgram<O.Option<T | string>> =>
   pipe(
     isQualifiedAttributeName(property)
       ? getAttribute(property)(el)
@@ -110,21 +110,21 @@ export const expectedLength: (
   errorObject: (els: ElementHandle<Element>[], r: WebDeps) => Object
 ) => (
   els: ElementHandle<Element>[]
-) => WT.WebProgram<ElementHandle<Element>[]> = (
+) => WP.WebProgram<ElementHandle<Element>[]> = (
   predicate: Predicate<number>
 ) => (errorObject) => (els) =>
   pipe(
-    WT.ask(),
-    WT.chain((r) =>
+    WP.ask(),
+    WP.chain((r) =>
       predicate(els.length)
-        ? WT.of(undefined)
-        : WT.leftFromErrorInfos<ElementHandle<Element>[]>({
+        ? WP.of(undefined)
+        : WP.leftFromErrorInfos<ElementHandle<Element>[]>({
             message: JSON.stringify(errorObject(els, r)),
             nameOfFunction: "expectedLength",
             filePath: PATH,
           })
     ),
-    WT.chain(() => WT.of(els))
+    WP.chain(() => WP.of(els))
   );
 /**
  * @deprecated
@@ -137,21 +137,21 @@ export const isNElementArray: (
   errorMessage: (els: ElementHandle<Element>[], r: WebDeps) => string
 ) => (
   els: ElementHandle<Element>[]
-) => WT.WebProgram<ElementHandle<Element>[]> = (
+) => WP.WebProgram<ElementHandle<Element>[]> = (
   howMany: (n: number) => boolean
 ) => (errorMessage) => (els) =>
   pipe(
-    WT.ask(),
-    WT.chain((r) =>
+    WP.ask(),
+    WP.chain((r) =>
       pipe(
         r,
-        WT.fromPredicate(
+        WP.fromPredicate(
           () => howMany(els.length),
           () => new Error(errorMessage(els, r))
         )
       )
     ),
-    WT.chain(() => WT.of(els))
+    WP.chain(() => WP.of(els))
   );
 /**
  * @deprecated
@@ -175,7 +175,7 @@ export const evaluate = <T extends EvaluateFn<any>>(
   pipe(
     el.evaluate(pageFunction, ...args),
     (prom) => () => () => prom,
-    WT.fromTaskK
+    WP.fromTaskK
   )();
 
 /**
@@ -183,8 +183,8 @@ export const evaluate = <T extends EvaluateFn<any>>(
  */
 export const $x = (XPath: string) => (
   el: ElementHandle<Element>
-): WT.WebProgram<ElementHandle<Element>[]> =>
-  WT.fromTaskEither(() =>
+): WP.WebProgram<ElementHandle<Element>[]> =>
+  WP.fromTaskEither(() =>
     el
       .$x(XPath)
       .then((els) => (els !== undefined ? E.right(els) : E.right([])))
@@ -197,10 +197,10 @@ export const $x = (XPath: string) => (
 export const type: (
   text: string,
   options?: { delay: number }
-) => (el: ElementHandle<Element>) => WT.WebProgram<void> = (text, options) => (
+) => (el: ElementHandle<Element>) => WP.WebProgram<void> = (text, options) => (
   el
 ) =>
-  WT.fromTaskEither(() =>
+  WP.fromTaskEither(() =>
     el
       .type(text, options)
       .then(() => E.right(undefined))
@@ -249,8 +249,8 @@ export const tellIfRelativeXPathExists = (relativeXPath: RelativeXPath) => (
 ) =>
   pipe(
     $x(relativeXPath.xpath)(el),
-    WT.map(A.isEmpty),
-    WT.map((b) =>
+    WP.map(A.isEmpty),
+    WP.map((b) =>
       b ? O.some<XPathResult>("NotFound") : O.some<XPathResult>("Found")
     )
   );
@@ -268,7 +268,7 @@ export type HTMLElementProperties<El extends Element, A> = (
  */
 const matchOnFirstProp = <El extends Element, A>(
   expectedProps: HTMLElementProperties<El, A>
-) => (el: ElementHandle<Element>): WT.WebProgram<O.Option<A | string>> => {
+) => (el: ElementHandle<Element>): WP.WebProgram<O.Option<A | string>> => {
   if (isQualifiedAttributeName(expectedProps[0][0])) {
     return getAttribute<El>(expectedProps[0][0])(el);
   } else if (isRelativePath(expectedProps[0][0])) {
@@ -282,11 +282,11 @@ const recursivelyCheckHTMLProperties = <El extends Element, A>(
   expectedProps: HTMLElementProperties<El, A>
 ) => (el: ElementHandle<El>) => (
   wrongProps: HTMLElementProperties<El, A>
-): WT.WebProgram<HTMLElementProperties<El, A>> =>
+): WP.WebProgram<HTMLElementProperties<El, A>> =>
   expectedProps.length > 0
     ? pipe(
         matchOnFirstProp<El, A>(expectedProps)(el),
-        WT.chain<O.Option<A | string>, HTMLElementProperties<El, A>>(
+        WP.chain<O.Option<A | string>, HTMLElementProperties<El, A>>(
           O.match(
             () =>
               recursivelyCheckHTMLProperties(expectedProps.slice(1))(el)([
@@ -305,7 +305,7 @@ const recursivelyCheckHTMLProperties = <El extends Element, A>(
           )
         )
       )
-    : WT.of(wrongProps);
+    : WP.of(wrongProps);
 
 /**
  * Check all properties to match with `expectedProps`
@@ -316,30 +316,30 @@ const recursivelyCheckHTMLProperties = <El extends Element, A>(
  */
 export const checkHTMLProperties = <El extends Element, A>(
   expectedProps: HTMLElementProperties<El, A>
-) => (el: ElementHandle<El>): WT.WebProgram<HTMLElementProperties<El, A>> =>
+) => (el: ElementHandle<El>): WP.WebProgram<HTMLElementProperties<El, A>> =>
   recursivelyCheckHTMLProperties(expectedProps)(el)([]);
 
 const recursivelyCheckHTMLPropertiesFromSets = <El extends Element, A>(
   setsOfExpectedProps: HTMLElementProperties<El, A>[]
 ) => (el: ElementHandle<El>) => (
   setsOfWrongProps: HTMLElementProperties<El, A>[]
-): WT.WebProgram<HTMLElementProperties<El, A>[]> =>
+): WP.WebProgram<HTMLElementProperties<El, A>[]> =>
   setsOfExpectedProps.length > 0
     ? pipe(
         checkHTMLProperties(setsOfExpectedProps[0])(el),
-        WT.chain((wrongProps) =>
+        WP.chain((wrongProps) =>
           recursivelyCheckHTMLPropertiesFromSets(setsOfExpectedProps.slice(1))(
             el
           )([...setsOfWrongProps, wrongProps])
         )
       )
-    : WT.of(setsOfWrongProps);
+    : WP.of(setsOfWrongProps);
 /**
  * @since 1.0.0
  */
 export const checkHTMLPropertiesFromSets = <El extends Element, A>(
   setsOfExpectedProps: HTMLElementProperties<El, A>[]
-) => (el: ElementHandle<El>): WT.WebProgram<HTMLElementProperties<El, A>[]> =>
+) => (el: ElementHandle<El>): WP.WebProgram<HTMLElementProperties<El, A>[]> =>
   recursivelyCheckHTMLPropertiesFromSets(setsOfExpectedProps)(el)([]);
 /**
  * @returns
@@ -348,46 +348,60 @@ export const checkHTMLPropertiesFromSets = <El extends Element, A>(
  * order of the input
  * e.g.
  * @example
+ * import * as WP from '../../src/WebProgram';
+ * import * as WD from '../../src/WebDeps';
+ * import { matchOneSetOfHTMLProperties } from '../../src/ElementHandle';
+ * import { pipe } from 'fp-ts/lib/function';
  * // ↓-- bad result
  * pipe(
- *  matchOneSetOfProperties([[["innerText","some wrong text"]]]),
- *  WT.map(
- * // first set of props ----↓  ↓---- first prop
- *    wrongSets => wrongSets[0][0]
+ *  WD.$x("//xpath"),
+ *  WP.chain((els) =>
+ *    matchOneSetOfHTMLProperties<HTMLElement, string>([
+ *      [["innerText", "some wrong text"]],
+ *    ])(els[0])
  *  ),
- *  WT.map(
- *    console.log
- *  ) // output -> ['innerText','some wrong text']
+ *  WP.map(
+ *    // first set of props ----↓  ↓---- first prop
+ *    (wrongSets) => wrongSets[0][0]
+ *  ),
+ *  WP.map(console.log) // output -> ['innerText','some wrong text']
  * );
  * // ↓-- bad result
  * pipe(
- *  matchOneSetOfProperties([[['...','...'],["./someWrongRelativeXPath","Found"]]]),
- *  WT.map(
- * // first set of props ----↓  ↓---- second prop
- *    wrongSets => wrongSets[0][1]
+ *  WD.$x("//xpath"),
+ *  WP.chain((els) =>
+ *    matchOneSetOfHTMLProperties<HTMLElement, string>([
+ *      [
+ *        ["innerHTML", "..."],
+ *        [{ xpath: "./someWrongRelativeXPath" }, "Found"],
+ *      ],
+ *    ])(els[0])
  *  ),
- *  WT.map(
- *    console.log
- *  ) // output -> ["./someWrongRelativeXPath","Found"]
+ *  WP.map(
+ *    // first set of props ----↓  ↓---- second prop
+ *    (wrongSets) => wrongSets[0][1]
+ *  ),
+ *  WP.map(console.log) // output -> ["./someWrongRelativeXPath","Found"]
  * );
  * // ↓-- good result
  * pipe(
- *  matchOneSetOfProperties([[["innerText","some good text"]]]),
- *  WT.map(
- *    wrongSets => wrongSets
+ *  WD.$x("//xpath"),
+ *  WP.chain((els) =>
+ *    matchOneSetOfHTMLProperties<HTMLElement, string>([
+ *      [["innerText", "some good text"]],
+ *    ])(els[0])
  *  ),
- *  WT.map(
- *    console.log
- *  ) // output -> [[]]
+ *  WP.map((wrongSets) => wrongSets),
+ *  WP.map(console.log) // output -> [[]]
  * );
  * @since 1.0.0
  */
 export const matchOneSetOfHTMLProperties = <El extends Element, A>(
   setsOfExpectedProps: HTMLElementProperties<El, A>[]
-) => (el: ElementHandle<El>): WT.WebProgram<HTMLElementProperties<El, A>[]> =>
+) => (el: ElementHandle<El>): WP.WebProgram<HTMLElementProperties<El, A>[]> =>
   pipe(
     checkHTMLPropertiesFromSets<El, A>(setsOfExpectedProps)(el),
-    WT.map((setsOfWrongProps) =>
+    WP.map((setsOfWrongProps) =>
       pipe(
         A.findFirst(A.isEmpty)(setsOfWrongProps),
         O.match(
@@ -402,10 +416,10 @@ export const matchOneSetOfHTMLProperties = <El extends Element, A>(
  */
 export const uploadFile: (
   ...filePaths: string[]
-) => (el: ElementHandle<Element>) => WT.WebProgram<void> = (...filePaths) => (
+) => (el: ElementHandle<Element>) => WP.WebProgram<void> = (...filePaths) => (
   el
 ) =>
-  WT.fromTaskEither(() =>
+  WP.fromTaskEither(() =>
     el
       .uploadFile(...filePaths)
       .then(() => E.right<Error, void>(undefined))

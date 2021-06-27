@@ -1,7 +1,7 @@
-import * as C from 'fp-ts/Console';
 /**
  * @since 1.0.0
  */
+import * as C from 'fp-ts/Console';
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
 import * as path from 'path';

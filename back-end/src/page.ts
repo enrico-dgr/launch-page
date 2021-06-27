@@ -4,12 +4,10 @@
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
 import path from 'path';
-import {
-    Browser, ElementHandle, HTTPResponse, Keyboard, KeyInput, Page, WaitForOptions
-} from 'puppeteer';
+import { Browser, ElementHandle, HTTPResponse, KeyInput, Page, WaitForOptions } from 'puppeteer';
 
 import { anyToError } from './ErrorInfos';
-import * as WT from './WebProgram';
+import * as WP from './WebProgram';
 
 const ABSOLUTE_PATH = path.resolve(__filename);
 /**
@@ -20,24 +18,24 @@ const ABSOLUTE_PATH = path.resolve(__filename);
  */
 export const waitFor$x = (xPath: string) => (
   page: Page
-): WT.WebProgram<ElementHandle<Element>[]> =>
+): WP.WebProgram<ElementHandle<Element>[]> =>
   pipe(
-    WT.of(undefined),
-    WT.fromTaskK(() => () =>
+    WP.of(undefined),
+    WP.fromTaskK(() => () =>
       page
         .waitForXPath(xPath)
         .then(() => undefined)
         .catch(() => undefined)
     ),
-    WT.chain(() => $x(xPath)(page))
+    WP.chain(() => $x(xPath)(page))
   );
 /**
  * @since 1.0.0
  */
 export const $x = (XPath: string) => (
   page: Page
-): WT.WebProgram<ElementHandle<Element>[]> =>
-  WT.fromTaskEither(() =>
+): WP.WebProgram<ElementHandle<Element>[]> =>
+  WP.fromTaskEither(() =>
     page
       .$x(XPath)
       .then((els) => (els !== undefined ? E.right(els) : E.right([])))
@@ -51,24 +49,24 @@ export const $x = (XPath: string) => (
  */
 export const waitFor$$ = (selector: string) => (
   page: Page
-): WT.WebProgram<ElementHandle<Element>[]> =>
+): WP.WebProgram<ElementHandle<Element>[]> =>
   pipe(
-    WT.of(undefined),
-    WT.fromTaskK(() => () =>
+    WP.of(undefined),
+    WP.fromTaskK(() => () =>
       page
         .waitForSelector(selector)
         .then(() => undefined)
         .catch(() => undefined)
     ),
-    WT.chain(() => $$(selector)(page))
+    WP.chain(() => $$(selector)(page))
   );
 /**
  * @since 1.0.0
  */
 export const $$ = (selector: string) => (
   page: Page
-): WT.WebProgram<ElementHandle<Element>[]> =>
-  WT.fromTaskEither(() =>
+): WP.WebProgram<ElementHandle<Element>[]> =>
+  WP.fromTaskEither(() =>
     page
       .$$(selector)
       .then((els) => E.right(els))
@@ -77,8 +75,8 @@ export const $$ = (selector: string) => (
 /**
  * @since 1.0.0
  */
-export const goto = (url: string) => (page: Page): WT.WebProgram<void> =>
-  WT.fromTaskEither(() =>
+export const goto = (url: string) => (page: Page): WP.WebProgram<void> =>
+  WP.fromTaskEither(() =>
     page
       .goto(url)
       .then(() => E.right(undefined))
@@ -87,15 +85,15 @@ export const goto = (url: string) => (page: Page): WT.WebProgram<void> =>
 /**
  * @since 1.0.0
  */
-export const browser = (page: Page): WT.WebProgram<Browser> =>
-  WT.of(page.browser());
+export const browser = (page: Page): WP.WebProgram<Browser> =>
+  WP.of(page.browser());
 /**
  * @returns the new page
  * @since 1.0.0
  */
-export const openNewPage: (page: Page) => WT.WebProgram<Page> = flow(
+export const openNewPage: (page: Page) => WP.WebProgram<Page> = flow(
   browser,
-  WT.chainTaskK((b) => () => b.newPage())
+  WP.chainTaskK((b) => () => b.newPage())
 );
 /**
  *
@@ -105,34 +103,34 @@ export const openNewPage: (page: Page) => WT.WebProgram<Page> = flow(
  */
 export const openNewPageToUrl: (
   url: string
-) => (page: Page) => WT.WebProgram<Page> = (url) =>
+) => (page: Page) => WP.WebProgram<Page> = (url) =>
   flow(
     openNewPage,
-    WT.chain((page_) =>
+    WP.chain((page_) =>
       pipe(
         page_,
         goto(url),
-        WT.chain(() => WT.of(page_))
+        WP.chain(() => WP.of(page_))
       )
     )
   );
 /**
  * @since 1.0.0
  */
-export const close: (page: Page) => WT.WebProgram<void> = (page) =>
-  WT.fromTaskK(() => () => page.close())();
+export const close: (page: Page) => WP.WebProgram<void> = (page) =>
+  WP.fromTaskK(() => () => page.close())();
 /**
  * @since 1.0.0
  */
-export const otherPages: (page: Page) => WT.WebProgram<Page[]> = (page: Page) =>
+export const otherPages: (page: Page) => WP.WebProgram<Page[]> = (page: Page) =>
   pipe(
     page,
     browser,
-    WT.chainTaskK((b) => () => b.pages()),
-    WT.chain((pages) => {
+    WP.chainTaskK((b) => () => b.pages()),
+    WP.chain((pages) => {
       const pageIndex = pages.findIndex((page_) => page === page_);
       if (pageIndex < 0) {
-        return WT.left(
+        return WP.left(
           new Error(
             `Impossible case. No main page in pages found. pageIndex =${pageIndex}`
           )
@@ -140,9 +138,9 @@ export const otherPages: (page: Page) => WT.WebProgram<Page[]> = (page: Page) =>
       } else {
         const lastIndex = pages.length - 1;
         if (lastIndex > pageIndex) {
-          return WT.of(pages.slice(pageIndex + 1));
+          return WP.of(pages.slice(pageIndex + 1));
         } else {
-          return WT.right([]);
+          return WP.right([]);
         }
       }
     })
@@ -151,17 +149,17 @@ export const otherPages: (page: Page) => WT.WebProgram<Page[]> = (page: Page) =>
  * @todo refactoring using *otherPages* abstraction
  * @since 1.0.0
  */
-export const closeOtherPages: (page: Page) => WT.WebProgram<Page> = (
+export const closeOtherPages: (page: Page) => WP.WebProgram<Page> = (
   page: Page
 ) =>
   pipe(
     page,
     browser,
-    WT.chainTaskK((b) => () => b.pages()),
-    WT.chain((pages) => {
+    WP.chainTaskK((b) => () => b.pages()),
+    WP.chain((pages) => {
       const pageIndex = pages.findIndex((page_) => page === page_);
       if (pageIndex < 0) {
-        return WT.left(
+        return WP.left(
           new Error(
             `Impossible case. No main page in pages found. pageIndex =${pageIndex}`
           )
@@ -172,10 +170,10 @@ export const closeOtherPages: (page: Page) => WT.WebProgram<Page> = (
           return pipe(
             pages[lastIndex],
             close,
-            WT.chain(() => closeOtherPages(page))
+            WP.chain(() => closeOtherPages(page))
           );
         } else {
-          return WT.right(page);
+          return WP.right(page);
         }
       }
     })
@@ -183,29 +181,34 @@ export const closeOtherPages: (page: Page) => WT.WebProgram<Page> = (
 /**
  * @since 1.0.0
  */
-export const bringToFront = (page: Page): WT.WebProgram<void> =>
-  WT.fromTaskK(() => () => page.bringToFront())();
+export const bringToFront = (page: Page): WP.WebProgram<void> =>
+  WP.fromTaskK(() => () => page.bringToFront())();
 /**
  * @param options Look at puppeteer docs.
  *
  * @example
  * // You can simply emulate a device as
  * // it happens for puppeteer.
- * import { emulate } from 'WebTeer/page.ts';
- * import * as WT from 'WebTeer/index.ts';
- * import { devices } from "puppeteer";
+ * import { pipe } from 'fp-ts/lib/function';
+ * import { emulate } from '../../src/Page';
+ * import * as WP from '../../src/WebProgram';
+ * import * as WD from '../../src/WebDeps';
+ * import { devices, launch } from "puppeteer";
  *
  * const iPhone = devices["iPhone 6"];
  *
  * (async ()=>{
  *  // ... launching puppeteer and deps
- *  pipe(
- *    WT.ask(),
- *    WT.chain(r =>
+ *  const browser = await launch();
+ *  const page = await browser.newPage();
+ *  //
+ *  await pipe(
+ *    WP.ask(),
+ *    WP.chain(r =>
  *      emulate(iPhone)(r.page)
  *    )
  *    // then change page or reload to see the effects
- *  )(deps: WT.WebDeps)
+ *  )({ page } as WD.WebDeps)()
  * })()
  * @since 1.0.0
  */
@@ -216,39 +219,39 @@ export const emulate = (options: {
    */
   viewport: {};
   userAgent: string;
-}) => (page: Page): WT.WebProgram<void> =>
-  WT.fromTaskK(() => () => page.emulate(options as any))();
+}) => (page: Page): WP.WebProgram<void> =>
+  WP.fromTaskK(() => () => page.emulate(options as any))();
 /**
  * @since 1.0.0
  */
 export const setUserAgent = (userAgent: string) => (
   page: Page
-): WT.WebProgram<void> =>
-  WT.fromTaskK(() => () => page.setUserAgent(userAgent))();
+): WP.WebProgram<void> =>
+  WP.fromTaskK(() => () => page.setUserAgent(userAgent))();
 
 /**
  * @since 1.0.0
  */
 export const reload = (options?: WaitForOptions) => (
   page: Page
-): WT.WebProgram<HTTPResponse> =>
+): WP.WebProgram<HTTPResponse> =>
   pipe(
-    WT.fromTaskK(() => () => page.reload(options))(),
-    WT.chain((res) =>
+    WP.fromTaskK(() => () => page.reload(options))(),
+    WP.chain((res) =>
       res === null
-        ? WT.leftFromErrorInfos({
+        ? WP.leftFromErrorInfos({
             message: `Page reloading returned 'null' value.`,
             nameOfFunction: "reload",
             filePath: ABSOLUTE_PATH,
           })
-        : WT.right(res)
+        : WP.right(res)
     )
   );
 /**
  * @since 1.0.0
  */
 export const screen = (path: string) => (page: Page) =>
-  WT.fromTaskEither(() =>
+  WP.fromTaskEither(() =>
     page
       .screenshot({
         path,
@@ -269,15 +272,15 @@ export const keyboard = {
     options?: {
       delay?: number | undefined;
     }
-  ) => (page: Page): WT.WebProgram<void> =>
+  ) => (page: Page): WP.WebProgram<void> =>
     pipe(
-      WT.fromTaskEither(() =>
+      WP.fromTaskEither(() =>
         page.keyboard
           .type(text, options)
           .then(E.right)
           .catch((err) => anyToError<any, void>(err))
       ),
-      WT.orElseStackErrorInfos({
+      WP.orElseStackErrorInfos({
         message: `Page's keyboard failed to type.`,
         nameOfFunction: "keyboard.type",
         filePath: ABSOLUTE_PATH,
@@ -289,15 +292,15 @@ export const keyboard = {
       delay?: number | undefined;
       text?: string | undefined;
     }
-  ) => (page: Page): WT.WebProgram<void> =>
+  ) => (page: Page): WP.WebProgram<void> =>
     pipe(
-      WT.fromTaskEither(() =>
+      WP.fromTaskEither(() =>
         page.keyboard
           .press(text, options)
           .then(E.right)
           .catch((err) => anyToError<any, void>(err))
       ),
-      WT.orElseStackErrorInfos({
+      WP.orElseStackErrorInfos({
         message: `Page's keyboard failed to press.`,
         nameOfFunction: "keyboard.press",
         filePath: ABSOLUTE_PATH,

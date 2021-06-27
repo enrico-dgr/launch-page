@@ -18,29 +18,23 @@ export type SettingsByLanguage<TypeOfSettings> = {
 /**
  * @example
  * // FILE: src/googleSettings.ts
- * import { SettingsByLanguage } from 'WebTeer/settingsByLanguage';
+ * import {
+ *  SettingsByLanguage, getPropertiesFromSettingsAndLanguage, Languages
+ * } from '../../src/SettingsByLanguage';
  *
- * export interface Settings {
+ * export interface SettingsOfGoogle {
  *  inputXPath: string;
  *  // ... other settings
  * }
- * export const settingsByLanguage: SettingsByLanguage<Settings> = {
+ * export const settingsByLanguageOfGoogle: SettingsByLanguage<SettingsOfGoogle> = {
  *  it: {
- *    inputXPath: string;
+ *    inputXPath: '//input'
  *    // ... other settings
  *  }
  * }
  *
  * // FILE: src/program.ts
- * import {
- *  getPropertiesFromSettingsAndLanguage,
- *  Languages,
- *  SettingsByLanguage
- * } from 'WebTeer/settingsByLanguage';
- * import {
- *  Settings as SettingsOfGoogle,
- *  settingsByLanguage as settingsByLanguageOfGoogle
- * } from 'src/googleSettings.ts';
+ * import * as WP from "../../src/WebProgram";
  * // --------------------------------
  * // Input of program
  * // --------------------------------
@@ -53,7 +47,7 @@ export type SettingsByLanguage<TypeOfSettings> = {
  *  SettingsOfGoogle
  * >((sets) => ({
  *  inputXPath: sets.inputXPath,
- * }))(settingsByLanguageTelegram);
+ * }))(settingsByLanguageOfGoogle);
  * // -
  * interface InputOfProgram {
  *  settings: SettingsOfProgram
@@ -61,7 +55,7 @@ export type SettingsByLanguage<TypeOfSettings> = {
  * // --------------------------------
  * // Program
  * // --------------------------------
- * const program = (I: InputOfProgram) => pipe(...);
+ * const program = (I: InputOfProgram) => WP.asks(() => `do something`);
  * // -
  * export const runProgram = (language: Languages) =>
  *  program({ settings: settingsByLanguage(language)});

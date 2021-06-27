@@ -1,16 +1,17 @@
+/**
+ * @since 1.0.0
+ */
 import * as E from 'fp-ts/Either';
-import { flow, pipe } from 'fp-ts/lib/function';
+import { pipe } from 'fp-ts/lib/function';
 import * as J from 'fp-ts/lib/Json';
-import path from 'path';
 import { format } from 'prettier';
 
-const PATH = path.resolve(__filename);
 /**
- *
+ * @ignore
  */
 export type Json = J.Json;
 /**
- *
+ * @since 1.0.0
  */
 export const stringify = <A>(a: A) =>
   pipe(
@@ -26,7 +27,7 @@ export const stringify = <A>(a: A) =>
     )
   );
 /**
- *
+ * @since 1.0.0
  */
 export const parseToFormattedJson = <A>(a: A) =>
   pipe(
@@ -34,7 +35,7 @@ export const parseToFormattedJson = <A>(a: A) =>
     E.map((stringified) => format(stringified, { parser: "json-stringify" }))
   );
 /**
- *
+ * @since 1.0.0
  */
 export const parse = <A extends Json>(s: string) =>
   pipe(

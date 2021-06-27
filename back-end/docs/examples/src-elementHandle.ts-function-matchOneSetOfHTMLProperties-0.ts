@@ -1,32 +1,46 @@
+import * as WP from '../../src/WebProgram';
+import * as WD from '../../src/WebDeps';
+import { matchOneSetOfHTMLProperties } from '../../src/ElementHandle';
+import { pipe } from 'fp-ts/lib/function';
 // ↓-- bad result
 pipe(
- matchOneSetOfProperties([[["innerText","some wrong text"]]]),
- WT.map(
-// first set of props ----↓  ↓---- first prop
-   wrongSets => wrongSets[0][0]
+ WD.$x("//xpath"),
+ WP.chain((els) =>
+   matchOneSetOfHTMLProperties<HTMLElement, string>([
+     [["innerText", "some wrong text"]],
+   ])(els[0])
  ),
- WT.map(
-   console.log
- ) // output -> ['innerText','some wrong text']
+ WP.map(
+   // first set of props ----↓  ↓---- first prop
+   (wrongSets) => wrongSets[0][0]
+ ),
+ WP.map(console.log) // output -> ['innerText','some wrong text']
 );
 // ↓-- bad result
 pipe(
- matchOneSetOfProperties([[['...','...'],["./someWrongRelativeXPath","Found"]]]),
- WT.map(
-// first set of props ----↓  ↓---- second prop
-   wrongSets => wrongSets[0][1]
+ WD.$x("//xpath"),
+ WP.chain((els) =>
+   matchOneSetOfHTMLProperties<HTMLElement, string>([
+     [
+       ["innerHTML", "..."],
+       [{ xpath: "./someWrongRelativeXPath" }, "Found"],
+     ],
+   ])(els[0])
  ),
- WT.map(
-   console.log
- ) // output -> ["./someWrongRelativeXPath","Found"]
+ WP.map(
+   // first set of props ----↓  ↓---- second prop
+   (wrongSets) => wrongSets[0][1]
+ ),
+ WP.map(console.log) // output -> ["./someWrongRelativeXPath","Found"]
 );
 // ↓-- good result
 pipe(
- matchOneSetOfProperties([[["innerText","some good text"]]]),
- WT.map(
-   wrongSets => wrongSets
+ WD.$x("//xpath"),
+ WP.chain((els) =>
+   matchOneSetOfHTMLProperties<HTMLElement, string>([
+     [["innerText", "some good text"]],
+   ])(els[0])
  ),
- WT.map(
-   console.log
- ) // output -> [[]]
+ WP.map((wrongSets) => wrongSets),
+ WP.map(console.log) // output -> [[]]
 );
