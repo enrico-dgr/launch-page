@@ -5,7 +5,6 @@ import * as C from 'fp-ts/Console';
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
 import * as path from 'path';
-import { format } from 'prettier';
 
 import * as J from './Json';
 
@@ -28,12 +27,7 @@ export const toString = (e: Error) => {
     `Error's stack: ${stack}`;
   return pipe(
     E.tryCatch(
-      () =>
-        destructError(
-          e.name,
-          format(e.message, { parser: "json-stringify" }),
-          e.stack
-        ),
+      () => destructError(e.name, JSON.stringify(e.message, null, 3), e.stack),
       (err) => {
         C.warn(
           `### NOTE: error's message has not been formatted because it is not a valid ` +
