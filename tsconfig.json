@@ -16,10 +16,9 @@
   "exclude": [
     "node_modules",
     "**/node_modules/*",
-    "./build",
-    "./node_modules/@types/mongoose/**",
-    "./srcOld",
+    "build",
+    "srcOld",
     "docs",
-    "./src/localCode"
+    "src/localCode"
   ]
 }
