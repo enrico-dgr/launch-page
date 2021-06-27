@@ -45,6 +45,7 @@
     "typescript": "^4.1.5"
   },
   "files": [
-    "build"
+    "build/es6",
+    "build/lib"
   ]
 }
