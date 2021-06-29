@@ -31,7 +31,7 @@ export const stringify = <A>(a: A) =>
 export const parseToFormattedJson = <A>(a: A) =>
   pipe(
     stringify<A>(a),
-    E.map((stringified) => JSON.stringify(stringified, null, 2))
+    E.map((stringified) => JSON.stringify(JSON.parse(stringified), null, 2))
   );
 /**
  * @since 1.0.0
