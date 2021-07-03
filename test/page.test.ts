@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/lib/function';
 import * as P from 'puppeteer';
 
 import * as ElH from '../src/ElementHandle';
-import { anyToError } from '../src/ErrorInfos';
+import { anyToError } from '../src/ErrorUtils';
 import * as _ from '../src/Page';
 import * as WT from '../src/WebProgram';
 

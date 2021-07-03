@@ -5,6 +5,8 @@ import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as J from 'fp-ts/lib/Json';
 
+import * as EU from './ErrorUtils';
+
 /**
  * @ignore
  */
@@ -12,18 +14,10 @@ export type Json = J.Json;
 /**
  * @since 1.0.0
  */
-export const stringify = <A>(a: A) =>
+export const stringify = <A>(a: A): E.Either<Error, string> =>
   pipe(
     J.stringify<A>(a),
-    E.orElse((u) =>
-      pipe(
-        E.tryCatch(
-          () => new Error(JSON.stringify(u)),
-          () => new Error("Not stringifiable error object.")
-        ),
-        E.chain<Error, Error, string>(E.left)
-      )
-    )
+    E.orElse((e) => EU.anyToError(e))
   );
 /**
  * @since 1.0.0
@@ -36,16 +30,8 @@ export const parseToFormattedJson = <A>(a: A) =>
 /**
  * @since 1.0.0
  */
-export const parse = <A extends Json>(s: string) =>
+export const parse = <A extends Json>(s: string): E.Either<Error, A> =>
   pipe(
     J.parse(s) as E.Either<unknown, A>,
-    E.orElse((u) =>
-      pipe(
-        E.tryCatch(
-          () => (u instanceof Error ? u : new Error(JSON.stringify(u))),
-          () => new Error("Not stringifiable error object.")
-        ),
-        E.chain<Error, Error, A>(E.left)
-      )
-    )
+    E.orElse((e) => EU.anyToError(e))
   );

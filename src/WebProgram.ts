@@ -3,14 +3,14 @@
  */
 import * as WP from 'fp-ts/Either';
 import * as IO from 'fp-ts/IO';
-import { flow, pipe, Predicate } from 'fp-ts/lib/function';
+import { flow, Predicate } from 'fp-ts/lib/function';
 import * as RT from 'fp-ts/ReaderTask';
 import * as RTE from 'fp-ts/ReaderTaskEither';
 import * as S from 'fp-ts/Semigroup';
 import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
 
-import { anyToError, createErrorFromErrorInfos, ErrorInfos, stackErrorInfos } from './ErrorInfos';
+import * as EU from './ErrorUtils';
 import { WebDeps } from './WebDeps';
 
 /**
@@ -25,7 +25,7 @@ export interface WebProgram<A>
  */
 export const of: <A = never>(a: A) => WebProgram<A> = RTE.of;
 /**
- * @category — Functor
+ * @category Functor
  * @since 1.0.0
  */
 export const map: <A, B>(
@@ -38,19 +38,6 @@ export const map: <A, B>(
 export const chain: <A, B>(
   f: (a: A) => WebProgram<B>
 ) => (ma: WebProgram<A>) => WebProgram<B> = RTE.chain;
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const chainAdd: <A, B>(
-  f: (a: A) => WebProgram<B>
-) => (ma: WebProgram<A>) => WebProgram<A & B> = (f) =>
-  chain((a) =>
-    pipe(
-      f(a),
-      chain((b) => of({ ...a, ...b }))
-    )
-  );
 /**
  * @category combinators
  * @since 1.0.0
@@ -126,14 +113,7 @@ export const left: <A = never>(e: Error) => WebProgram<A> = RTE.left;
  * @since 1.0.0
  */
 export const leftAny: <E = never, A = never>(err: E) => WebProgram<A> = (err) =>
-  fromEither(anyToError(err));
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const leftFromErrorInfos = <A = never>(
-  errorInfos: ErrorInfos
-): WebProgram<A> => left(createErrorFromErrorInfos(errorInfos));
+  fromEither(EU.anyToError(err));
 /**
  * @category instances
  * @since 1.0.0
@@ -181,10 +161,8 @@ export const orElseW: <B>(
  * @category combinators
  * @since 1.0.0
  */
-export const orElseStackErrorInfos = <A>(errorInfos: ErrorInfos) => (
-  ma: WebProgram<A>
-): WebProgram<A> =>
-  orElse<A>((e: Error) => left(stackErrorInfos(errorInfos)(e)))(ma);
+export const orElseAppendMessage = <A>(message: string) =>
+  orElse<A>(flow(EU.appendMessage(message), left));
 /**
  * @category combinators
  * @since 1.0.0

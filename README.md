@@ -2,7 +2,7 @@
 
 **:warning: DISCLAIMER :warning:**
 
-This was just a way to learn fp-ts library using puppeteer. The main learning-project was the one contained in `example` dir.
+This was just a way to learn fp-ts library using puppeteer. The main learning-project is removed from repo.
 
 Eventually I decided to separate the main library from programs.
 

@@ -1,6 +1,6 @@
 {
   "name": "launch-page",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "",
   "main": "lib/index.js",
   "module": "es6/index.js",
@@ -17,8 +17,8 @@
     "clean": "rimraf ./build",
     "prebuild": "npm run clean",
     "build": "tsc -p ./tsconfig.build.json && tsc -p ./tsconfig.build-es6.json",
-    "postbuild": "prettier --loglevel=silent --write \"./build/**/*.ts\"",
-    "prerelease": "cp package.json README.md build",
+    "postbuild": "prettier --loglevel=silent --write \"./build/**/*.ts\" ",
+    "prerelease": "npm run build && cp package.json README.md build",
     "release": "cd ./build && npm publish && cd ..",
     "dev:start": "ts-node build/examples/index.js",
     "dev:ts:start": "ts-node examples/index.ts",
@@ -31,7 +31,6 @@
   "author": "Enrico Di Grazia <enrico.digrazia98@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "fp-ts": "^2.10.4",
     "puppeteer": "^7.1.0"
   },
   "devDependencies": {
@@ -46,6 +45,9 @@
     "ts-node": "^10.0.0",
     "tslint": "^6.1.3",
     "typescript": "^4.1.5"
+  },
+  "peerDependencies": {
+    "fp-ts": "^2.10.4"
   },
   "files": [
     "es6",

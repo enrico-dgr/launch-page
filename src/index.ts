@@ -2,7 +2,7 @@
  * @since 1.0.0
  */
 import * as ElementHandle from './ElementHandle';
-import * as ErrorInfos from './ErrorInfos';
+import * as ErrorInfos from './ErrorUtils';
 import * as Json from './Json';
 import * as jsonFiles from './jsonFiles';
 import * as Page from './Page';

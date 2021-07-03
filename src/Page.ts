@@ -3,13 +3,11 @@
  */
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/lib/function';
-import path from 'path';
 import { Browser, ElementHandle, HTTPResponse, KeyInput, Page, WaitForOptions } from 'puppeteer';
 
-import { anyToError } from './ErrorInfos';
+import * as EU from './ErrorUtils';
 import * as WP from './WebProgram';
 
-const ABSOLUTE_PATH = path.resolve(__filename);
 /**
  * @param xPath
  * @returns Array or empty array.
@@ -39,7 +37,7 @@ export const $x = (XPath: string) => (
     page
       .$x(XPath)
       .then((els) => (els !== undefined ? E.right(els) : E.right([])))
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );
 /**
  * @param selector
@@ -70,7 +68,7 @@ export const $$ = (selector: string) => (
     page
       .$$(selector)
       .then((els) => E.right(els))
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );
 /**
  * @since 1.0.0
@@ -80,7 +78,7 @@ export const goto = (url: string) => (page: Page): WP.WebProgram<void> =>
     page
       .goto(url)
       .then(() => E.right(undefined))
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );
 /**
  * @since 1.0.0
@@ -239,11 +237,7 @@ export const reload = (options?: WaitForOptions) => (
     WP.fromTaskK(() => () => page.reload(options))(),
     WP.chain((res) =>
       res === null
-        ? WP.leftFromErrorInfos({
-            message: `Page reloading returned 'null' value.`,
-            nameOfFunction: "reload",
-            filePath: ABSOLUTE_PATH,
-          })
+        ? WP.left(new Error(`Page reloading returned 'null' value.`))
         : WP.right(res)
     )
   );
@@ -257,7 +251,7 @@ export const screen = (path: string) => (page: Page) =>
         path,
       })
       .then(E.right)
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );
 
 // -----------------------
@@ -278,13 +272,9 @@ export const keyboard = {
         page.keyboard
           .type(text, options)
           .then(E.right)
-          .catch((err) => anyToError<any, void>(err))
+          .catch((err) => EU.anyToError<any, void>(err))
       ),
-      WP.orElseStackErrorInfos({
-        message: `Page's keyboard failed to type.`,
-        nameOfFunction: "keyboard.type",
-        filePath: ABSOLUTE_PATH,
-      })
+      WP.orElseAppendMessage(`Page's keyboard failed to type.`)
     ),
   press: (
     text: KeyInput,
@@ -298,12 +288,8 @@ export const keyboard = {
         page.keyboard
           .press(text, options)
           .then(E.right)
-          .catch((err) => anyToError<any, void>(err))
+          .catch((err) => EU.anyToError<any, void>(err))
       ),
-      WP.orElseStackErrorInfos({
-        message: `Page's keyboard failed to press.`,
-        nameOfFunction: "keyboard.press",
-        filePath: ABSOLUTE_PATH,
-      })
+      WP.orElseAppendMessage(`Page's keyboard failed to press.`)
     ),
 };

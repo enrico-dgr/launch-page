@@ -5,14 +5,12 @@ import * as A from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import { pipe, Predicate } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
-import path from 'path';
 import { ClickOptions, ElementHandle, EvaluateFn, SerializableOrJSHandle } from 'puppeteer';
 
-import { anyToError } from './ErrorInfos';
+import * as EU from './ErrorUtils';
 import { WebDeps } from './WebDeps';
 import * as WP from './WebProgram';
 
-const PATH = path.resolve(__filename);
 /**
  * @since 1.0.0
  */
@@ -42,7 +40,7 @@ export const getProperty = <T = never, El extends Element = never>(
           ? E.right(O.none)
           : E.right<Error, O.Option<T>>(O.some(json))
       )
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );
 /**
  * @since 1.0.0
@@ -80,7 +78,7 @@ export const getAttribute = <El extends Element = never>(
           ? E.right(O.none)
           : E.right<Error, O.Option<string>>(O.some(value))
       )
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );
 /**
  * @since 1.0.0
@@ -118,11 +116,9 @@ export const expectedLength: (
     WP.chain((r) =>
       predicate(els.length)
         ? WP.of(undefined)
-        : WP.leftFromErrorInfos<ElementHandle<Element>[]>({
-            message: JSON.stringify(errorObject(els, r)),
-            nameOfFunction: "expectedLength",
-            filePath: PATH,
-          })
+        : WP.left<ElementHandle<Element>[]>(
+            new Error(JSON.stringify(errorObject(els, r)))
+          )
     ),
     WP.chain(() => WP.of(els))
   );
@@ -188,7 +184,7 @@ export const $x = (XPath: string) => (
     el
       .$x(XPath)
       .then((els) => (els !== undefined ? E.right(els) : E.right([])))
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );
 
 /**
@@ -204,7 +200,7 @@ export const type: (
     el
       .type(text, options)
       .then(() => E.right(undefined))
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );
 
 /**
@@ -423,5 +419,5 @@ export const uploadFile: (
     el
       .uploadFile(...filePaths)
       .then(() => E.right<Error, void>(undefined))
-      .catch((err) => anyToError(err))
+      .catch((err) => EU.anyToError(err))
   );

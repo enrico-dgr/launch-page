@@ -2,14 +2,12 @@
  * @since 1.0.0
  */
 import * as E from 'fp-ts/Either';
-import { flow, pipe } from 'fp-ts/lib/function';
+import { pipe } from 'fp-ts/lib/function';
 import * as TE from 'fp-ts/TaskEither';
-import path from 'path';
 import P from 'puppeteer';
 
-import { anyToError, stackErrorInfos } from './ErrorInfos';
+import * as EU from './ErrorUtils';
 
-const PATH = path.resolve(__filename);
 /**
  * @ignore
  */
@@ -32,21 +30,16 @@ export const launchPage = (
     () =>
       P.launch(options)
         .then(E.right)
-        .catch((err) => anyToError<Error, P.Browser>(err)),
+        .catch((err) => EU.anyToError<Error, P.Browser>(err)),
     TE.chain<Error, P.Browser, P.Page>((browser) => () =>
       browser
         .newPage()
         .then((page) => E.right<Error, P.Page>(page))
-        .catch((err) => anyToError<Error, P.Page>(err))
+        .catch((err) => EU.anyToError<Error, P.Page>(err))
     ),
-    TE.orElse<Error, P.Page, Error>(
-      flow(
-        stackErrorInfos({
-          message: "Unknown error on launching puppeteer browser.",
-          nameOfFunction: "launch",
-          filePath: PATH,
-        }),
-        TE.left
+    TE.orElse<Error, P.Page, Error>((e) =>
+      TE.left(
+        EU.appendMessage("Unknown error on launching puppeteer browser.")(e)
       )
     )
   );

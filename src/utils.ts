@@ -8,15 +8,13 @@ import { IO } from 'fp-ts/lib/IO';
 import { Option } from 'fp-ts/lib/Option';
 import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
-import path from 'path';
 import { Page } from 'puppeteer';
 
-import { createErrorFromErrorInfos, toString } from './ErrorInfos';
+import { toString } from './ErrorUtils';
 import * as J from './Json';
 import { WebDeps } from './WebDeps';
 import * as WP from './WebProgram';
 
-const PATH = path.resolve(__filename);
 /**
  * @since 1.0.0
  */
@@ -68,12 +66,8 @@ export const startFromOptionPage = <A>(wpa: WP.WebProgram<A>) => (
   ioep: Option<Page>
 ): TE.TaskEither<Error, A> =>
   pipe(
-    TE.fromOption<Error>(() =>
-      createErrorFromErrorInfos({
-        message: `No page in Option<Page>.`,
-        nameOfFunction: startFromOptionPage.name,
-        filePath: PATH,
-      })
+    TE.fromOption<Error>(
+      () => new Error(`No page while starting process.`)
     )<Page>(ioep),
     startFrom(wpa)
   );
@@ -87,8 +81,9 @@ export const log = <A>(tea: TE.TaskEither<Error, A>) =>
       (e) =>
         C.error(
           `--------- --------- --------- --------- --------- ---------\n` +
-            `Program stopped because of left (handled error situation).\n` +
-            `--------- Message: ${toString(e)}\n` +
+            `-Error occurred.\n` +
+            `-Message:\n` +
+            `-${toString(e)}\n` +
             `--------- --------- --------- --------- --------- ---------`
         )(),
       (a) =>
